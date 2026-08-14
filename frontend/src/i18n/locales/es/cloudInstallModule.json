@@ -37,6 +37,7 @@
         "backendDeployDetail": "Despliega FastAPI en Google Cloud Run con los secretos correctos",
         "dataAuth": "Conexión de datos y autenticación",
         "dataAuthDetail": "Conecta MongoDB Atlas y verifica Firebase Auth en producción",
+        "security": "Endurecimiento de seguridad",
         "smokeTests": "Smoke tests",
         "smokeTestsDetail": "Ejecuta todos los smoke tests críticos y confirma que el despliegue funciona"
       },

@@ -12,9 +12,23 @@
 - `HMAC_SECRET` – HMAC-nøkkel for signering mellom agenter
 - `ALLOWED_ORIGINS` – tillatte CORS-origins, kommaseparert (f.eks. `https://your-app.vercel.app,http://localhost:3000`)
 - `PORT` – backend-port (Cloud Run setter denne automatisk, standard 8000)
+- `ALLOW_MOCK_AUTH` – **SIKKERHET**: når `true` returnerer backend en mock-bruker og alle endepunkter er åpne. **Må være `false` (eller ikke satt) i produksjon**, sammen med ekte Firebase-legitimasjon.
 - `ANTHROPIC_API_KEY` – Anthropic-API-nøkkel (valgfri, alternativ LLM)
 - `FIREBASE_SERVICE_ACCOUNT` – sti til Firebase-tjenestekonto-JSON
 - `LM_STUDIO_URL` – lokalt LM Studio-endepunkt (valgfritt, ikke brukt i skyen)
+
+#### Nyere agenter / moduler (valgfritt, sett kun hvis funksjonen brukes)
+- `API_PROVIDER` – LLM-gateway-leverandør: `openai` \| `openrouter` \| `itemai` (bruk `openai` i skyen; itemai/LM Studio er kun lokalt)
+- `OPENROUTER_API_KEY` – OpenRouter-nøkkel (alternativ LLM-leverandør)
+- `EMBED_MODEL` – embeddings-modell for Self-Simulating Reality-vektorbutikken / Kildekart (standard `text-embedding-3-small`; faller tilbake til offline TF-IDF uten `OPENAI_API_KEY`)
+- `AZURE_DEVOPS_PAT` (eller `ADO_PAT`) – Azure DevOps-PAT for Red Cross Web QA Agent (sprint / arbeidselement-innhenting)
+- `WAVE_API_KEY` – WebAIM WAVE-nøkkel for Red Cross QA tilgjengelighetssjekker
+- `ROBOMIND_ADMIN_TOKEN` – admin-port for Robomind Clinic innstillinger/policy-endepunkter
+- `EMAIL_PROVIDER` + `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`SMTP_FROM` (eller `SENDGRID_API_KEY`) – utgående e-post for Future-modulens "Notify Me"-flyt
+- `JWT_SECRET` – signeringshemmelighet for sesjon/JWT
+- `VOICEBOX_URL` – lokalt Voicebox-endepunkt (Language Agents; kun lokalt, faller tilbake til nettleser-TTS i skyen)
+
+> Merk: `OPENAI_API_KEY` driver nå også Self-Simulating Reality-embeddings (Kildekart) og Andrés the Robot bilde/syn. Uten den degraderer disse elegant (offline/mock), de krasjer ikke.
 - `BACKEND_BASE_URL` – basis-URL for FastAPI (standard http://localhost:8000)
 - `OUTSYSTEMS_CALLBACK_URL` – overstyrer standard callback ved behov
 - `OUTSYSTEMS_*` eller `N8N_*` – sett OutSystems, eller utelat for å bruke n8n-reserveløsning
@@ -61,12 +75,23 @@ gcloud run deploy wlwai-backend --image gcr.io/PROJECT/wlwai-backend --region eu
 
 ### Cloud Install-modul
 Modulen «Installing the App in the Cloud» gir en utrullingsarbeidsbenk i appen:
-- Klarhets-score og fremdriftssporing per seksjon
-- Arkitekturanbefalinger med kostnadsestimater
-- Maler for miljøvariabler med veiledning om sky-lagring
-- Automatiske røyktester mot live-endepunkter
-- Feilsøkingsguide (13 punkter over 5 kategorier)
-- API: `GET/POST /api/cloud-install/*` (7 endepunkter)
+- Klarhets-score over **7 seksjoner**: Arkitektur, Miljø og hemmeligheter, Frontend, Backend,
+  Data og Auth, **Sikkerhetsherding**, Røyktester.
+- Arkitekturanbefalinger med kostnadsestimater.
+- Maler for miljøvariabler med veiledning om sky-lagring (inkluderer nå de nyere agent-variablene over).
+- Automatiske røyktester mot live-endepunkter, inkludert et **"Agenter og moduler"-lag** som
+  pinger hver notabel agents health-endepunkt (Andrés `/api/andres/health`, Self-Simulating
+  Reality `/api/self-sim-reality/health`, Claim Analyzer, Self-Correcting Loop, Robomind
+  `/api/clinic/health`, Cybersecurity `/api/cyber/health`, AGI `/api/agi/progress`) — slik at
+  en deploy valideres til å faktisk servere modulene, ikke bare `/health`.
+- Feilsøkingsguide (nå med `modules`-, `security`- og resonneringsmodell-oppføringer).
+- API: `GET/POST /api/cloud-install/*` (7 endepunkter).
+
+### Sikkerhetsherding (før produksjon)
+- Sett **`ALLOW_MOCK_AUTH=false`** (eller la den være usatt) — ellers serverer backend en delt
+  mock-bruker og alle endepunkter er åpne.
+- Oppgi **ekte Firebase-legitimasjon** slik at auth ikke faller tilbake til mock-brukeren.
+- Modulens **Sikkerhetsherding**-seksjon sjekker begge og blir rød hvis noe er feil.
 
 ## Merknader
 - Oppdater CORS-origins til å inkludere frontend-verten(e) via `ALLOWED_ORIGINS`-miljøvariabelen.

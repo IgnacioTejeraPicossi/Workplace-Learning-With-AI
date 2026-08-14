@@ -112,7 +112,31 @@ def get_cloud_install_status() -> dict:
         "details": "Cloud MongoDB configured" if is_cloud_mongo else "Using local MongoDB" if mongo_uri else "No MongoDB URI",
     })
 
-    # 6. Smoke Tests — always pending until explicitly run
+    # 6. Security — production hardening gate. The single most important pre-prod
+    #    check: mock auth must be OFF and real Firebase credentials must be present,
+    #    otherwise every endpoint is open behind a shared mock user.
+    mock_auth_on = str(os.getenv("ALLOW_MOCK_AUTH", "")).strip().lower() in ("1", "true", "yes", "on")
+    firebase_present = bool(
+        os.getenv("FIREBASE_SERVICE_ACCOUNT")
+        or os.getenv("FIREBASE_CREDENTIALS")
+        or os.path.exists("serviceAccountKey.json")
+    )
+    sec_ok = (not mock_auth_on) and firebase_present
+    if sec_ok:
+        sec_detail = "Mock auth OFF, Firebase credentials present"
+    elif mock_auth_on:
+        sec_detail = "⚠ ALLOW_MOCK_AUTH is ON — every endpoint is open behind a mock user"
+    else:
+        sec_detail = "Firebase credentials not found — auth may fall back to a mock user"
+    sections.append({
+        "id": "security",
+        "label": "Security Hardening",
+        "status": "ready" if sec_ok else "not_started" if mock_auth_on else "partial",
+        "progress": 100 if sec_ok else 0 if mock_auth_on else 50,
+        "details": sec_detail,
+    })
+
+    # 7. Smoke Tests — always pending until explicitly run
     sections.append({
         "id": "smoke_tests",
         "label": "Smoke Tests",
@@ -373,6 +397,8 @@ def generate_deploy_checklist(scope: str = "all") -> dict:
             {"id": "be-7", "label": "Set ALLOWED_ORIGINS to Vercel frontend URL", "category": "backend", "required": True},
             {"id": "be-8", "label": "Verify /health returns 200", "category": "backend", "required": True},
             {"id": "be-9", "label": "Verify /ready returns 200", "category": "backend", "required": True},
+            {"id": "be-10", "label": "SECURITY: set ALLOW_MOCK_AUTH=false and provide real Firebase credentials", "category": "backend", "required": True, "help_text": "If ALLOW_MOCK_AUTH is true (or Firebase creds are missing) the backend serves a mock user and every endpoint is open."},
+            {"id": "be-11", "label": "Verify the agent modules respond (run the 'Agents & Modules' smoke layer)", "category": "backend", "required": True, "help_text": "Confirms Andrés, Self-Simulating Reality, Claim Analyzer, Self-Correcting Loop, Robomind, Cybersecurity and AGI all registered and return their /health."},
         ])
 
     if scope in ("database", "all"):

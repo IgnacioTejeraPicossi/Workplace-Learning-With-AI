@@ -37,6 +37,7 @@
         "backendDeployDetail": "Rull ut FastAPI til Google Cloud Run med riktige hemmeligheter",
         "dataAuth": "Data og autentisering",
         "dataAuthDetail": "Koble til MongoDB Atlas og verifiser Firebase Auth i produksjon",
+        "security": "Sikkerhetsherding",
         "smokeTests": "Røyktester",
         "smokeTestsDetail": "Kjør alle kritiske røyktester og bekreft at utrullingen fungerer"
       },

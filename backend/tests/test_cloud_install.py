@@ -22,10 +22,17 @@ def test_status_has_six_sections_and_score():
     assert s["ok"] is True and s["module"] == "cloud_install"
     assert isinstance(s["readinessScore"], int) and 0 <= s["readinessScore"] <= 100
     ids = [sec["id"] for sec in s["sections"]]
-    assert ids == ["architecture", "env_secrets", "frontend", "backend", "data_auth", "smoke_tests"]
+    assert ids == ["architecture", "env_secrets", "frontend", "backend", "data_auth", "security", "smoke_tests"]
     for sec in s["sections"]:
         assert 0 <= sec["progress"] <= 100
         assert sec["status"] in {"ready", "partial", "not_started"}
+
+
+def test_security_section_flags_mock_auth(monkeypatch):
+    # ALLOW_MOCK_AUTH on → security section must be not_started (0%), the loud red state
+    monkeypatch.setenv("ALLOW_MOCK_AUTH", "true")
+    sec = next(s for s in svc.get_cloud_install_status()["sections"] if s["id"] == "security")
+    assert sec["status"] == "not_started" and sec["progress"] == 0
 
 
 def test_env_template_includes_new_module_vars():

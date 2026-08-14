@@ -84,7 +84,7 @@ export default function CloudOverview() {
 
   const sectionIcons = {
     architecture: '⚙️', env_secrets: '🔐', frontend: '🚀',
-    backend: '🔧', data_auth: '🗄️', smoke_tests: '✅',
+    backend: '🔧', data_auth: '🗄️', security: '🛡️', smoke_tests: '✅',
   };
   const sectionTitles = {
     architecture: t('cloudInstall.overview.readiness.architecture'),
@@ -92,6 +92,7 @@ export default function CloudOverview() {
     frontend: t('cloudInstall.overview.readiness.frontendDeploy'),
     backend: t('cloudInstall.overview.readiness.backendDeploy'),
     data_auth: t('cloudInstall.overview.readiness.dataAuth'),
+    security: t('cloudInstall.overview.readiness.security'),
     smoke_tests: t('cloudInstall.overview.readiness.smokeTests'),
   };
   const statusMap = {

@@ -30,6 +30,29 @@ reusable.
 
 ---
 
+## [1.40.3] - 2026-08-14
+
+### Added — Cloud Install: Security Hardening readiness section + help doc refresh
+
+Follow-up to the [1.40.2] audit. Surfaced the top remaining gap and refreshed the help.
+
+- **New "🛡️ Security Hardening" readiness section** (`get_cloud_install_status`, now **7
+  sections**): checks that `ALLOW_MOCK_AUTH` is OFF **and** real Firebase credentials are
+  present — the single most important pre-prod gate. Shows red (0%) when mock-auth is on, so
+  it can't be missed in the headline score (previously this only lived in troubleshooting).
+  Frontend `CloudOverview.jsx` renders it dynamically (🛡️ icon + i18n title EN/ES/NO).
+- **Deploy checklist**: added `be-10` (set `ALLOW_MOCK_AUTH=false` + real Firebase) and
+  `be-11` (verify the agent modules respond via the new smoke layer).
+- **Help doc refreshed** (`docs/deployment.md` + `.es.md` + `.no.md`, shown in the README
+  Viewer): the newer-agent env vars, the `ALLOW_MOCK_AUTH` security var, the 7-section
+  readiness, the "Agents & Modules" smoke layer, and a "Security hardening before going live"
+  section.
+- **Tests**: `test_cloud_install.py` extended to 6 (7-section order incl. `security`; a
+  `monkeypatch` test that `ALLOW_MOCK_AUTH=true` flags the section red). Backend compile;
+  JSON/JSX; production build (exit 0).
+
+---
+
 ## [1.40.2] - 2026-08-14
 
 ### Changed — "Installing the App in the Cloud": audit + refresh for the newer agents/modules
