@@ -192,7 +192,8 @@
         "backend": "Backend",
         "auth": "Autentisering",
         "database": "Database",
-        "ai": "AI-lag"
+        "ai": "AI-lag",
+        "modules": "Agenter og moduler"
       }
     }
   }

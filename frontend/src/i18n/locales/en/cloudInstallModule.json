@@ -192,7 +192,8 @@
         "backend": "Backend",
         "auth": "Auth",
         "database": "Database",
-        "ai": "AI Layer"
+        "ai": "AI Layer",
+        "modules": "Agents & Modules"
       }
     }
   }

@@ -23,6 +23,21 @@ import httpx
 logger = logging.getLogger("cloud_install")
 
 
+# Representative agent/module health endpoints — the "modules" smoke-test layer
+# pings these so a cloud deploy is validated to actually serve the newer agents,
+# not just /health. Each shares the one backend. Keep to confirmed, always-200
+# endpoints (health probes, or a GET that returns 200 with no auth).
+MODULE_HEALTH_ENDPOINTS = [
+    ("Andrés the Robot",          "/api/andres/health"),
+    ("Self-Simulating Reality",   "/api/self-sim-reality/health"),
+    ("Claim Analyzer",            "/api/claim-analyzer/health"),
+    ("Self-Correcting Loop",      "/api/self-correcting-loop/health"),
+    ("Robomind Clinic",           "/api/clinic/health"),
+    ("Cybersecurity",             "/api/cyber/health"),
+    ("AGI Progress Tracker",      "/api/agi/progress"),
+]
+
+
 # ─── Status ─────────────────────────────────────────────────────────────────
 
 def get_cloud_install_status() -> dict:
@@ -254,14 +269,31 @@ def generate_env_template(scope: str = "all", include_optional: bool = True) -> 
             {"name": "HMAC_SECRET", "value_hint": "your-random-secret-key", "type": "secret", "description": "HMAC key for agent-to-agent signing", "cloud_note": "Store in Secret Manager", "required": True},
             {"name": "ALLOWED_ORIGINS", "value_hint": "https://your-app.vercel.app,https://your-domain.com", "type": "public", "description": "CORS allowed origins (comma-separated)", "cloud_note": "Must include your Vercel frontend URL", "required": True},
             {"name": "PORT", "value_hint": "8000", "type": "public", "description": "Backend port (Cloud Run sets $PORT automatically)", "cloud_note": "Cloud Run injects PORT env var", "required": True},
+            {"name": "ALLOW_MOCK_AUTH", "value_hint": "false", "type": "public", "description": "SECURITY: when true the backend returns a mock user and every endpoint is open. MUST be false (or unset) in production.", "cloud_note": "Set ALLOW_MOCK_AUTH=false in Cloud Run — and provide real Firebase credentials.", "required": True},
         ]
         if include_optional:
             backend_vars.extend([
-                {"name": "ANTHROPIC_API_KEY", "value_hint": "sk-ant-...", "type": "secret", "description": "Anthropic API key (alternative LLM)", "cloud_note": "Store in Secret Manager", "required": False},
-                {"name": "FIREBASE_SERVICE_ACCOUNT", "value_hint": "/path/to/serviceAccountKey.json", "type": "secret", "description": "Firebase service account JSON", "cloud_note": "Mount as volume or inline JSON in Secret Manager", "required": False},
+                # LLM gateway (provider selection + alternatives)
+                {"name": "API_PROVIDER", "value_hint": "openai", "type": "public", "description": "LLM gateway provider: openai | openrouter | itemai. Use 'openai' in cloud.", "cloud_note": "Set to 'openai' (itemai/LM Studio is local-only)", "required": False},
+                {"name": "ANTHROPIC_API_KEY", "value_hint": "sk-ant-...", "type": "secret", "description": "Anthropic API key (alternative LLM provider)", "cloud_note": "Store in Secret Manager", "required": False},
+                {"name": "OPENROUTER_API_KEY", "value_hint": "sk-or-...", "type": "secret", "description": "OpenRouter API key (alternative LLM provider)", "cloud_note": "Store in Secret Manager", "required": False},
+                {"name": "EMBED_MODEL", "value_hint": "text-embedding-3-small", "type": "public", "description": "Embeddings model for the Self-Simulating Reality vector store (Source Map). Falls back to offline TF-IDF if OPENAI_API_KEY is missing.", "cloud_note": "Optional; default is fine", "required": False},
+                # Auth / Firebase
+                {"name": "FIREBASE_SERVICE_ACCOUNT", "value_hint": "/path/to/serviceAccountKey.json", "type": "secret", "description": "Firebase service account JSON (real auth). Without it, auth may fall back to a mock user — see ALLOW_MOCK_AUTH.", "cloud_note": "Mount as volume or inline JSON in Secret Manager", "required": False},
+                {"name": "JWT_SECRET", "value_hint": "your-random-jwt-secret", "type": "secret", "description": "Session/JWT signing secret", "cloud_note": "Store in Secret Manager", "required": False},
+                # Red Cross Web QA Agent — Azure DevOps + accessibility
+                {"name": "AZURE_DEVOPS_PAT", "value_hint": "your-ado-personal-access-token", "type": "secret", "description": "Azure DevOps PAT (Red Cross QA Agent — sprint/work-item ingest). Also read as ADO_PAT.", "cloud_note": "Store in Secret Manager if the Red Cross QA ADO integration is used", "required": False},
+                {"name": "WAVE_API_KEY", "value_hint": "your-wave-key", "type": "secret", "description": "WebAIM WAVE API key (Red Cross QA accessibility checks)", "cloud_note": "Store in Secret Manager if used", "required": False},
+                # Robomind Clinic
+                {"name": "ROBOMIND_ADMIN_TOKEN", "value_hint": "your-admin-token", "type": "secret", "description": "Admin gate for Robomind Clinic settings/policy endpoints", "cloud_note": "Store in Secret Manager if Robomind admin is exposed", "required": False},
+                # Notify Me (Future module) — outbound email
+                {"name": "EMAIL_PROVIDER", "value_hint": "smtp", "type": "public", "description": "Email provider for 'Notify Me' confirmations/notifications: smtp | sendgrid", "cloud_note": "Set if the Future module email flow is used", "required": False},
+                {"name": "SMTP_HOST", "value_hint": "smtp.yourhost.com", "type": "optional", "description": "SMTP host (with SMTP_PORT/USER/PASS/FROM) for outbound email", "cloud_note": "Store SMTP_PASS in Secret Manager", "required": False},
+                # Local-only services (leave empty in cloud)
                 {"name": "LM_STUDIO_URL", "value_hint": "http://localhost:1234", "type": "optional", "description": "Local LM Studio endpoint (not used in cloud)", "cloud_note": "Remove or leave empty in cloud", "required": False},
-                {"name": "JIRA_BASE_URL", "value_hint": "https://your-domain.atlassian.net", "type": "optional", "description": "Jira integration (EA Agent)", "cloud_note": "Store in Secret Manager if used", "required": False},
-                {"name": "SLACK_BOT_TOKEN", "value_hint": "xoxb-...", "type": "optional", "description": "Slack bot token (EA Agent)", "cloud_note": "Store in Secret Manager if used", "required": False},
+                {"name": "VOICEBOX_URL", "value_hint": "http://127.0.0.1:5005", "type": "optional", "description": "Local Voicebox voice-cloning endpoint (Language Agents; local-only)", "cloud_note": "Not available in cloud — language agents fall back to browser TTS", "required": False},
+                {"name": "JIRA_BASE_URL", "value_hint": "https://your-domain.atlassian.net", "type": "optional", "description": "Jira integration (EA Second Brain Agent)", "cloud_note": "Store token in Secret Manager if used", "required": False},
+                {"name": "SLACK_BOT_TOKEN", "value_hint": "xoxb-...", "type": "optional", "description": "Slack bot token (EA Second Brain Agent)", "cloud_note": "Store in Secret Manager if used", "required": False},
             ])
         groups.append({
             "scope": "backend",
@@ -432,6 +464,13 @@ async def run_smoke_tests(
             "message": "AI key available" if has_ai else "No OPENAI_API_KEY or ANTHROPIC_API_KEY",
         })
 
+    if "modules" in layers:
+        # Verify the newer agents/modules actually respond after deployment.
+        # Each shares the same backend, so a failure here means the deploy is up
+        # but that module's router didn't register (or a dependency is missing).
+        for name, path in MODULE_HEALTH_ENDPOINTS:
+            checks.append(await _check_url(f"{backend_url}{path}", "modules", name))
+
     passed = sum(1 for c in checks if c["status"] == "pass")
     failed = sum(1 for c in checks if c["status"] == "fail")
     skipped = sum(1 for c in checks if c["status"] == "skip")
@@ -526,7 +565,15 @@ def get_troubleshooting(category: str = None) -> dict:
         {"id": "ts-db-2", "category": "database", "symptom": "Writes work locally but fail in cloud", "probable_cause": "Atlas user doesn't have write permissions", "fix": "Check Atlas → Database Access → verify user has readWriteAnyDatabase role.", "severity": "high"},
         # AI
         {"id": "ts-ai-1", "category": "ai", "symptom": "AI features return errors or [MOCKED RESPONSE]", "probable_cause": "OPENAI_API_KEY not set or invalid", "fix": "Set OPENAI_API_KEY in Cloud Run secrets. The app falls back to mock responses if no AI key is available.", "severity": "medium"},
-        {"id": "ts-ai-2", "category": "ai", "symptom": "LM Studio features don't work in cloud", "probable_cause": "LM Studio is a local-only service", "fix": "LM Studio (localhost:1234) is not available in cloud. The app uses OpenAI/Anthropic fallback automatically.", "severity": "low"},
+        {"id": "ts-ai-2", "category": "ai", "symptom": "LM Studio features don't work in cloud", "probable_cause": "LM Studio is a local-only service", "fix": "LM Studio (localhost:1234) is not available in cloud. Set API_PROVIDER=openai. The app uses OpenAI/Anthropic fallback automatically.", "severity": "low"},
+        {"id": "ts-ai-3", "category": "ai", "symptom": "A reasoning model returns empty text or [MOCKED RESPONSE] despite a valid key", "probable_cause": "gpt-5.x/o-series count reasoning tokens against max_completion_tokens; a small budget can leave no room for the answer", "fix": "Handled centrally (llm.py retries at ≥4096). Ensure OPENAI_API_KEY is set and the model isn't being called with a tiny max_tokens.", "severity": "medium"},
+        # New agents / modules (added 2026-08)
+        {"id": "ts-mod-1", "category": "modules", "symptom": "A new agent's page (Andrés, Self-Sim, Claim Analyzer, Robomind…) shows errors or only mock replies", "probable_cause": "OPENAI_API_KEY missing — it powers chat, the Self-Sim embeddings (Source Map) and Andrés image/vision", "fix": "Set OPENAI_API_KEY in Cloud Run secrets. Modules degrade gracefully (mock/offline) without it, but won't be fully live.", "severity": "high"},
+        {"id": "ts-mod-2", "category": "modules", "symptom": "Self-Simulating Reality Source Map says 'keyword (TF-IDF)' instead of 'semantic (embeddings)'", "probable_cause": "No OPENAI_API_KEY, so the vector store falls back to the offline TF-IDF backend", "fix": "Set OPENAI_API_KEY to enable the text-embedding-3-small semantic backend. This is a graceful degradation, not a crash.", "severity": "low"},
+        {"id": "ts-mod-3", "category": "modules", "symptom": "Red Cross QA Agent can't pull Azure DevOps sprints / work items", "probable_cause": "AZURE_DEVOPS_PAT (or ADO_PAT) not set, expired, or wrong org/project", "fix": "Set a valid AZURE_DEVOPS_PAT in Secret Manager with the correct org/project. The rest of the QA module works without it.", "severity": "medium"},
+        {"id": "ts-mod-4", "category": "modules", "symptom": "'Notify Me' (Future module) emails never arrive", "probable_cause": "EMAIL_PROVIDER / SMTP_* (or SENDGRID_API_KEY) not configured", "fix": "Set EMAIL_PROVIDER and the SMTP_HOST/PORT/USER/PASS/FROM (or a SendGrid key) in Cloud Run. Store secrets in Secret Manager.", "severity": "low"},
+        # Security
+        {"id": "ts-sec-1", "category": "security", "symptom": "Every endpoint is open / users see a shared 'mock' account", "probable_cause": "ALLOW_MOCK_AUTH is true, or Firebase credentials are missing so auth falls back to a mock user", "fix": "Set ALLOW_MOCK_AUTH=false AND provide real Firebase credentials (serviceAccountKey / FIREBASE_SERVICE_ACCOUNT) before going live.", "severity": "critical"},
     ]
 
     if category:

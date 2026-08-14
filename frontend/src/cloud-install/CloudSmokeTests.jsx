@@ -79,6 +79,25 @@ const LAYERS = [
       { id: 'ai-3', text: 'Errors are surfaced clearly when AI provider is unavailable', critical: false },
     ]
   },
+  {
+    key: 'modules',
+    icon: '🧩',
+    labelKey: 'cloudInstall.smoke.layers.modules',
+    color: '#0891b2',
+    bgColor: '#ecfeff',
+    borderColor: '#a5f3fc',
+    checks: [
+      { id: 'mod-1', text: 'Andrés the Robot — /api/andres/health returns 200', critical: true },
+      { id: 'mod-2', text: 'Self-Simulating Reality — /api/self-sim-reality/health returns 200', critical: true },
+      { id: 'mod-3', text: 'Claim Analyzer — /api/claim-analyzer/health returns 200', critical: false },
+      { id: 'mod-4', text: 'Self-Correcting Loop — /api/self-correcting-loop/health returns 200', critical: false },
+      { id: 'mod-5', text: 'Robomind Clinic — /api/clinic/health returns 200', critical: true },
+      { id: 'mod-6', text: 'Cybersecurity — /api/cyber/health returns 200', critical: false },
+      { id: 'mod-7', text: 'AGI Progress Tracker — /api/agi/progress returns data', critical: false },
+      { id: 'mod-8', text: 'Language Agents load (Spanish/English/… tabs open)', critical: false },
+      { id: 'mod-9', text: 'ALLOW_MOCK_AUTH is false in production (real auth enforced)', critical: true },
+    ]
+  },
 ];
 
 // Static fallback troubleshooting (used when backend is offline)
@@ -197,7 +216,7 @@ export default function CloudSmokeTests() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          layers: ['backend', 'frontend', 'auth', 'database', 'ai'],
+          layers: ['backend', 'frontend', 'auth', 'database', 'ai', 'modules'],
         }),
       });
       if (resp.ok) {

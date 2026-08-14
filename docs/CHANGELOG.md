@@ -30,6 +30,39 @@ reusable.
 
 ---
 
+## [1.40.2] - 2026-08-14
+
+### Changed — "Installing the App in the Cloud": audit + refresh for the newer agents/modules
+
+The deployment workbench was last updated ~April 2026 and didn't reflect the many agents
+and modules added since (Andrés, Self-Simulating Reality, Claim Analyzer, Self-Correcting
+Loop, Red Cross QA, AGI Tracker, Robomind, Language Agents, Notify-Me email…). Audited and
+refreshed — content is backend-driven, so the frontend picks it up automatically.
+
+- **New "🧩 Agents & Modules" smoke-test layer** — the biggest gap: deploys were only
+  validated with a generic `/health`. `run_smoke_tests(layers=["modules"])`
+  (`cloud_install_service.py`, `MODULE_HEALTH_ENDPOINTS`) now pings each notable agent's
+  health endpoint (Andrés, Self-Sim, Claim Analyzer, Self-Correcting Loop, Robomind Clinic,
+  Cybersecurity, AGI Progress). Added to the frontend's automated run and as a manual
+  checklist layer in `CloudSmokeTests.jsx` (i18n EN/ES/NO).
+- **Refreshed env template** (`generate_env_template`): added the real newer-module vars —
+  `API_PROVIDER`, `OPENROUTER_API_KEY`, `EMBED_MODEL` (Self-Sim vector store),
+  `AZURE_DEVOPS_PAT` + `WAVE_API_KEY` (Red Cross QA), `ROBOMIND_ADMIN_TOKEN`,
+  `EMAIL_PROVIDER` + `SMTP_HOST` (Notify-Me), `JWT_SECRET`, `VOICEBOX_URL` — and, crucially,
+  **`ALLOW_MOCK_AUTH`** flagged **required** with a security note (must be false in prod, or
+  every endpoint is open behind a mock user).
+- **Refreshed troubleshooting**: new `modules` entries (a module shows mock/errors → set
+  `OPENAI_API_KEY`; Source Map falls back to TF-IDF without embeddings; Red Cross QA can't
+  reach Azure DevOps; Notify-Me email not sending) + a `security` entry (mock-auth / missing
+  Firebase → open app) + an `ai` entry (reasoning-model empty output → the llm.py retry fix).
+- **Audit gap fixed**: the module had **no tests**. Added `backend/tests/test_cloud_install.py`
+  (5 offline: 6 readiness sections + score, env template has the new + security vars,
+  troubleshooting covers modules+security, the modules smoke layer is structured and
+  fail-safe against an unreachable host, status endpoint). Backend compile; JSON/JSX; i18n;
+  production build (exit 0). No schema change — the workbench renders the new data itself.
+
+---
+
 ## [1.40.0] - 2026-08-13
 
 ### Added — Self-Simulating Reality Agent: the "mind co-constructs reality" lineage (Pribram → Bohm → Grinberg)
