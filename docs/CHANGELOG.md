@@ -30,6 +30,27 @@ reusable.
 
 ---
 
+## [1.40.5] - 2026-08-17
+
+### Docs — AGI Progress Hub "help": README model list refreshed to the current 14 models
+
+The AGI Progress Hub help documentation (the README's "AGI Progress Tracker" section) still
+listed the April-2026 state ("Dataset expanded from 2 to **5 models**": GPT-4, GPT-5, Opus 4.6,
+Gemini 3.1 Pro, Opus 4.7). It now mirrors the live `DEFAULT_DATA` in
+`backend/routers/agi_progress.py`.
+
+- **`README.md` / `README.es.md` / `README.no.md`** — the AGI Progress Tracker bullet now
+  describes **14 models, refreshed through August 2026**: GPT-4 27% → GPT-5 58% → Opus
+  4.6/4.7/4.8 61/67/71% → Gemini 3.1 Pro 61% → Kimi K2.6/K3 (Moonshot, open-weight) 59/66% →
+  GPT-5.6 "Sol" 75% → Opus 5 76% → Gemini 3.6 Flash 66% → Grok 4.5/4.6 (xAI/SpaceXAI) 68/73% →
+  Fable 5 80% (requires usage credits). Keeps the honest caveat: text-first open-weight models
+  (Kimi) may lead coding benchmarks but score lower on *this* breadth metric because vision and
+  audio weigh equally. Trilingual parity preserved.
+- Docs-only change; no code paths touched. Guard test `test_agi_progress.py` remains the
+  data-integrity gate.
+
+---
+
 ## [1.40.4] - 2026-08-17
 
 ### Changed — AGI Progress Tracker: added Grok 4.6 (xAI/SpaceXAI)
