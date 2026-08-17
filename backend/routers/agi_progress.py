@@ -121,6 +121,12 @@ DEFAULT_DATA: List[AGIItem] = [
         total=68,
         notes="xAI, 2026. Strong agentic/coding: SWE-bench Pro 64.7% and leads Humanity's Last Exam (50.7%). Notably did NOT publish the classic academic benchmarks (GPQA/MMLU/AIME/SWE-bench Verified/ARC-AGI-2) at launch, reporting agentic/coding evals instead. Real-time knowledge via X integration; multimodal vision.",
     ),
+    AGIItem(
+        model="Grok 4.6", year=2026, month=8,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":8,"MS":0,"MR":7,"V":7,"A":5,"S":6},
+        total=73,
+        notes="SpaceXAI (xAI), 12 Aug 2026. Frontier reasoning + agentic coding and long-running tasks; 500K context; text+image input (text-only output). Artificial Analysis Intelligence Index 61 (up from Grok 4.5's 56) — third overall, matching GPT-5.6 Sol and overtaking Kimi K3. CursorBench v3.2 69.9%, DeepSWE 65.9%, APEX-Agents 57.5%, Terminal-Bench 26%. Available in Cursor (acquired by SpaceXAI), Grok Build, API, OpenRouter and Vercel. Native audio (A) still trails the fully-multimodal leaders, so its CHC-breadth score sits just below Opus 5 / GPT-5.6 Sol despite matching them on the intelligence index.",
+    ),
 ]
 
 
