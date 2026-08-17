@@ -30,6 +30,26 @@ reusable.
 
 ---
 
+## [1.40.4] - 2026-08-17
+
+### Changed — AGI Progress Tracker: added Grok 4.6 (xAI/SpaceXAI)
+
+Web-sourced refresh (my knowledge cutoff predates it) after the owner saw Grok 4.6 announced
+in Cursor.
+
+- **Grok 4.6** (SpaceXAI/xAI, 12 Aug 2026) added to `DEFAULT_DATA` — total **73** (CHC
+  10-domain breadth approximation; MS=0; total = sum). Artificial Analysis Intelligence Index
+  **61** (up from Grok 4.5's 56) — third overall, matching GPT-5.6 Sol and overtaking Kimi K3.
+  500K context, text+image input (text-only output); strong agentic coding / long-running
+  tasks (CursorBench 69.9%, DeepSWE 65.9%, APEX-Agents 57.5%). Available in Cursor (acquired
+  by SpaceXAI), Grok Build, API, OpenRouter, Vercel. Note in the entry: weaker native audio
+  keeps its breadth score just below Opus 5 / GPT-5.6 Sol despite matching them on the
+  intelligence index.
+- Subtitle updated (EN/ES/NO + JSX) "Grok 4.5 → Grok 4.5/4.6". Guard test `test_agi_progress.py`
+  still green (total==sum, MS=0, domains complete); backend compile; JSON; production build (exit 0).
+
+---
+
 ## [1.40.3] - 2026-08-14
 
 ### Added — Cloud Install: Security Hardening readiness section + help doc refresh
