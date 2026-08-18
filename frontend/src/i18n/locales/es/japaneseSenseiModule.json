@@ -9,6 +9,7 @@
       "kana": "Entrenador Kana",
       "kanji": "Dojo Kanji",
       "conversation": "Conversación",
+      "conversationAudio": "Conversación en audio",
       "vocabulary": "Vocabulario SRS",
       "grammar": "Gramática",
       "reading": "Lectura",
@@ -95,6 +96,19 @@
       "correctionLabel": "Corrección",
       "newConversation": "← Nueva conversación",
       "noLLM": "Tutor IA no disponible — mostrando respuesta simulada"
+    },
+    "conversationAudio": {
+      "title": "Conversación en audio",
+      "subtitle": "Práctica hablada con manos libres: tú hablas y el sensei responde en voz alta en japonés. Elige un tema y mantén la conversación.",
+      "startBtn": "Iniciar conversación hablada",
+      "speak": "Hablar",
+      "stopSpeaking": "Detener",
+      "listening": "Escuchando…",
+      "thinking": "El sensei está pensando…",
+      "autoSpeak": "Leer las respuestas en voz alta",
+      "replay": "Reproducir de nuevo",
+      "noAsr": "Tu navegador no admite reconocimiento de voz. Usa Chrome o Edge en un ordenador para la práctica con manos libres.",
+      "noVoice": "No hay una voz japonesa instalada en el sistema, por lo que puede que las respuestas no se lean en voz alta. Instala una voz japonesa en los ajustes de tu sistema operativo para escuchar al sensei."
     },
     "vocabulary": {
       "title": "Vocabulario SRS",

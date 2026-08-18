@@ -11,6 +11,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJapaneseTTS } from './useJapaneseTTS';
+import { useSpeechCapture } from '../hologram/useSpeechCapture';
 import KanjiStrokeAnimation from './KanjiStrokeAnimation';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -578,6 +579,204 @@ const TabConversation = () => {
           </div>
         </>
       )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Conversation Audio — hands-free SPOKEN conversation
+// ---------------------------------------------------------------------------
+// You speak (Web Speech ASR, ja-JP) → the sensei replies (same LLM endpoint as
+// the written Conversation Sensei tab) → the Japanese reply is spoken back
+// automatically (useJapaneseTTS). Reuses /api/japanese/conversation/message;
+// no backend change. Mirrors English Mastery AI's Conversation Audio tab.
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabConversationAudio = () => {
+  const { t, i18n } = useTranslation();
+  const tts = useJapaneseTTS();
+  const asr = useSpeechCapture({ lang: 'ja-JP', interim: true });
+
+  const [scenarios, setScenarios] = useState([]);
+  const [scenario, setScenario]   = useState('intro');
+  const [difficulty, setDifficulty] = useState('beginner');
+  const [started, setStarted]     = useState(false);
+  const [history, setHistory]     = useState([]); // {role:'user',content} | {role:'assistant',payload}
+  const [last, setLast]           = useState(null); // latest assistant payload
+  const [sending, setSending]     = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+
+  const spokenRef     = useRef(null);   // last reply already spoken (avoid repeats)
+  const transcriptRef = useRef('');     // latest ASR transcript (fresh in effects)
+  const sendRef       = useRef(null);   // latest sendUserTurn (avoid stale closure)
+  const wasListening  = useRef(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/japanese/conversation/scenarios?lang=${toLang(i18n.language)}`)
+      .then((r) => r.json()).then((d) => setScenarios(d.scenarios || [])).catch(() => {});
+  }, [i18n.language]);
+
+  useEffect(() => { transcriptRef.current = asr.transcript; }, [asr.transcript]);
+
+  // Auto-speak each new sensei reply once (the Japanese sentence).
+  useEffect(() => {
+    if (autoSpeak && last?.jp && spokenRef.current !== last.jp) {
+      spokenRef.current = last.jp;
+      tts?.speak?.(last.jp);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [last, autoSpeak]);
+
+  // Normalise history to {role, content} the way the backend expects
+  // (assistant content = the Japanese sentence it produced).
+  const wireHistory = (hist) => hist.map((h) => ({
+    role: h.role, content: h.role === 'assistant' ? (h.payload?.jp || '') : h.content,
+  }));
+
+  const start = async () => {
+    setStarted(true); setHistory([]); setLast(null); spokenRef.current = null;
+    setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/japanese/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: [], user_text: null, lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([{ role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  };
+
+  const sendUserTurn = useCallback(async (text) => {
+    if (!text || !text.trim() || sending) return;
+    const newHist = [...history, { role: 'user', content: text.trim() }];
+    setHistory(newHist); setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/japanese/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: wireHistory(newHist), user_text: text.trim(), lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([...newHist, { role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  }, [history, sending, scenario, difficulty, i18n.language]);
+
+  useEffect(() => { sendRef.current = sendUserTurn; });
+
+  // When listening stops (user released the mic or it auto-ended) send the turn.
+  useEffect(() => {
+    if (wasListening.current && !asr.isListening) {
+      const txt = transcriptRef.current;
+      if (txt && txt.trim()) { sendRef.current?.(txt); asr.reset(); }
+    }
+    wasListening.current = asr.isListening;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.isListening]);
+
+  const toggleMic = () => {
+    if (asr.isListening) { asr.stopListening(); return; }
+    tts?.stop?.();          // don't record the sensei's own voice
+    asr.startListening();
+  };
+
+  const reset = () => {
+    asr.stopListening(); tts?.stop?.();
+    setStarted(false); setHistory([]); setLast(null); spokenRef.current = null;
+  };
+
+  const bubble = (turn, i) => {
+    if (turn.role === 'user') return (
+      <div key={i} style={{ alignSelf: 'flex-end', background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`,
+                             borderRadius: 12, padding: '10px 14px', maxWidth: '75%', fontSize: 14, color: COLORS.ink,
+                             fontFamily: '"Yu Mincho","Noto Serif JP",serif' }}>{turn.content}</div>
+    );
+    const p = turn.payload;
+    return (
+      <div key={i} style={{ alignSelf: 'flex-start', background: '#fef8f0', border: `1px solid ${COLORS.border}`,
+                             borderLeft: `4px solid ${COLORS.accent}`, borderRadius: 12, padding: '12px 14px', maxWidth: '85%' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 700, margin: 0, flex: 1 }}>{p.jp}</p>
+          <button onClick={() => tts?.speak?.(p.jp)} title={t('japaneseSenseiModule.conversationAudio.replay')} style={{
+            background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 15, color: COLORS.accent, padding: 2, lineHeight: 1 }}>🔊</button>
+        </div>
+        {p.kana && p.kana !== p.jp && (
+          <p style={{ fontSize: 12, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif', margin: '4px 0 0' }}><strong style={{ color: COLORS.accent, fontSize: 9, letterSpacing: '0.1em' }}>{t('japaneseSenseiModule.conversation.kanaLabel')}:</strong> {p.kana}</p>
+        )}
+        {p.romaji && (<p style={{ fontSize: 11, color: COLORS.inkSoft, fontStyle: 'italic', margin: '4px 0 0' }}>{p.romaji}</p>)}
+        {p.translation && (<p style={{ fontSize: 12, color: COLORS.ink, marginTop: 6, paddingTop: 6, borderTop: `1px dashed ${COLORS.border}` }}>{p.translation}</p>)}
+        {p.hint && (<p style={{ fontSize: 11, color: COLORS.gold, marginTop: 6, fontStyle: 'italic' }}>💡 {p.hint}</p>)}
+        {p.correction && (<p style={{ fontSize: 11, color: '#2563eb', marginTop: 6, fontStyle: 'italic' }}>✎ {p.correction}</p>)}
+        {p.is_mock && (<p style={{ fontSize: 9, color: COLORS.gold, marginTop: 8, letterSpacing: '0.08em' }}>{t('japaneseSenseiModule.conversation.noLLM')}</p>)}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 880, margin: '0 auto' }}>
+      <SectionLabel index={10} label={t('japaneseSenseiModule.tabs.conversationAudio')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('japaneseSenseiModule.conversationAudio.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('japaneseSenseiModule.conversationAudio.subtitle')}</p>
+
+      {!asr.isSupported && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('japaneseSenseiModule.conversationAudio.noAsr')}</p>
+        </Card>
+      )}
+      {tts.status === 'no-voice' && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('japaneseSenseiModule.conversationAudio.noVoice')}</p>
+        </Card>
+      )}
+
+      {!started ? (
+        <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: '22px 24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
+            <div>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.conversation.scenario')}</p>
+              <select value={scenario} onChange={(e) => setScenario(e.target.value)}
+                      style={{ width: '100%', background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '9px 12px', fontSize: 13, color: COLORS.ink }}>
+                {scenarios.map((s) => (<option key={s.key} value={s.key}>{s.label}</option>))}
+              </select>
+            </div>
+            <div>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.conversation.difficulty')}</p>
+              <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}
+                      style={{ width: '100%', background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '9px 12px', fontSize: 13, color: COLORS.ink }}>
+                <option value="beginner">{t('japaneseSenseiModule.conversation.beginner')}</option>
+                <option value="intermediate">{t('japaneseSenseiModule.conversation.intermediate')}</option>
+                <option value="advanced">{t('japaneseSenseiModule.conversation.advanced')}</option>
+              </select>
+            </div>
+          </div>
+          <Button primary onClick={start} disabled={sending}>🎙 {t('japaneseSenseiModule.conversationAudio.startBtn')}</Button>
+        </div>
+      ) : (<>
+        <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: '18px 22px', maxHeight: 420, overflowY: 'auto', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {history.map(bubble)}
+          {sending && <div style={{ alignSelf: 'flex-start', color: COLORS.inkSoft, fontSize: 12 }}>{t('japaneseSenseiModule.conversationAudio.thinking')}</div>}
+        </div>
+
+        {/* Live interim transcript while the mic is open. */}
+        <div style={{ minHeight: 22, marginBottom: 10, fontSize: 13, color: asr.isListening ? COLORS.accent : COLORS.inkSoft, fontStyle: 'italic' }}>
+          {asr.isListening ? `🎙 ${asr.transcript || t('japaneseSenseiModule.conversationAudio.listening')}` : ''}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={toggleMic} disabled={sending || !asr.isSupported} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', fontSize: 15, fontWeight: 700,
+            borderRadius: 999, border: 'none', cursor: (sending || !asr.isSupported) ? 'not-allowed' : 'pointer',
+            background: asr.isListening ? '#b91c1c' : COLORS.accent, color: '#fff',
+            boxShadow: asr.isListening ? '0 0 0 4px rgba(220,38,38,0.2)' : '0 2px 8px rgba(220,38,38,0.2)',
+          }}>
+            {asr.isListening ? `⏹ ${t('japaneseSenseiModule.conversationAudio.stopSpeaking')}` : `🎙 ${t('japaneseSenseiModule.conversationAudio.speak')}`}
+          </button>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: COLORS.inkSoft, cursor: 'pointer' }}>
+            <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} />
+            {t('japaneseSenseiModule.conversationAudio.autoSpeak')}
+          </label>
+          <Button onClick={reset} style={{ marginLeft: 'auto' }}>{t('japaneseSenseiModule.conversation.newConversation')}</Button>
+        </div>
+      </>)}
     </div>
   );
 };
@@ -1233,6 +1432,7 @@ const JapaneseSensei = () => {
     { id: 'kana',         label: t('japaneseSenseiModule.tabs.kana'),         icon: 'あ' },
     { id: 'kanji',        label: t('japaneseSenseiModule.tabs.kanji'),        icon: '漢' },
     { id: 'conversation', label: t('japaneseSenseiModule.tabs.conversation'), icon: '💬' },
+    { id: 'conversationAudio', label: t('japaneseSenseiModule.tabs.conversationAudio'), icon: '🎙' },
     { id: 'vocabulary',   label: t('japaneseSenseiModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'grammar',      label: t('japaneseSenseiModule.tabs.grammar'),      icon: '📐' },
     { id: 'reading',      label: t('japaneseSenseiModule.tabs.reading'),      icon: '📖' },
@@ -1246,6 +1446,7 @@ const JapaneseSensei = () => {
       case 'kana':         return <TabKana />;
       case 'kanji':        return <TabKanji />;
       case 'conversation': return <TabConversation />;
+      case 'conversationAudio': return <TabConversationAudio />;
       case 'vocabulary':   return <TabVocabulary />;
       case 'grammar':      return <TabGrammar />;
       case 'reading':      return <TabReading />;

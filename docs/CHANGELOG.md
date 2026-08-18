@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.41.0] - 2026-08-17
+
+### Added — Japanese Sensei AI: "Conversation Audio" hands-free spoken tab
+
+Ported the hands-free spoken-practice flow from **English Mastery AI** to **Japanese
+Sensei AI** (the owner started a Japanese course at the University of Oslo). Until now
+Conversation Audio existed only for the English agent; this is the first of the other
+language agents to get it.
+
+- **`frontend/src/components/JapaneseSensei/JapaneseSensei.jsx`** — new `TabConversationAudio`
+  component + a 🎙 "Conversation Audio" tab inserted after "Conversation Sensei". You speak
+  (Web Speech ASR, `lang: 'ja-JP'`) → the sensei replies via the **existing**
+  `/api/japanese/conversation/message` endpoint → the Japanese sentence is spoken back with
+  `useJapaneseTTS` (auto-speak toggle + per-bubble 🔊 replay). Same robust mic pattern as the
+  English tab (interim transcript, send-on-release, no double-speak). Reuses the shared
+  `../hologram/useSpeechCapture` hook.
+- **No backend change** — the conversation endpoint already accepts
+  `scenario/difficulty/history/user_text/lang` and returns the structured
+  `{jp, kana, romaji, translation, hint, correction, is_mock}` payload; the audio tab renders
+  and speaks that same shape. No API/contract change.
+- Graceful degradation: warns if the browser lacks speech recognition, and if no Japanese
+  system TTS voice is installed (replies then display but may not be spoken).
+- **i18n** EN/NO/ES — `japaneseSenseiModule.tabs.conversationAudio` +
+  `japaneseSenseiModule.conversationAudio.*` (11 keys each). Parity verified (175 keys/locale).
+
+Validated: `@babel/parser` JSX parse (OK); i18n trilingual parity (OK). Frontend-only, low risk.
+Future: the same tab can now be replicated for the Chinese/Korean/other language agents.
+
+---
+
 ## [1.40.1] - 2026-08-13
 
 ### Added — Dev tooling: "prompt-shortcuts" skill + 6 curated slash commands
