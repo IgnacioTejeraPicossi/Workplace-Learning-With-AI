@@ -12,6 +12,7 @@
       "vocabulary": "Vokabular SRS",
       "falseFriends": "Falsos Amigos",
       "conversation": "Conversación",
+      "conversationAudio": "Samtale (lyd)",
       "writing": "Escritura",
       "culture": "Cultura"
     },
@@ -65,7 +66,10 @@
       "prev": "Forrige",
       "next": "Neste",
       "of": "{{n}} av {{total}}",
-      "levels": { "core": "grunnleggende", "advanced": "avansert" }
+      "levels": {
+        "core": "grunnleggende",
+        "advanced": "avansert"
+      }
     },
     "conjugation": {
       "title": "Conjugación",
@@ -110,6 +114,17 @@
       "upgrade": "Mer naturlig måte å si det på",
       "tip": "Undervisningstips"
     },
+    "conversationAudio": {
+      "title": "Samtale med lyd",
+      "subtitle": "Muntlig øving uten hendene: du snakker, læreren svarer høyt på spansk. Velg et scenario og hold samtalen i gang.",
+      "startBtn": "Start muntlig samtale",
+      "speak": "Snakk",
+      "stopSpeaking": "Stopp",
+      "listening": "Lytter…",
+      "thinking": "Læreren tenker…",
+      "autoSpeak": "Les opp svar automatisk",
+      "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge på datamaskin for håndfri øving."
+    },
     "writing": {
       "title": "Escritura",
       "subtitle": "Lim inn en spansk tekst og få tilbakemelding — ser/estar, kjønn, verb, aksenter",
@@ -120,7 +135,11 @@
       "corrected": "Korrigert tekst",
       "issues": "Funne problemer",
       "upgrades": "Forbedringer mot morsmålsnivå",
-      "registers": { "formal": "formell", "neutral": "nøytral", "informal": "uformell" },
+      "registers": {
+        "formal": "formell",
+        "neutral": "nøytral",
+        "informal": "uformell"
+      },
       "types": {
         "ser_estar": "ser / estar",
         "por_para": "por / para",

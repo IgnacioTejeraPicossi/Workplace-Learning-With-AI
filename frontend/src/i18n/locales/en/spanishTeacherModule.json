@@ -12,6 +12,7 @@
       "vocabulary": "Vocabulary SRS",
       "falseFriends": "Falsos Amigos",
       "conversation": "Conversación",
+      "conversationAudio": "Conversation Audio",
       "writing": "Escritura",
       "culture": "Cultura"
     },
@@ -65,7 +66,10 @@
       "prev": "Previous",
       "next": "Next",
       "of": "{{n}} of {{total}}",
-      "levels": { "core": "core", "advanced": "advanced" }
+      "levels": {
+        "core": "core",
+        "advanced": "advanced"
+      }
     },
     "conjugation": {
       "title": "Conjugación",
@@ -110,6 +114,17 @@
       "upgrade": "More native way to say it",
       "tip": "Teaching tip"
     },
+    "conversationAudio": {
+      "title": "Conversation Audio",
+      "subtitle": "Hands-free spoken practice: you talk, the teacher answers out loud in Spanish. Pick a scenario and keep the conversation going.",
+      "startBtn": "Start spoken conversation",
+      "speak": "Speak",
+      "stopSpeaking": "Stop",
+      "listening": "Listening…",
+      "thinking": "The teacher is thinking…",
+      "autoSpeak": "Auto-speak replies",
+      "noAsr": "Your browser does not support speech recognition. Try Chrome or Edge on desktop for hands-free practice."
+    },
     "writing": {
       "title": "Escritura",
       "subtitle": "Paste a Spanish text and get feedback — ser/estar, gender, verbs, accents",
@@ -120,7 +135,11 @@
       "corrected": "Corrected text",
       "issues": "Issues found",
       "upgrades": "Native-like upgrades",
-      "registers": { "formal": "formal", "neutral": "neutral", "informal": "informal" },
+      "registers": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      },
       "types": {
         "ser_estar": "ser / estar",
         "por_para": "por / para",

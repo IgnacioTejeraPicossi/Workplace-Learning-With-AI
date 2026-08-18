@@ -12,6 +12,7 @@
       "vocabulary": "Vocabulario SRS",
       "falseFriends": "Falsos Amigos",
       "conversation": "Conversación",
+      "conversationAudio": "Conversación en audio",
       "writing": "Escritura",
       "culture": "Cultura"
     },
@@ -65,7 +66,10 @@
       "prev": "Anterior",
       "next": "Siguiente",
       "of": "{{n}} de {{total}}",
-      "levels": { "core": "básico", "advanced": "avanzado" }
+      "levels": {
+        "core": "básico",
+        "advanced": "avanzado"
+      }
     },
     "conjugation": {
       "title": "Conjugación",
@@ -110,6 +114,17 @@
       "upgrade": "Forma más natural de decirlo",
       "tip": "Consejo docente"
     },
+    "conversationAudio": {
+      "title": "Conversación en audio",
+      "subtitle": "Práctica hablada con manos libres: tú hablas y el profe responde en voz alta en español. Elige un escenario y mantén la conversación.",
+      "startBtn": "Iniciar conversación hablada",
+      "speak": "Hablar",
+      "stopSpeaking": "Detener",
+      "listening": "Escuchando…",
+      "thinking": "El profe está pensando…",
+      "autoSpeak": "Leer las respuestas en voz alta",
+      "noAsr": "Tu navegador no admite reconocimiento de voz. Usa Chrome o Edge en un ordenador para la práctica con manos libres."
+    },
     "writing": {
       "title": "Escritura",
       "subtitle": "Pega un texto en español y recibe feedback — ser/estar, género, verbos, tildes",
@@ -120,7 +135,11 @@
       "corrected": "Texto corregido",
       "issues": "Problemas encontrados",
       "upgrades": "Mejoras hacia lo nativo",
-      "registers": { "formal": "formal", "neutral": "neutral", "informal": "informal" },
+      "registers": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      },
       "types": {
         "ser_estar": "ser / estar",
         "por_para": "por / para",

@@ -16,6 +16,7 @@ import React, { useState, useEffect, useCallback, useRef, createContext, useCont
 import { useTranslation } from 'react-i18next';
 import { useSpanishTTS } from './useSpanishTTS';
 import { useVoiceEngine } from '../shared/useVoiceEngine';
+import { useSpeechCapture } from '../hologram/useSpeechCapture';
 import VoiceSelector from '../shared/VoiceSelector';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -574,6 +575,192 @@ const TabConversation = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Conversación en audio — práctica hablada con manos libres
+// ---------------------------------------------------------------------------
+// Hablas (Web Speech ASR, es-ES) → el profe responde (mismo endpoint que la
+// pestaña Conversación escrita) → la respuesta se lee en voz alta (TTS, con
+// soporte de Voicebox / voz clonada vía useVoice). Reusa
+// /api/spanish/conversation/message; sin cambios en el backend. Réplica de la
+// pestaña Conversation Audio de English Mastery AI y Japanese Sensei AI.
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabConversationAudio = () => {
+  const { t, i18n } = useTranslation();
+  const lang = toLang(i18n.language);
+  const tts = useVoice();
+  const asr = useSpeechCapture({ lang: 'es-ES', interim: true });
+
+  const [scenarios, setScenarios] = useState([]);
+  const [scenario, setScenario] = useState('presentarse');
+  const [difficulty, setDifficulty] = useState('intermediate');
+  const [started, setStarted] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [last, setLast] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+
+  const spokenRef = useRef(null);       // last reply already spoken (avoid repeats)
+  const transcriptRef = useRef('');     // latest ASR transcript (fresh in effects)
+  const sendRef = useRef(null);         // latest sendUserTurn (avoid stale closure)
+  const wasListening = useRef(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/spanish/conversation/scenarios?lang=${lang}`)
+      .then((r) => r.json()).then((d) => setScenarios(d.scenarios || [])).catch(() => {});
+  }, [lang]);
+
+  useEffect(() => { transcriptRef.current = asr.transcript; }, [asr.transcript]);
+
+  // Auto-speak each new reply once.
+  useEffect(() => {
+    if (autoSpeak && last?.reply && spokenRef.current !== last.reply) {
+      spokenRef.current = last.reply;
+      tts?.speak?.(last.reply);
+    }
+  }, [last, autoSpeak, tts]);
+
+  const start = async () => {
+    setStarted(true); setHistory([]); setLast(null); spokenRef.current = null;
+    setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/spanish/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: [], lang }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([{ role: 'assistant', content: d.reply }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  };
+
+  const sendUserTurn = useCallback(async (text) => {
+    if (!text || !text.trim() || sending) return;
+    const newHist = [...history, { role: 'user', content: text.trim() }];
+    setHistory(newHist); setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/spanish/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: newHist, user_text: text.trim(), lang }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([...newHist, { role: 'assistant', content: d.reply }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  }, [history, sending, scenario, difficulty, lang]);
+
+  useEffect(() => { sendRef.current = sendUserTurn; });
+
+  // When listening stops (user released the mic or it auto-ended) send the turn.
+  useEffect(() => {
+    if (wasListening.current && !asr.isListening) {
+      const txt = transcriptRef.current;
+      if (txt && txt.trim()) { sendRef.current?.(txt); asr.reset(); }
+    }
+    wasListening.current = asr.isListening;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.isListening]);
+
+  const toggleMic = () => {
+    if (asr.isListening) { asr.stopListening(); return; }
+    tts?.stop?.();          // don't record the teacher's own voice
+    asr.startListening();
+  };
+
+  const reset = () => {
+    asr.stopListening(); tts?.stop?.();
+    setStarted(false); setHistory([]); setLast(null); spokenRef.current = null;
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 920, margin: '0 auto' }}>
+      <SectionLabel index={10} label={t('spanishTeacherModule.tabs.conversationAudio')} />
+      <h2 style={{ color: C.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('spanishTeacherModule.conversationAudio.title')}</h2>
+      <p style={{ color: C.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('spanishTeacherModule.conversationAudio.subtitle')}</p>
+
+      {!asr.isSupported && (
+        <Card accent={C.gold} style={{ background: C.goldLight || '#fffbeb', borderColor: '#fde68a', marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('spanishTeacherModule.conversationAudio.noAsr')}</p>
+        </Card>
+      )}
+
+      {!started ? (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
+          <div>
+            <label style={sublabel}>{t('spanishTeacherModule.conversation.scenario')}</label>
+            <select value={scenario} onChange={(e) => setScenario(e.target.value)} style={selectStyle}>{scenarios.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}</select>
+          </div>
+          <div>
+            <label style={sublabel}>{t('spanishTeacherModule.conversation.difficulty')}</label>
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={selectStyle}>
+              <option value="beginner">{t('spanishTeacherModule.conversation.beginner')}</option>
+              <option value="intermediate">{t('spanishTeacherModule.conversation.intermediate')}</option>
+              <option value="advanced">{t('spanishTeacherModule.conversation.advanced')}</option>
+            </select>
+          </div>
+          <Button primary onClick={start} disabled={sending}>🎙 {t('spanishTeacherModule.conversationAudio.startBtn')}</Button>
+        </div>
+      ) : (<>
+        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, maxHeight: 340, overflowY: 'auto', marginBottom: 14 }}>
+          {history.map((msg, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 8 }}>
+              <div style={{ background: msg.role === 'user' ? C.navy : C.accentLight, color: msg.role === 'user' ? '#fff' : C.ink, border: msg.role === 'user' ? 'none' : `1px solid ${C.accentBorder}`, borderRadius: 14, padding: '8px 12px', maxWidth: '75%', fontSize: 14 }}>{msg.content}</div>
+            </div>
+          ))}
+          {last && (
+            <Card accent={C.accent} style={{ marginTop: 10, background: C.accentLight, borderColor: C.accentBorder }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                {last.translation && <span style={{ fontSize: 12, color: C.inkSoft, fontStyle: 'italic' }}>{last.translation}</span>}
+                <SpeakBtn text={last.reply} tts={tts} style={{ marginLeft: 'auto' }} />
+              </div>
+              {last.correction && (<div style={{ marginBottom: 6 }}>
+                <span style={miniLabel(C.accent)}>✎ {t('spanishTeacherModule.conversation.correction')}</span>
+                <p style={{ fontSize: 12, color: '#7f1d1d', margin: '2px 0 0', fontStyle: 'italic' }}>{last.correction}</p>
+              </div>)}
+              {last.upgrade && (<div style={{ marginBottom: 6 }}>
+                <span style={miniLabel(C.green)}>▲ {t('spanishTeacherModule.conversation.upgrade')}</span>
+                <p style={{ fontSize: 13, color: C.green, margin: '2px 0 0', fontWeight: 600 }}>{last.upgrade}</p>
+              </div>)}
+              {last.tip && (<div>
+                <span style={miniLabel(C.gold)}>💡 {t('spanishTeacherModule.conversation.tip')}</span>
+                <p style={{ fontSize: 12, color: '#92400e', margin: '2px 0 0', fontStyle: 'italic' }}>{last.tip}</p>
+              </div>)}
+            </Card>
+          )}
+        </div>
+
+        {/* Live interim transcript while the mic is open. */}
+        <div style={{ minHeight: 22, marginBottom: 10, fontSize: 13, color: asr.isListening ? C.accent : C.inkSoft, fontStyle: 'italic' }}>
+          {asr.isListening
+            ? `🎙 ${asr.transcript || t('spanishTeacherModule.conversationAudio.listening')}`
+            : (sending ? t('spanishTeacherModule.conversationAudio.thinking') : '')}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={toggleMic}
+            disabled={sending || !asr.isSupported}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', fontSize: 15, fontWeight: 700,
+              borderRadius: 999, border: 'none', cursor: (sending || !asr.isSupported) ? 'not-allowed' : 'pointer',
+              background: asr.isListening ? '#dc2626' : C.accent, color: '#fff',
+              boxShadow: asr.isListening ? '0 0 0 4px rgba(220,38,38,0.2)' : '0 2px 8px rgba(170,21,27,0.2)',
+            }}
+          >
+            {asr.isListening
+              ? `⏹ ${t('spanishTeacherModule.conversationAudio.stopSpeaking')}`
+              : `🎙 ${t('spanishTeacherModule.conversationAudio.speak')}`}
+          </button>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: C.inkSoft, cursor: 'pointer' }}>
+            <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} />
+            {t('spanishTeacherModule.conversationAudio.autoSpeak')}
+          </label>
+          <Button onClick={reset} style={{ marginLeft: 'auto' }}>{t('spanishTeacherModule.conversation.newConversation')}</Button>
+        </div>
+      </>)}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Tab: Escritura
 // ═══════════════════════════════════════════════════════════════════════════════
 const TabWriting = () => {
@@ -742,6 +929,7 @@ const SpanishTeacher = () => {
     { id: 'vocabulary',   label: t('spanishTeacherModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'falseFriends', label: t('spanishTeacherModule.tabs.falseFriends'), icon: '⚠' },
     { id: 'conversation', label: t('spanishTeacherModule.tabs.conversation'), icon: '💬' },
+    { id: 'conversationAudio', label: t('spanishTeacherModule.tabs.conversationAudio'), icon: '🎙' },
     { id: 'writing',      label: t('spanishTeacherModule.tabs.writing'),      icon: '✍' },
     { id: 'culture',      label: t('spanishTeacherModule.tabs.culture'),      icon: '🎭' },
   ];
@@ -754,6 +942,7 @@ const SpanishTeacher = () => {
       case 'vocabulary':    return <TabVocabulary />;
       case 'falseFriends':  return <TabFalseFriends />;
       case 'conversation':  return <TabConversation />;
+      case 'conversationAudio': return <TabConversationAudio />;
       case 'writing':       return <TabWriting />;
       case 'culture':       return <TabCulture />;
       default:              return <TabDashboard onJump={setActiveTab} />;

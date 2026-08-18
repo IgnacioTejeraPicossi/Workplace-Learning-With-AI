@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.41.1] - 2026-08-17
+
+### Added — Spanish Teacher AI: "Conversation Audio" hands-free spoken tab
+
+Second language agent to get the hands-free spoken-practice flow (after Japanese Sensei AI
+in 1.41.0). Spanish Teacher already shared English's voice infrastructure
+(`useVoiceEngine` + `VoiceSelector`, incl. Voicebox / native-clone), so the port was clean.
+
+- **`frontend/src/components/SpanishTeacher/SpanishTeacher.jsx`** — new `TabConversationAudio`
+  + a 🎙 "Conversation Audio" tab after "Conversación". You speak (Web Speech ASR,
+  `lang: 'es-ES'`) → the teacher replies via the **existing**
+  `/api/spanish/conversation/message` endpoint → the reply is spoken back through the shared
+  `useVoice()` engine (auto-speak toggle + 🔊 button), which routes through Voicebox / the
+  cloned native voice when connected. Renders the same rich payload as the written tab
+  (reply + translation + correction + upgrade + tip). Reuses `../hologram/useSpeechCapture`.
+- **No backend change** — endpoint already accepts `scenario/difficulty/history/user_text/lang`
+  and returns `{reply, translation, correction, upgrade, tip}`. No API/contract change.
+- Graceful degradation: warns if the browser lacks speech recognition.
+- **i18n** EN/NO/ES — `spanishTeacherModule.tabs.conversationAudio` +
+  `spanishTeacherModule.conversationAudio.*` (9 keys each). Parity verified (123 keys/locale).
+
+Validated: `@babel/parser` JSX parse (OK); i18n trilingual parity (OK). Frontend-only, low risk.
+
+---
+
 ## [1.41.0] - 2026-08-17
 
 ### Added — Japanese Sensei AI: "Conversation Audio" hands-free spoken tab
