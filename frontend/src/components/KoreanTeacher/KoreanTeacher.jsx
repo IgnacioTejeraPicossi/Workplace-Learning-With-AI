@@ -10,9 +10,10 @@
  * Backend: /api/korean/*
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useKoreanTTS } from './useKoreanTTS';
+import { useSpeechCapture } from '../hologram/useSpeechCapture';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const toLang = (lng) => lng === 'es' ? 'es' : lng === 'no' ? 'no' : 'en';
@@ -782,6 +783,190 @@ const TabConversation = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Conversation Audio — hands-free SPOKEN conversation
+// ---------------------------------------------------------------------------
+// You speak (Web Speech ASR, ko-KR) → the teacher replies (same LLM endpoint as
+// the written Conversation tab) → the Korean reply is spoken back automatically
+// (useKoreanTTS). Reuses /api/korean/conversation/message; no backend change.
+// Mirrors the Conversation Audio tab of English / Japanese / Spanish / Chinese.
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabConversationAudio = () => {
+  const { t, i18n } = useTranslation();
+  const tts = useKoreanTTS();
+  const asr = useSpeechCapture({ lang: 'ko-KR', interim: true });
+
+  const [scenarios, setScenarios] = useState([]);
+  const [scenario, setScenario]   = useState('intro');
+  const [difficulty, setDifficulty] = useState('beginner');
+  const [started, setStarted]     = useState(false);
+  const [history, setHistory]     = useState([]); // {role:'user',content} | {role:'assistant',payload}
+  const [last, setLast]           = useState(null);
+  const [sending, setSending]     = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+
+  const spokenRef     = useRef(null);
+  const transcriptRef = useRef('');
+  const sendRef       = useRef(null);
+  const wasListening  = useRef(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/korean/conversation/scenarios?lang=${toLang(i18n.language)}`)
+      .then((r) => r.json()).then((d) => setScenarios(d.scenarios || [])).catch(() => {});
+  }, [i18n.language]);
+
+  useEffect(() => { transcriptRef.current = asr.transcript; }, [asr.transcript]);
+
+  useEffect(() => {
+    if (autoSpeak && last?.hangul && spokenRef.current !== last.hangul) {
+      spokenRef.current = last.hangul;
+      tts?.speak?.(last.hangul);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [last, autoSpeak]);
+
+  const wireHistory = (hist) => hist.map((h) => ({
+    role: h.role, content: h.role === 'assistant' ? (h.payload?.hangul || '') : h.content,
+  }));
+
+  const start = async () => {
+    setStarted(true); setHistory([]); setLast(null); spokenRef.current = null;
+    setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/korean/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: [], user_text: null, lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([{ role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  };
+
+  const sendUserTurn = useCallback(async (text) => {
+    if (!text || !text.trim() || sending) return;
+    const newHist = [...history, { role: 'user', content: text.trim() }];
+    setHistory(newHist); setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/korean/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: wireHistory(newHist), user_text: text.trim(), lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([...newHist, { role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  }, [history, sending, scenario, difficulty, i18n.language]);
+
+  useEffect(() => { sendRef.current = sendUserTurn; });
+
+  useEffect(() => {
+    if (wasListening.current && !asr.isListening) {
+      const txt = transcriptRef.current;
+      if (txt && txt.trim()) { sendRef.current?.(txt); asr.reset(); }
+    }
+    wasListening.current = asr.isListening;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.isListening]);
+
+  const toggleMic = () => {
+    if (asr.isListening) { asr.stopListening(); return; }
+    tts?.stop?.();
+    asr.startListening();
+  };
+
+  const reset = () => {
+    asr.stopListening(); tts?.stop?.();
+    setStarted(false); setHistory([]); setLast(null); spokenRef.current = null;
+  };
+
+  const bubble = (turn, i) => {
+    if (turn.role === 'user') return (
+      <div key={i} style={{ alignSelf: 'flex-end', background: COLORS.accent, color: '#fff',
+                             borderRadius: 12, padding: '10px 14px', maxWidth: '75%', fontSize: 15, fontWeight: 600, fontFamily: KOREAN_FONT }}>{turn.content}</div>
+    );
+    const p = turn.payload;
+    return (
+      <div key={i} style={{ alignSelf: 'flex-start', background: COLORS.redLight, border: `1px solid ${COLORS.redBorder}`,
+                             borderLeft: `4px solid ${COLORS.red}`, borderRadius: 12, padding: '12px 14px', maxWidth: '85%' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: KOREAN_FONT, fontWeight: 700, margin: 0, flex: 1 }}>{p.hangul}</p>
+          <button onClick={() => tts?.speak?.(p.hangul)} title={t('koreanTeacherModule.conversationAudio.replay')} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14 }}>🔊</button>
+        </div>
+        {p.romanization && <p style={{ fontSize: 12, color: COLORS.red, fontFamily: 'monospace', margin: '4px 0 0' }}><strong style={{ fontSize: 9, letterSpacing: '0.1em' }}>{t('koreanTeacherModule.conversation.romanizationLabel')}:</strong> {p.romanization}</p>}
+        {p.translation && <p style={{ fontSize: 12, color: COLORS.ink, marginTop: 6, paddingTop: 6, borderTop: `1px dashed ${COLORS.border}` }}>{p.translation}</p>}
+        {p.hint && <p style={{ fontSize: 11, color: '#92400e', marginTop: 6, fontStyle: 'italic' }}>💡 {p.hint}</p>}
+        {p.correction && <p style={{ fontSize: 11, color: '#7f1d1d', marginTop: 6, fontStyle: 'italic' }}>✎ {p.correction}</p>}
+        {p.is_mock && <p style={{ fontSize: 9, color: COLORS.gold, marginTop: 8, letterSpacing: '0.08em' }}>{t('koreanTeacherModule.conversation.noLLM', { defaultValue: '' })}</p>}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 880, margin: '0 auto' }}>
+      <SectionLabel index={12} label={t('koreanTeacherModule.tabs.conversationAudio')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('koreanTeacherModule.conversationAudio.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('koreanTeacherModule.conversationAudio.subtitle')}</p>
+
+      {!asr.isSupported && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('koreanTeacherModule.conversationAudio.noAsr')}</p>
+        </Card>
+      )}
+      {tts.status === 'no-voice' && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('koreanTeacherModule.conversationAudio.noVoice')}</p>
+        </Card>
+      )}
+
+      {!started ? (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: COLORS.accent, marginBottom: 6 }}>{t('koreanTeacherModule.conversation.scenario')}</label>
+            <select value={scenario} onChange={(e) => setScenario(e.target.value)} style={{ ...selectStyle, fontSize: 13, fontFamily: 'inherit' }}>
+              {scenarios.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: COLORS.accent, marginBottom: 6 }}>{t('koreanTeacherModule.conversation.difficulty')}</label>
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ ...selectStyle, fontSize: 13, fontFamily: 'inherit' }}>
+              <option value="beginner">{t('koreanTeacherModule.conversation.beginner')}</option>
+              <option value="intermediate">{t('koreanTeacherModule.conversation.intermediate')}</option>
+              <option value="advanced">{t('koreanTeacherModule.conversation.advanced')}</option>
+            </select>
+          </div>
+          <Button primary onClick={start} disabled={sending}>🎙 {t('koreanTeacherModule.conversationAudio.startBtn')}</Button>
+        </div>
+      ) : (<>
+        <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: '18px 22px', maxHeight: 420, overflowY: 'auto', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {history.map(bubble)}
+          {sending && <div style={{ alignSelf: 'flex-start', color: COLORS.inkSoft, fontSize: 12 }}>{t('koreanTeacherModule.conversationAudio.thinking')}</div>}
+        </div>
+
+        <div style={{ minHeight: 22, marginBottom: 10, fontSize: 13, color: asr.isListening ? COLORS.accent : COLORS.inkSoft, fontStyle: 'italic' }}>
+          {asr.isListening ? `🎙 ${asr.transcript || t('koreanTeacherModule.conversationAudio.listening')}` : ''}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={toggleMic} disabled={sending || !asr.isSupported} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', fontSize: 15, fontWeight: 700,
+            borderRadius: 999, border: 'none', cursor: (sending || !asr.isSupported) ? 'not-allowed' : 'pointer',
+            background: asr.isListening ? '#dc2626' : COLORS.accent, color: '#fff',
+            boxShadow: asr.isListening ? '0 0 0 4px rgba(220,38,38,0.2)' : '0 2px 8px rgba(0,0,0,0.15)',
+          }}>
+            {asr.isListening ? `⏹ ${t('koreanTeacherModule.conversationAudio.stopSpeaking')}` : `🎙 ${t('koreanTeacherModule.conversationAudio.speak')}`}
+          </button>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: COLORS.inkSoft, cursor: 'pointer' }}>
+            <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} />
+            {t('koreanTeacherModule.conversationAudio.autoSpeak')}
+          </label>
+          <Button onClick={reset} style={{ marginLeft: 'auto' }}>{t('koreanTeacherModule.conversation.newConversation')}</Button>
+        </div>
+      </>)}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Tab: CJK Bridge
 // ═══════════════════════════════════════════════════════════════════════════════
 const TabBridge = () => {
@@ -1180,6 +1365,7 @@ const KoreanTeacher = () => {
     { id: 'vocabulary',   label: t('koreanTeacherModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'grammar',      label: t('koreanTeacherModule.tabs.grammar'),      icon: '📐' },
     { id: 'conversation', label: t('koreanTeacherModule.tabs.conversation'), icon: '💬' },
+    { id: 'conversationAudio', label: t('koreanTeacherModule.tabs.conversationAudio'), icon: '🎙' },
     { id: 'reading',      label: t('koreanTeacherModule.tabs.reading'),      icon: '📖' },
     { id: 'speaking',     label: t('koreanTeacherModule.tabs.speaking'),     icon: '🎤' },
     { id: 'culture',      label: t('koreanTeacherModule.tabs.culture'),      icon: '🏯' },
@@ -1195,6 +1381,7 @@ const KoreanTeacher = () => {
       case 'vocabulary':   return <TabVocabulary />;
       case 'grammar':      return <TabGrammar />;
       case 'conversation': return <TabConversation />;
+      case 'conversationAudio': return <TabConversationAudio />;
       case 'reading':      return <TabReading />;
       case 'speaking':     return <TabSpeaking />;
       case 'culture':      return <TabCulture />;

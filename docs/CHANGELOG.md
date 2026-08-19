@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.41.2] - 2026-08-17
+
+### Added — Chinese & Korean Teacher AI: "Conversation Audio" hands-free spoken tab
+
+Completes the rollout of the hands-free spoken-practice flow across all six language
+agents (English original; Japanese 1.41.0; Spanish 1.41.1; Chinese + Korean here).
+
+- **`frontend/src/components/ChineseTeacher/ChineseTeacher.jsx`** — new `TabConversationAudio`
+  + 🎙 tab after "Conversation". ASR `lang: 'zh-CN'`, speaks the reply via the existing
+  `useChineseTTS` (browser-only), renders the `{hz, py, translation, hint, correction}`
+  payload with per-bubble 🔊 replay. Reuses `/api/chinese/conversation/message`.
+- **`frontend/src/components/KoreanTeacher/KoreanTeacher.jsx`** — new `TabConversationAudio`
+  + 🎙 tab after "Conversation". ASR `lang: 'ko-KR'`, speaks via `useKoreanTTS`, renders the
+  `{hangul, romanization, translation, hint, correction}` payload. Reuses
+  `/api/korean/conversation/message`. (Also added the missing `useRef` import.)
+- **No backend change** — both endpoints already accept
+  `scenario/difficulty/history/user_text(Optional)/lang` and return the structured payloads.
+  No API/contract change.
+- Same robust mic pattern as the other agents (interim transcript, send-on-release, no
+  double-speak, auto-speak toggle). Graceful degradation: warns if the browser lacks speech
+  recognition, and if no zh/ko system TTS voice is installed (replies show but may not speak).
+- **i18n** EN/NO/ES — `<mod>.tabs.conversationAudio` + `<mod>.conversationAudio.*` (11 keys
+  each) for both modules. Parity verified (Chinese 189, Korean 203 keys/locale).
+
+Validated: `@babel/parser` JSX parse both (OK); i18n trilingual parity both (OK).
+Frontend-only, low risk. **Conversation Audio is now available in all six language agents.**
+
+---
+
 ## [1.41.1] - 2026-08-17
 
 ### Added — Spanish Teacher AI: "Conversation Audio" hands-free spoken tab

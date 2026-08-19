@@ -13,6 +13,7 @@
       "vocabulary": "Vocabulary SRS",
       "grammar": "Grammar",
       "conversation": "Conversation",
+      "conversationAudio": "Conversation Audio",
       "bridge": "Kanji-Hanzi Bridge",
       "reading": "Reading",
       "speaking": "Speaking Lab",
@@ -125,6 +126,19 @@
       "correctionLabel": "Correction",
       "newConversation": "← New conversation",
       "noLLM": "AI tutor unavailable — showing mock response"
+    },
+    "conversationAudio": {
+      "title": "Conversation Audio",
+      "subtitle": "Hands-free spoken practice: you talk, the teacher answers out loud in Chinese. Pick a scenario and keep the conversation going.",
+      "startBtn": "Start spoken conversation",
+      "speak": "Speak",
+      "stopSpeaking": "Stop",
+      "listening": "Listening…",
+      "thinking": "The teacher is thinking…",
+      "autoSpeak": "Auto-speak replies",
+      "replay": "Play again",
+      "noAsr": "Your browser does not support speech recognition. Try Chrome or Edge on desktop for hands-free practice.",
+      "noVoice": "No Chinese system voice is installed, so replies may not be spoken. Install a Chinese voice in your OS settings to hear the teacher."
     },
     "bridge": {
       "title": "Kanji-Hanzi Bridge",

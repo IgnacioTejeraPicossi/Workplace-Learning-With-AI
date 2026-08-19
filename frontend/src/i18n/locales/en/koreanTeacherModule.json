@@ -13,6 +13,7 @@
       "vocabulary": "Vocabulary SRS",
       "grammar": "Grammar",
       "conversation": "Conversation",
+      "conversationAudio": "Conversation Audio",
       "reading": "Reading",
       "speaking": "Speaking Lab",
       "culture": "Culture",
@@ -149,6 +150,19 @@
       "listen": "🔊 Listen",
       "newConversation": "← New conversation",
       "noLLM": "AI tutor unavailable — showing mock response"
+    },
+    "conversationAudio": {
+      "title": "Conversation Audio",
+      "subtitle": "Hands-free spoken practice: you talk, the teacher answers out loud in Korean. Pick a scenario and keep the conversation going.",
+      "startBtn": "Start spoken conversation",
+      "speak": "Speak",
+      "stopSpeaking": "Stop",
+      "listening": "Listening…",
+      "thinking": "The teacher is thinking…",
+      "autoSpeak": "Auto-speak replies",
+      "replay": "Play again",
+      "noAsr": "Your browser does not support speech recognition. Try Chrome or Edge on desktop for hands-free practice.",
+      "noVoice": "No Korean system voice is installed, so replies may not be spoken. Install a Korean voice in your OS settings to hear the teacher."
     },
     "bridge": {
       "title": "CJK Bridge — Hanzi · Kanji · Hanja",

@@ -13,6 +13,7 @@
       "vocabulary": "Vocabulario SRS",
       "grammar": "Gramática",
       "conversation": "Conversación",
+      "conversationAudio": "Conversación en audio",
       "bridge": "Puente Kanji-Hanzi",
       "reading": "Lectura",
       "speaking": "Laboratorio de Habla",
@@ -125,6 +126,19 @@
       "correctionLabel": "Corrección",
       "newConversation": "← Nueva conversación",
       "noLLM": "Tutor IA no disponible — mostrando respuesta simulada"
+    },
+    "conversationAudio": {
+      "title": "Conversación en audio",
+      "subtitle": "Práctica hablada con manos libres: tú hablas y el profe responde en voz alta en chino. Elige un escenario y mantén la conversación.",
+      "startBtn": "Iniciar conversación hablada",
+      "speak": "Hablar",
+      "stopSpeaking": "Detener",
+      "listening": "Escuchando…",
+      "thinking": "El profe está pensando…",
+      "autoSpeak": "Leer las respuestas en voz alta",
+      "replay": "Reproducir de nuevo",
+      "noAsr": "Tu navegador no admite reconocimiento de voz. Usa Chrome o Edge en un ordenador para la práctica con manos libres.",
+      "noVoice": "No hay una voz de chino instalada en el sistema, por lo que puede que las respuestas no se lean en voz alta. Instala una voz de chino en los ajustes de tu sistema operativo para escuchar al profe."
     },
     "bridge": {
       "title": "Puente Kanji-Hanzi",

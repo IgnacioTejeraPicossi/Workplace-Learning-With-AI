@@ -13,6 +13,7 @@
       "vocabulary": "Ordforråd SRS",
       "grammar": "Grammatikk",
       "conversation": "Samtale",
+      "conversationAudio": "Samtale (lyd)",
       "bridge": "Kanji-Hanzi Bro",
       "reading": "Lesetrening",
       "speaking": "Tale-lab",
@@ -125,6 +126,19 @@
       "correctionLabel": "Korreksjon",
       "newConversation": "← Ny samtale",
       "noLLM": "KI-veileder utilgjengelig — viser simulert svar"
+    },
+    "conversationAudio": {
+      "title": "Samtale med lyd",
+      "subtitle": "Muntlig øving uten hendene: du snakker, læreren svarer høyt på kinesisk. Velg et scenario og hold samtalen i gang.",
+      "startBtn": "Start muntlig samtale",
+      "speak": "Snakk",
+      "stopSpeaking": "Stopp",
+      "listening": "Lytter…",
+      "thinking": "Læreren tenker…",
+      "autoSpeak": "Les opp svar automatisk",
+      "replay": "Spill av igjen",
+      "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge på datamaskin for håndfri øving.",
+      "noVoice": "Ingen kinesisk systemstemme er installert, så svar blir kanskje ikke lest opp. Installer en kinesisk stemme i OS-innstillingene for å høre læreren."
     },
     "bridge": {
       "title": "Kanji-Hanzi Bro",

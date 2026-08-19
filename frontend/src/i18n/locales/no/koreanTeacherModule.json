@@ -13,6 +13,7 @@
       "vocabulary": "Ordforråd SRS",
       "grammar": "Grammatikk",
       "conversation": "Samtale",
+      "conversationAudio": "Samtale (lyd)",
       "reading": "Lesing",
       "speaking": "Talelab",
       "culture": "Kultur",
@@ -149,6 +150,19 @@
       "listen": "🔊 Lytt",
       "newConversation": "← Ny samtale",
       "noLLM": "AI-tutor utilgjengelig — viser mock-respons"
+    },
+    "conversationAudio": {
+      "title": "Samtale med lyd",
+      "subtitle": "Muntlig øving uten hendene: du snakker, læreren svarer høyt på koreansk. Velg et scenario og hold samtalen i gang.",
+      "startBtn": "Start muntlig samtale",
+      "speak": "Snakk",
+      "stopSpeaking": "Stopp",
+      "listening": "Lytter…",
+      "thinking": "Læreren tenker…",
+      "autoSpeak": "Les opp svar automatisk",
+      "replay": "Spill av igjen",
+      "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge på datamaskin for håndfri øving.",
+      "noVoice": "Ingen koreansk systemstemme er installert, så svar blir kanskje ikke lest opp. Installer en koreansk stemme i OS-innstillingene for å høre læreren."
     },
     "bridge": {
       "title": "CJK Bridge — Hanzi · Kanji · Hanja",

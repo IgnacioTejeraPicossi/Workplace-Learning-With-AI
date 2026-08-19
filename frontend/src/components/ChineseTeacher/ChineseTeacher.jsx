@@ -14,6 +14,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useChineseTTS } from './useChineseTTS';
+import { useSpeechCapture } from '../hologram/useSpeechCapture';
 import HanziStrokeAnimation from './HanziStrokeAnimation';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -784,6 +785,194 @@ const TabConversation = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Conversation Audio — hands-free SPOKEN conversation
+// ---------------------------------------------------------------------------
+// You speak (Web Speech ASR, zh-CN) → the teacher replies (same LLM endpoint as
+// the written Conversation tab) → the Chinese reply is spoken back automatically
+// (useChineseTTS). Reuses /api/chinese/conversation/message; no backend change.
+// Mirrors the Conversation Audio tab of English / Japanese / Spanish agents.
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabConversationAudio = () => {
+  const { t, i18n } = useTranslation();
+  const tts = useChineseTTS();
+  const asr = useSpeechCapture({ lang: 'zh-CN', interim: true });
+
+  const [scenarios, setScenarios] = useState([]);
+  const [scenario, setScenario]   = useState('intro');
+  const [difficulty, setDifficulty] = useState('beginner');
+  const [started, setStarted]     = useState(false);
+  const [history, setHistory]     = useState([]); // {role:'user',content} | {role:'assistant',payload}
+  const [last, setLast]           = useState(null);
+  const [sending, setSending]     = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+
+  const spokenRef     = useRef(null);
+  const transcriptRef = useRef('');
+  const sendRef       = useRef(null);
+  const wasListening  = useRef(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/chinese/conversation/scenarios?lang=${toLang(i18n.language)}`)
+      .then((r) => r.json()).then((d) => setScenarios(d.scenarios || [])).catch(() => {});
+  }, [i18n.language]);
+
+  useEffect(() => { transcriptRef.current = asr.transcript; }, [asr.transcript]);
+
+  useEffect(() => {
+    if (autoSpeak && last?.hz && spokenRef.current !== last.hz) {
+      spokenRef.current = last.hz;
+      tts?.speak?.(last.hz);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [last, autoSpeak]);
+
+  const wireHistory = (hist) => hist.map((h) => ({
+    role: h.role, content: h.role === 'assistant' ? (h.payload?.hz || '') : h.content,
+  }));
+
+  const start = async () => {
+    setStarted(true); setHistory([]); setLast(null); spokenRef.current = null;
+    setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/chinese/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: [], user_text: null, lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([{ role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  };
+
+  const sendUserTurn = useCallback(async (text) => {
+    if (!text || !text.trim() || sending) return;
+    const newHist = [...history, { role: 'user', content: text.trim() }];
+    setHistory(newHist); setSending(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/chinese/conversation/message`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario, difficulty, history: wireHistory(newHist), user_text: text.trim(), lang: toLang(i18n.language) }),
+      });
+      const d = await r.json();
+      setLast(d); setHistory([...newHist, { role: 'assistant', payload: d }]);
+    } catch (e) { /* noop */ }
+    setSending(false);
+  }, [history, sending, scenario, difficulty, i18n.language]);
+
+  useEffect(() => { sendRef.current = sendUserTurn; });
+
+  useEffect(() => {
+    if (wasListening.current && !asr.isListening) {
+      const txt = transcriptRef.current;
+      if (txt && txt.trim()) { sendRef.current?.(txt); asr.reset(); }
+    }
+    wasListening.current = asr.isListening;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.isListening]);
+
+  const toggleMic = () => {
+    if (asr.isListening) { asr.stopListening(); return; }
+    tts?.stop?.();
+    asr.startListening();
+  };
+
+  const reset = () => {
+    asr.stopListening(); tts?.stop?.();
+    setStarted(false); setHistory([]); setLast(null); spokenRef.current = null;
+  };
+
+  const bubble = (turn, i) => {
+    if (turn.role === 'user') return (
+      <div key={i} style={{ alignSelf: 'flex-end', background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`,
+                             borderRadius: 12, padding: '10px 14px', maxWidth: '75%', fontSize: 14, color: COLORS.ink, fontFamily: CHINESE_FONT }}>{turn.content}</div>
+    );
+    const p = turn.payload;
+    return (
+      <div key={i} style={{ alignSelf: 'flex-start', background: '#fef8f5', border: `1px solid ${COLORS.border}`,
+                             borderLeft: `4px solid ${COLORS.accent}`, borderRadius: 12, padding: '12px 14px', maxWidth: '85%' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 700, margin: 0, flex: 1 }}>{p.hz}</p>
+          <button onClick={() => tts?.speak?.(p.hz)} title={t('chineseTeacherModule.conversationAudio.replay')} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14 }}>🔊</button>
+        </div>
+        {p.py && <p style={{ fontSize: 12, color: COLORS.accent, fontFamily: 'monospace', margin: '4px 0 0' }}><strong style={{ fontSize: 9, letterSpacing: '0.1em' }}>{t('chineseTeacherModule.conversation.pinyinLabel')}:</strong> {p.py}</p>}
+        {p.translation && <p style={{ fontSize: 12, color: COLORS.ink, marginTop: 6, paddingTop: 6, borderTop: `1px dashed ${COLORS.border}` }}>{p.translation}</p>}
+        {p.hint && <p style={{ fontSize: 11, color: COLORS.gold, marginTop: 6, fontStyle: 'italic' }}>💡 {p.hint}</p>}
+        {p.correction && <p style={{ fontSize: 11, color: '#2563eb', marginTop: 6, fontStyle: 'italic' }}>✎ {p.correction}</p>}
+        {p.is_mock && <p style={{ fontSize: 9, color: COLORS.gold, marginTop: 8, letterSpacing: '0.08em' }}>{t('chineseTeacherModule.conversation.noLLM')}</p>}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 880, margin: '0 auto' }}>
+      <SectionLabel index={12} label={t('chineseTeacherModule.tabs.conversationAudio')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('chineseTeacherModule.conversationAudio.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('chineseTeacherModule.conversationAudio.subtitle')}</p>
+
+      {!asr.isSupported && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('chineseTeacherModule.conversationAudio.noAsr')}</p>
+        </Card>
+      )}
+      {tts.status === 'no-voice' && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 16 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⚠ {t('chineseTeacherModule.conversationAudio.noVoice')}</p>
+        </Card>
+      )}
+
+      {!started ? (
+        <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: '22px 24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
+            <div>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('chineseTeacherModule.conversation.scenario')}</p>
+              <select value={scenario} onChange={(e) => setScenario(e.target.value)}
+                      style={{ width: '100%', background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '9px 12px', fontSize: 13, color: COLORS.ink }}>
+                {scenarios.map((s) => (<option key={s.key} value={s.key}>{s.label}</option>))}
+              </select>
+            </div>
+            <div>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('chineseTeacherModule.conversation.difficulty')}</p>
+              <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}
+                      style={{ width: '100%', background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '9px 12px', fontSize: 13, color: COLORS.ink }}>
+                <option value="beginner">{t('chineseTeacherModule.conversation.beginner')}</option>
+                <option value="intermediate">{t('chineseTeacherModule.conversation.intermediate')}</option>
+                <option value="advanced">{t('chineseTeacherModule.conversation.advanced')}</option>
+              </select>
+            </div>
+          </div>
+          <Button primary onClick={start} disabled={sending}>🎙 {t('chineseTeacherModule.conversationAudio.startBtn')}</Button>
+        </div>
+      ) : (<>
+        <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: '18px 22px', maxHeight: 420, overflowY: 'auto', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {history.map(bubble)}
+          {sending && <div style={{ alignSelf: 'flex-start', color: COLORS.inkSoft, fontSize: 12 }}>{t('chineseTeacherModule.conversationAudio.thinking')}</div>}
+        </div>
+
+        <div style={{ minHeight: 22, marginBottom: 10, fontSize: 13, color: asr.isListening ? COLORS.accent : COLORS.inkSoft, fontStyle: 'italic' }}>
+          {asr.isListening ? `🎙 ${asr.transcript || t('chineseTeacherModule.conversationAudio.listening')}` : ''}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={toggleMic} disabled={sending || !asr.isSupported} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', fontSize: 15, fontWeight: 700,
+            borderRadius: 999, border: 'none', cursor: (sending || !asr.isSupported) ? 'not-allowed' : 'pointer',
+            background: asr.isListening ? '#dc2626' : COLORS.accent, color: '#fff',
+            boxShadow: asr.isListening ? '0 0 0 4px rgba(220,38,38,0.2)' : '0 2px 8px rgba(0,0,0,0.15)',
+          }}>
+            {asr.isListening ? `⏹ ${t('chineseTeacherModule.conversationAudio.stopSpeaking')}` : `🎙 ${t('chineseTeacherModule.conversationAudio.speak')}`}
+          </button>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: COLORS.inkSoft, cursor: 'pointer' }}>
+            <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} />
+            {t('chineseTeacherModule.conversationAudio.autoSpeak')}
+          </label>
+          <Button onClick={reset} style={{ marginLeft: 'auto' }}>{t('chineseTeacherModule.conversation.newConversation')}</Button>
+        </div>
+      </>)}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Tab: Kanji-Hanzi Bridge — THE DIFFERENTIATOR
 // ═══════════════════════════════════════════════════════════════════════════════
 const TabBridge = () => {
@@ -1279,6 +1468,7 @@ const ChineseTeacher = () => {
     { id: 'vocabulary',   label: t('chineseTeacherModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'grammar',      label: t('chineseTeacherModule.tabs.grammar'),      icon: '📐' },
     { id: 'conversation', label: t('chineseTeacherModule.tabs.conversation'), icon: '💬' },
+    { id: 'conversationAudio', label: t('chineseTeacherModule.tabs.conversationAudio'), icon: '🎙' },
     { id: 'reading',      label: t('chineseTeacherModule.tabs.reading'),      icon: '📖' },
     { id: 'speaking',     label: t('chineseTeacherModule.tabs.speaking'),     icon: '🎤' },
     { id: 'bridge',       label: t('chineseTeacherModule.tabs.bridge'),       icon: '🌉' },
@@ -1294,6 +1484,7 @@ const ChineseTeacher = () => {
       case 'vocabulary':   return <TabVocabulary />;
       case 'grammar':      return <TabGrammar />;
       case 'conversation': return <TabConversation />;
+      case 'conversationAudio': return <TabConversationAudio />;
       case 'reading':      return <TabReading />;
       case 'speaking':     return <TabSpeaking />;
       case 'bridge':       return <TabBridge />;
