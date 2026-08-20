@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.41.3] - 2026-08-17
+
+### Added — Norwegian Mentor AI: "Conversation Audio" hands-free spoken tab
+
+Final language agent to get the hands-free spoken-practice flow — **Conversation Audio is
+now in all six** (English original; Japanese 1.41.0; Spanish 1.41.1; Chinese + Korean 1.41.2;
+Norwegian here). Norwegian Mentor shares English/Spanish's voice infrastructure
+(`useVoiceEngine` + `VoiceSelector`, Voicebox-capable), so the port was a clean mirror of
+the Spanish one.
+
+- **`frontend/src/components/NorwegianMentor/NorwegianMentor.jsx`** — new `TabConversationAudio`
+  + 🎙 tab after "Conversation". You speak (Web Speech ASR, `lang: 'nb-NO'` Bokmål) → the
+  mentor replies via the **existing** `/api/norwegian/conversation/message` endpoint → the
+  reply is spoken back through the shared `useVoice()` engine (auto-speak toggle + 🔊 button),
+  which routes through Voicebox when connected. Renders the same rich payload as the written
+  tab (reply + translation + correction + upgrade + tip; difficulty B1/B2/C1). Reuses
+  `../hologram/useSpeechCapture`. (Also added the missing `useRef` import.)
+- **No backend change** — endpoint already accepts `scenario/difficulty/history/user_text(Optional)/lang`
+  and returns `{reply, translation, correction, upgrade, tip}`. No API/contract change.
+- Graceful degradation: warns if the browser lacks speech recognition.
+- **i18n** EN/NO/ES — `norwegianMentorModule.tabs.conversationAudio` +
+  `norwegianMentorModule.conversationAudio.*` (9 keys each). Parity verified (110 keys/locale).
+
+Validated: `@babel/parser` JSX parse (OK); i18n trilingual parity (OK). Frontend-only, low risk.
+
+---
+
 ## [1.41.2] - 2026-08-17
 
 ### Added — Chinese & Korean Teacher AI: "Conversation Audio" hands-free spoken tab

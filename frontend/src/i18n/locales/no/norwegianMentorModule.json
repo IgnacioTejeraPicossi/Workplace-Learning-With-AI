@@ -12,6 +12,7 @@
       "vocabulary": "Ordforråd SRS",
       "bridge": "Germansk bro",
       "conversation": "Samtale",
+      "conversationAudio": "Samtale (lyd)",
       "writing": "Skriving og stil",
       "culture": "Kultur"
     },
@@ -94,6 +95,17 @@
       "correction": "Rettelse",
       "upgrade": "Mer naturlig måte å si det på",
       "tip": "Tips"
+    },
+    "conversationAudio": {
+      "title": "Samtale med lyd",
+      "subtitle": "Muntlig øving uten hendene: du snakker, mentoren svarer høyt på norsk. Velg et scenario og hold samtalen i gang.",
+      "startBtn": "Start muntlig samtale",
+      "speak": "Snakk",
+      "stopSpeaking": "Stopp",
+      "listening": "Lytter…",
+      "thinking": "Mentoren tenker…",
+      "autoSpeak": "Les opp svar automatisk",
+      "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge på datamaskin for håndfri øving."
     },
     "writing": {
       "title": "Skriving og stil",

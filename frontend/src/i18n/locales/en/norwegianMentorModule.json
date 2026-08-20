@@ -12,6 +12,7 @@
       "vocabulary": "Vocabulary SRS",
       "bridge": "Germanic Bridge",
       "conversation": "Conversation",
+      "conversationAudio": "Conversation Audio",
       "writing": "Writing & Style",
       "culture": "Kultur"
     },
@@ -94,6 +95,17 @@
       "correction": "Correction",
       "upgrade": "More natural way to say it",
       "tip": "Tip"
+    },
+    "conversationAudio": {
+      "title": "Conversation Audio",
+      "subtitle": "Hands-free spoken practice: you talk, the mentor answers out loud in Norwegian. Pick a scenario and keep the conversation going.",
+      "startBtn": "Start spoken conversation",
+      "speak": "Speak",
+      "stopSpeaking": "Stop",
+      "listening": "Listening…",
+      "thinking": "The mentor is thinking…",
+      "autoSpeak": "Auto-speak replies",
+      "noAsr": "Your browser does not support speech recognition. Try Chrome or Edge on desktop for hands-free practice."
     },
     "writing": {
       "title": "Writing & Style",

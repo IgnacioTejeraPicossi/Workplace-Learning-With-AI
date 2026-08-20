@@ -12,6 +12,7 @@
       "vocabulary": "Vocabulario SRS",
       "bridge": "Puente Germánico",
       "conversation": "Conversación",
+      "conversationAudio": "Conversación en audio",
       "writing": "Escritura y Estilo",
       "culture": "Kultur"
     },
@@ -94,6 +95,17 @@
       "correction": "Corrección",
       "upgrade": "Forma más natural de decirlo",
       "tip": "Consejo"
+    },
+    "conversationAudio": {
+      "title": "Conversación en audio",
+      "subtitle": "Práctica hablada con manos libres: tú hablas y el mentor responde en voz alta en noruego. Elige un escenario y mantén la conversación.",
+      "startBtn": "Iniciar conversación hablada",
+      "speak": "Hablar",
+      "stopSpeaking": "Detener",
+      "listening": "Escuchando…",
+      "thinking": "El mentor está pensando…",
+      "autoSpeak": "Leer las respuestas en voz alta",
+      "noAsr": "Tu navegador no admite reconocimiento de voz. Usa Chrome o Edge en un ordenador para la práctica con manos libres."
     },
     "writing": {
       "title": "Escritura y Estilo",
