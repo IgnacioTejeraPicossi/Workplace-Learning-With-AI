@@ -23,7 +23,6 @@
     "tabRiskMatrix": "Risikomatrise",
     "tabRuns": "Kjøringer",
     "tabSettings": "Innstillinger",
-
     "common": {
       "environment": "Miljø",
       "envLocal": "Lokalt",
@@ -57,7 +56,6 @@
       "actions": "Handlinger",
       "time": "Tid"
     },
-
     "modes": {
       "title": "Kjøringsmodus",
       "generateOnly": "Generer skript og rapporter",
@@ -65,7 +63,6 @@
       "executeDirectly": "Kjør tester direkte fra appen",
       "executeDirectlyDesc": "Kjør Playwright, Cypress, axe-core, Lighthouse, k6 i appen"
     },
-
     "dashboard": {
       "header": "Kvalitetsstatus",
       "subheader": "Siste QA‑kjøringer, blokkerere, dekning og risiko på ett blikk",
@@ -94,7 +91,6 @@
       "tomTipPostman": "Foretrukken arbeidsflyt for å teste Guillotine/XP GraphQL interaktivt.",
       "tomTipsAttribution": "Tips fra Tom (Tech leder, Røde Kors) — delt i Slack 2026-05-12."
     },
-
     "testPlan": {
       "header": "Generer sprint‑testplan",
       "subheader": "Konverter et Azure DevOps‑epic eller en brukerhistorie til en komplett QA‑testplan",
@@ -113,7 +109,6 @@
       "outputSuggestedData": "Foreslåtte testdata",
       "outputAdoWorkItems": "Azure DevOps‑arbeidselementer"
     },
-
     "aiUsage": {
       "title": "Bruk av KI i teknisk testing",
       "subtitle": "Tydeliggjør hva KI brukes til, hva den ikke skal brukes til, og hvem som har endelig ansvar",
@@ -143,7 +138,6 @@
       "hideDetails": "Skjul detaljer",
       "compactHeadline": "KI brukes som støtte. Reelle persondata, produksjonsdata og API‑nøkler hører IKKE hjemme i KI."
     },
-
     "playwright": {
       "header": "Playwright‑testgenerator",
       "subheader": "Tverrnettleser‑E2E + universell‑utforming‑støttede Playwright‑skript",
@@ -164,7 +158,6 @@
       "generatedFile": "Generert fil",
       "trace": "Sporing"
     },
-
     "cypress": {
       "header": "Cypress‑testgenerator",
       "subheader": "Utviklervennlige komponent‑ og frontend‑regresjonstester",
@@ -177,7 +170,6 @@
       "tomNoticeLabel": "Tom (Tech leder) — anbefaling",
       "tomNoticeText": "For rodekors.no‑omleggingen er Playwright (fane 3) det foretrukne E2E‑verktøyet fordi Storybook‑integrasjonen allerede er på plass. Bruk denne Cypress‑fanen kun til ad‑hoc / ikke‑Storybook‑behov."
     },
-
     "apiQa": {
       "header": "API & GraphQL‑kvalitet",
       "subheader": "Enonic Guillotine GraphQL + NextJS API‑ruter + eksterne integrasjoner",
@@ -217,7 +209,6 @@
       "btnExportPostman": "Last ned .postman_collection.json",
       "postmanDownloaded": "Lastet ned {{filename}} ({{count}} operasjoner). Importer i Postman → sett base_url‑variabelen og du er klar."
     },
-
     "cmsQa": {
       "header": "Enonic CMS‑kvalitet",
       "subheader": "Besøkendeopplevelse + redaktøropplevelse i Enonic Content Studio",
@@ -238,7 +229,6 @@
       "areaIsr": "ISR‑regenerering",
       "rolesTitle": "Redaksjonelle roller"
     },
-
     "formsQa": {
       "header": "Skjema-QA — Skjemabygger",
       "subheader": "JSON Schema + Adam Silver / gov.uk-mønstre + APIM-forhåndsutfylling + Vipps-overlevering",
@@ -269,7 +259,6 @@
       "checkInjectionInFormFields": "Injeksjonstest i skjemafelt",
       "checkServiceUrlGeneration": "Tjeneste-URL via lib-portal"
     },
-
     "contentMigration": {
       "header": "Innholdsmigrerings-revisjon",
       "subheader": "Gradvis migrering av innhold — gammel CMS → Enonic XP / Content Studio v.6",
@@ -318,7 +307,6 @@
       "issuesOpen": "Åpne saker",
       "origin": "Opphav"
     },
-
     "accessibility": {
       "header": "Universell utforming‑pilot",
       "subheader": "axe‑core + Lighthouse + manuell sjekkliste + skjermleserskript (WCAG 2.2 AA)",
@@ -379,7 +367,6 @@
       "waveColWcag": "WCAG",
       "waveColSeverity": "Alvorlighet"
     },
-
     "performance": {
       "btnRunBoth": "Kjør begge (Lighthouse + Enonic)",
       "presetsTitle": "URL-snarveier",
@@ -439,7 +426,6 @@
       "checkChangeDetectionPerf": "GC-trykk fra endringsdeteksjon",
       "checkConnectionPooling": "Connection pooling per request"
     },
-
     "designsystemet": {
       "header": "Designsystemet (Digdir) etterlevelse",
       "subheader": "Revisjon av @digdir/designsystemet-react, tokens, merkevareoverstyring og tilgjengelighet på rodekors.no",
@@ -462,7 +448,6 @@
       "checkDsPackageVersionsAligned": "DS-pakkeversjoner justert",
       "checkDsHtmlAreaIntegration": "HtmlArea typografi-integrasjon"
     },
-
     "roleMatrix": {
       "header": "Rolletillatelses-matrise",
       "subheader": "Reelle autorisasjonstester på tvers av 6 redaksjonelle roller i Enonic Content Studio",
@@ -490,9 +475,12 @@
       "checkApiAuthZ": "API-nivå autorisasjon",
       "checkRepositoryAcl": "Repository-ACL revisjon",
       "checkNoQLInjectionInRoleQueries": "NoQL-injeksjon i rolle-spørringer",
-      "checkRoleCacheStaleness": "Cache-utdaterthet ved rolle-endring"
+      "checkRoleCacheStaleness": "Cache-utdaterthet ved rolle-endring",
+      "driftTitle": "Matrisedrift vs baseline",
+      "driftAdded": "Lagt til",
+      "driftRemoved": "Fjernet",
+      "driftChanged": "Endret"
     },
-
     "stressTest": {
       "header": "Stress‑ og lasttesting",
       "subheader": "k6 (protokoll-nivå) + Loadster (nettleser-nivå) lastprofiler for Røde Kors‑bruk",
@@ -524,7 +512,6 @@
       "scenarioCmsPublish": "CMS‑publisering under høy trafikk",
       "scenarioCachePurge": "Cache‑rensing / regenerering"
     },
-
     "securityPrivacy": {
       "header": "Sikkerhet og personvern",
       "subheader": "OWASP Topp 10, headere, rategrenser, GDPR‑relaterte flyter",
@@ -542,7 +529,6 @@
       "checkLogging": "Logging uten sensitive data",
       "checkConsent": "Samtykke / informasjonskapsler",
       "checkGdpr": "GDPR‑relatert innhold og flyter",
-
       "snapshotTitle": "Nåværende status",
       "runScan": "Kjør ny skanning",
       "lastScanAt": "Siste skanning",
@@ -550,7 +536,6 @@
       "overall": "Totalt",
       "statTotal": "Antall sjekker",
       "statOpenFindings": "Åpne funn",
-
       "checksTitle": "Sikkerhets‑ og personvernkontroller",
       "checksHint": "Klikk på et kort for å åpne detaljpanel med full bevisførsel, anbefalinger og koblede funn.",
       "noChecksForFilter": "Ingen sjekker matcher gjeldende filtre.",
@@ -558,21 +543,17 @@
       "findingsCount": "Koblede funn",
       "scanType": "Scan‑type",
       "source": "Kilde",
-
       "scanType_automatic": "Automatisk",
       "scanType_semi_automatic": "Delvis automatisk",
       "scanType_manual": "Manuell",
-
       "category_security": "Sikkerhet",
       "category_privacy": "Personvern",
       "category_dpia": "DPIA",
-
       "detailSummary": "Sammendrag",
       "detailEvidence": "Bevis",
       "detailRecommendations": "Anbefalinger",
       "detailLinkedFindings": "Koblede funn",
       "noFindingsForCheck": "Ingen funn koblet til denne sjekken — grønt lys eller revisjons‑hull.",
-
       "findingsSectionTitle": "Funn",
       "noFindingsForFilter": "Ingen funn matcher gjeldende filtre. Alt grønt eller ingen skanning ennå.",
       "findingStatusLabel": "Status",
@@ -585,19 +566,16 @@
       "findingSave": "Lagre endringer",
       "findingHistory": "Revisjonshistorikk",
       "updatedAt": "Oppdatert",
-
       "findingStatus_open": "Åpen",
       "findingStatus_accepted_risk": "Akseptert risiko",
       "findingStatus_fixed": "Rettet",
       "findingStatus_verified": "Verifisert",
-
       "filterStatus": "Status",
       "filterScanType": "Type",
       "filterCategory": "Kategori",
       "filterFindingStatus": "Funn‑status",
       "filterSeverity": "Alvorlighet",
       "filterAll": "Alle",
-
       "historyTitle": "Skanne‑historikk",
       "historyHint": "Siste 5 skanninger med pass/warn/fail‑telling. Pil viser trend mot forrige kjøring.",
       "historyTrigger": "Trigger",
@@ -605,7 +583,6 @@
       "trendImproving": "Forbedring (færre saker enn forrige)",
       "trendRegressing": "Regresjon (flere saker enn forrige)",
       "trendFlat": "Ingen endring vs forrige",
-
       "dpiaTitle": "DPIA / Innebygget personvern‑sjekkliste",
       "dpiaHint": "Strukturert DPIA‑skjema iht. GDPR art. 35. Endringer lagres på det enkelte DPIA‑dokumentet og blir kilden for sprintrapport + databehandlerregister.",
       "dpiaSave": "Lagre endringer",
@@ -615,7 +592,6 @@
       "dpiaBoolYes": "Ja — særlige kategorier av personopplysninger behandles",
       "dpiaBoolNo": "Nei — bare ordinære personopplysninger",
       "dpiaListHint": "ett element per linje",
-
       "dpiaField_purpose": "Formål med behandlingen",
       "dpiaField_data_types": "Datatyper som samles inn",
       "dpiaField_sensitive_data": "Sensitive data (art. 9)",
@@ -626,7 +602,6 @@
       "dpiaField_legal_basis": "Behandlingsgrunnlag (art. 6 / art. 9)",
       "dpiaField_risk_notes": "Risiko for den registrerte",
       "dpiaField_mitigations": "Risikoreduserende tiltak",
-
       "dpiaPlaceholder_purpose": "f.eks. Informasjon, kontakt og støttefunksjoner for rodekors.no",
       "dpiaPlaceholder_data_types": "navn\\nepost\\ntelefon\\nfritekst",
       "dpiaPlaceholder_storage_location": "Enonic XP + Fundy + Vipps + Dataverse + Okta",
@@ -636,10 +611,8 @@
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) samtykke for donasjon; art. 9(2)(d) for helsedata",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = art. 9‑data; lekkasje = høy konsekvens",
       "dpiaPlaceholder_mitigations": "Dataminimering\\nRBAC\\nSlettepolicy\\nIngen PII i logger",
-
       "exportMarkdownBtn": "Eksporter Markdown",
       "exportSprintPlaceholder": "Valgfritt sprint-navn",
-
       "findingDispatchAdo": "Send til ADO",
       "findingDispatchAdoTitle": "Opprett et Azure DevOps-arbeidsobjekt fra dette funnet. Mock-først i dag; samme funn lander alltid på samme work-item-ID.",
       "findingAdoLinkTitle": "Åpne ADO-arbeidsobjektet i ny fane.",
@@ -649,7 +622,6 @@
       "findingAdoLiveTitle": "Ekte Azure DevOps-arbeidsobjekt — opprettet via ADO REST-API.",
       "findingVerify": "Verifiser fiks",
       "findingVerifyTitle": "Kjør skanning på nytt for å verifisere fiksen. Hvis ikke oppdaget → status blir «verified». Hvis oppdaget igjen → gjenåpnes.",
-
       "diffTitle": "Diff vs forrige skanning",
       "diffHint": "Sammenlign to skanne-kjøringer. Standard: nyeste vs forrige. Velg en annen «fra»-kjøring under for å sammenligne over lengre vinduer.",
       "diffFromLabel": "Sammenlign fra",
@@ -662,14 +634,12 @@
       "diffBucket_persisted": "Vedvarer",
       "diffBucketEmpty": "Ingen elementer i denne bøtten.",
       "diffBucketMore": "+{{count}} flere vises ikke",
-
       "envMatrixTitle": "Miljømatrise",
       "envMatrixHint": "Siste snapshot per miljø. Klikk på et kort for å bytte aktivt miljø for resten av denne fanen.",
       "envMatrixWorst": "Verste totalt",
       "envMatrixRefresh": "Last på nytt",
       "envMatrixPickHint": "Bytt til dette miljøet"
     },
-
     "ado": {
       "header": "Azure DevOps‑forsendelse",
       "subheader": "Konverter funn til Azure DevOps‑arbeidselementer (Trines offisielle testverktøy — Teststrategi 30.3 §5)",
@@ -726,7 +696,6 @@
       "fetchNoItems": "Ingen saker funnet i den iterasjonen.",
       "fetchError": "Henting feilet"
     },
-
     "sprintReport": {
       "header": "Sprintrapport",
       "subheader": "Automatisk sprintrapport (status, avvik, anbefalinger) for Trine — per Teststrategi 30.3 §8",
@@ -754,7 +723,6 @@
       "dispatches": "ADO‑forsendelser",
       "workItems": "arbeidselementer"
     },
-
     "runs": {
       "header": "Kjøringshistorikk",
       "subheader": "Tidligere QA‑kjøringer, logger, artefakter, skjermbilder, attestasjons‑hash",
@@ -766,7 +734,6 @@
       "artifacts": "Artefakter",
       "attestationHash": "Attestasjons‑hash"
     },
-
     "settings": {
       "header": "Agentinnstillinger",
       "subheader": "Miljøer, verktøy, Azure DevOps, sprint, betalingsflyt, terskler",
@@ -795,7 +762,6 @@
       "savedAt": "Lagret kl. {{value}}",
       "btnSave": "Lagre innstillinger"
     },
-
     "stakeholders": {
       "header": "Interessenter og roller — Røde Kors-team",
       "subheader": "Eneste sannhetskilde for hvem som eier beslutninger på rodekors.no-omleggingen. Hentet fra det offisielle «Roller og ansvar»-dokumentet. Brukes av UAT-støtte, sprintrapporter og signeringsskjemaer.",
@@ -865,7 +831,6 @@
         }
       }
     },
-
     "suites": {
       "smokePublic": "redcross-smoke-public",
       "donationFlow": "redcross-donation-flow",
@@ -880,7 +845,6 @@
       "securityBasic": "redcross-security-basic",
       "releaseReadiness": "redcross-release-readiness"
     },
-
     "dpia": {
       "header": "DPIA / Innebygget personvern",
       "subheader": "Røde Kors håndterer sensitive data (helseerklæring, politiattest, kriserammede). 12 sjekker mot personvernforordningen art. 25/35 og dataregisteret.",
@@ -893,7 +857,6 @@
       "retention": "Lagringstid",
       "findings": "GDPR-funn"
     },
-
     "dod": {
       "header": "Definition of Done-verifikator",
       "subheader": "Trine §6.1 — per arbeidselement: funksjonalitet testet ✓ / integrasjoner verifisert ✓ / kjente feil dokumentert ✓ / klar for UAT ✓",
@@ -911,7 +874,6 @@
       "readyForUatCol": "Klar for UAT",
       "dodOverall": "DoD totalt"
     },
-
     "resilience": {
       "header": "Resilience / lasttesting",
       "subheader": "Trine §7 — resilience er ikke det samme som ytelse. Går utover gjennomstrømming for å finne bruddpunkter, gjenoppretting og minnelekkasjer under vedvarende last.",
@@ -928,7 +890,6 @@
       "memoryDriftHint": "Minnevekst gjennom soak-vinduet — lekkasjeindikator.",
       "findings": "Resilience-funn"
     },
-
     "uatSupport": {
       "header": "UAT-støtte — Akseptansetest-bistand",
       "subheader": "Item kjører ikke UAT — det gjør Røde Kors. Genererer skript, sjekklister og signeringsskjema for Hilde, Trine og Astri.",
@@ -953,7 +914,6 @@
       "comment": "Kommentar",
       "supportNotes": "Støttenotater til Røde Kors"
     },
-
     "riskMatrix": {
       "header": "Risikomatrise-input",
       "subheader": "Trine §10 — matrisen ligger utenfor strategi-dokumentet. Lim inn CSV/JSON; agenten scorer risiko (sannsynlighet × konsekvens) og prioriterer test-suiter.",
@@ -980,6 +940,15 @@
       "level": "Nivå",
       "coverageGaps": "Dekningshull",
       "summary": "Sammendrag"
+    },
+    "crossLink": {
+      "title": "Ny til menneske-vs-KI-fordelingen?",
+      "body": "Workshopen \"Homo Sapiens vs. KI i test\" forklarer når KI leder, når mennesket leder, og når de bør jobbe sammen — rammeverket bak denne agenten.",
+      "cta": "Åpne workshopen →"
+    },
+    "enonicSignals": {
+      "relatedTools": "Relaterte verktøy og spesifikasjoner",
+      "compositeScore": "Sammensatt score"
     }
   }
 }

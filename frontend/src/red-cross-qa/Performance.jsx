@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
+import { CompositeScore, DeltaPct, CrossToolRefs } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -402,6 +403,7 @@ const Performance = ({ environment }) => {
                   <tr>
                     <th style={th}>Query</th>
                     <th style={th}>p95 (ms)</th>
+                    <th style={th}>Δ base</th>
                     <th style={th}>Queries</th>
                     <th style={th}>Duplicates</th>
                     <th style={th}>{t('redCrossWebQaModule.performance.fixHint')}</th>
@@ -412,6 +414,7 @@ const Performance = ({ environment }) => {
                     <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#f8fafc' : 'white' }}>
                       <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 12, color: '#1e293b', fontWeight: 600 }}>{q.name}</td>
                       <td style={{ ...td, color: q.p95_ms > 400 ? '#b91c1c' : '#475569', fontWeight: 600 }}>{q.p95_ms}</td>
+                      <td style={td}><DeltaPct delta={q.delta_pct} higherIsBetter={false} /></td>
                       <td style={td}>{q.queries}</td>
                       <td style={{ ...td, color: q.duplicates > 0 ? '#92400e' : '#10b981', fontWeight: 600 }}>{q.duplicates}</td>
                       <td style={{ ...td, fontSize: 12, color: '#7c3aed', fontStyle: 'italic' }}>{q.fix_hint}</td>
@@ -420,6 +423,14 @@ const Performance = ({ environment }) => {
                 </tbody>
               </table>
             </div>
+            {(enonicReport?.composite_score != null || enonicReport?.cross_tool_refs) && (
+              <div style={{ marginTop: 12 }}>
+                {enonicReport?.composite_score != null && (
+                  <CompositeScore score={enonicReport.composite_score} />
+                )}
+                <CrossToolRefs refs={enonicReport?.cross_tool_refs} />
+              </div>
+            )}
           </div>
         )}
 

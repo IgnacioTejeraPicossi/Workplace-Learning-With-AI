@@ -8,7 +8,7 @@ import VoicesOnAGI from './agi/VoicesOnAGI';
 import ReflectionsFromAI from './agi/ReflectionsFromAI';
 import FreshInsights from '../../FreshInsights';
 
-export default function AgiProgressPage() {
+export default function AgiProgressPage({ onNavigate }) {
   const { t } = useTranslation();
   // Default to the Homo-vs-AI workshop tab: the agent's most hands-on testing
   // utility should be the first thing the user meets.
@@ -33,7 +33,7 @@ export default function AgiProgressPage() {
       case 'benefits':
         return <BenefitsOfAGI />;
       case 'homoVsAi':
-        return <HomoSapiensVsAI />;
+        return <HomoSapiensVsAI onNavigate={onNavigate} />;
       case 'voices':
         return <VoicesOnAGI />;
       case 'reflections':

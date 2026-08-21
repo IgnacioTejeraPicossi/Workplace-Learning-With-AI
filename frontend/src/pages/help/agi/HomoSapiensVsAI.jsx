@@ -2701,7 +2701,45 @@ function SectionHeader({ num, title, lead }) {
 // Top-level component
 // ---------------------------------------------------------------------------
 
-export default function HomoSapiensVsAI() {
+// ---------------------------------------------------------------------------
+// Cross-link banner → Red Cross Web QA Agent. The workshop teaches the
+// human-vs-AI framing in the abstract; the Red Cross agent is where that
+// framing gets applied to a real production site (rodekors.no / Enonic XP).
+// Only renders when the host app threaded an `onNavigate(section)` callback.
+// ---------------------------------------------------------------------------
+function ApplyToRealSite({ t, onNavigate }) {
+  if (typeof onNavigate !== 'function') return null;
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+      padding: '14px 18px', borderRadius: 12,
+      background: 'linear-gradient(135deg,#fef2f2,#fff1f2)',
+      border: '1px solid #fecaca',
+    }}>
+      <span style={{ fontSize: 26, lineHeight: 1 }}>❤️‍🩹</span>
+      <div style={{ flex: 1, minWidth: 220 }}>
+        <div style={{ fontWeight: 800, color: '#991b1b', fontSize: 14 }}>
+          {t('homoVsAi.crossLink.title', { defaultValue: 'Apply this to a real site' })}
+        </div>
+        <div style={{ fontSize: 12.5, color: '#7f1d1d', marginTop: 2 }}>
+          {t('homoVsAi.crossLink.body', { defaultValue: 'See the same human-vs-AI split applied to a live production website in the Red Cross Web QA Agent.' })}
+        </div>
+      </div>
+      <button
+        onClick={() => onNavigate('red-cross-web-qa')}
+        style={{
+          padding: '9px 16px', borderRadius: 999, border: 'none', cursor: 'pointer',
+          background: 'linear-gradient(135deg,#dc2626,#b91c1c)', color: '#fff',
+          fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+        }}
+      >
+        {t('homoVsAi.crossLink.cta', { defaultValue: 'Open Red Cross Web QA Agent →' })}
+      </button>
+    </div>
+  );
+}
+
+export default function HomoSapiensVsAI({ onNavigate }) {
   const { t, i18n } = useTranslation();
   const [externalVote, setExternalVote] = useState(null);
 
@@ -2712,6 +2750,7 @@ export default function HomoSapiensVsAI() {
   return (
     <div style={{ display: 'grid', gap: 24 }}>
       <WorkshopHero t={t} />
+      <ApplyToRealSite t={t} onNavigate={onNavigate} />
       <ActivityMatrix t={t} />
       <HeadToHeadDemos t={t} i18n={i18n} onVote={onVote} />
       <TrustFramework t={t} />

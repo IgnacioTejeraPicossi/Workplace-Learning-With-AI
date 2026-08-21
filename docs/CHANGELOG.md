@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.42.1] - 2026-08-21
+
+### Added — Red Cross QA audit follow-ups P3 (surface Enonic signals) + P4 (cross-link the two modules)
+
+Continues the audit of "Homo Sapiens vs. AI in Testing" + "Red Cross Web QA Agent" (after
+P1+P2 in 1.42.0). Frontend-only, additive, low risk.
+
+**P3 — surface the Enonic-XP signals the backend already computes** (closes deferred #3 of the
+2026-05 Enonic roundup: the backend enriched responses with `enonic_xp_pattern`,
+`cross_tool_refs`, `composite_score`, `delta_pct`, `matrix_drift`, but the UI never showed them).
+- New shared component `frontend/src/red-cross-qa/_EnonicSignals.jsx` — defensive, reusable:
+  `EnonicPatternBadge` (🧩 skill-section ref), `CrossToolRefs` (🔗 related tools/specs strip),
+  `CompositeScore` (0-100 pill, red/amber/green band), `DeltaPct` (signed ▲/▼ vs baseline, with
+  a `higherIsBetter` prop so perf-p95-up reads red and score-up reads green). Each returns null
+  when its field is absent, so callers drop them in unconditionally.
+- Wired into three representative pages covering all five signals: **Accessibility**
+  (`enonic_xp_pattern` per violation + `cross_tool_refs`), **Performance** (`composite_score` +
+  `delta_pct` column on hot queries + `cross_tool_refs`), **Role Matrix** (`enonic_xp_pattern`
+  per violation + a `matrix_drift` added/removed/changed summary + `cross_tool_refs`). The
+  remaining panels can adopt the same component with a one-line import (documented pattern).
+- i18n EN/NO/ES: `redCrossWebQaModule.enonicSignals.*` + `redCrossWebQaModule.roleMatrix.drift*`.
+
+**P4 — cross-link the two related modules** (they were never connected, despite one teaching the
+framing the other applies).
+- Homo-vs-AI workshop → new "Apply this to a real site" banner opening the Red Cross Web QA Agent
+  (threaded `onNavigate` App → `AgiProgressPage` → `HomoSapiensVsAI`; `homoVsAi.crossLink.*`).
+- Red Cross Dashboard → new "New to the human-vs-AI split?" banner opening the workshop (new
+  `onNavigateSection` prop, kept distinct from the Dashboard's internal tab `onNavigate`;
+  `redCrossWebQaModule.crossLink.*`).
+
+**Validated**: `@babel/parser` parse of all 9 touched JSX files (OK); `redCrossWebQaModule` i18n
+parity EN/NO/ES (OK); production build (see below). (The pre-existing `common.json` parity drift
+in unrelated namespaces — robomind/aiLearning/cyber — was left untouched; the 3 new
+`homoVsAi.crossLink` keys are consistent across all three locales.)
+
+### Verified — 1.42.0 CI gate reproduced in a clean Docker container
+
+Ran the full 15-file offline CI set in a fresh `python:3.11` container with **no MongoDB, no
+`.env` (so no `OPENAI_API_KEY`), and `docs-ISTQB/` excluded** (mirroring a clean CI checkout),
+clean `pip install -r backend/requirements.txt`: **178 passed in 12.83s** (exit 0). Confirms the
+P1+P2 gate is hermetic and fast on the real CI runner (faster than local — Linux refuses the dead
+Mongo host instantly).
+
+---
+
 ## [1.42.0] - 2026-08-20
 
 ### Added — CI safety net for the two Red Cross QA modules + offline fast-mock (audit P1+P2)

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import { EnonicPatternBadge, CrossToolRefs } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -202,8 +203,34 @@ const RoleMatrix = ({ environment }) => {
                       💡 {v.fix_hint}
                     </p>
                   )}
+                  {v.enonic_xp_pattern && (
+                    <div style={{ marginTop: 6 }}><EnonicPatternBadge pattern={v.enonic_xp_pattern} /></div>
+                  )}
                 </div>
               ))}
+            </div>
+            <CrossToolRefs refs={report?.cross_tool_refs} />
+          </div>
+        )}
+
+        {report?.matrix_drift && (
+          <div style={panel}>
+            <h3 style={panelTitle}>📊 {t('redCrossWebQaModule.roleMatrix.driftTitle', { defaultValue: 'Matrix drift vs baseline' })}</h3>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              {['added_rows', 'removed_rows', 'changed_rows'].map((k) => {
+                const labels = { added_rows: t('redCrossWebQaModule.roleMatrix.driftAdded', { defaultValue: 'Added' }), removed_rows: t('redCrossWebQaModule.roleMatrix.driftRemoved', { defaultValue: 'Removed' }), changed_rows: t('redCrossWebQaModule.roleMatrix.driftChanged', { defaultValue: 'Changed' }) };
+                const val = report.matrix_drift[k] || 0;
+                const color = val > 0 ? '#b45309' : '#16a34a';
+                return (
+                  <span key={k} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '6px 12px', borderRadius: 10, background: val > 0 ? '#fffbeb' : '#f0fdf4', border: `1px solid ${color}33` }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#475569' }}>{labels[k]}</span>
+                    <span style={{ fontSize: 18, fontWeight: 900, color, fontFamily: 'monospace', lineHeight: 1 }}>{val}</span>
+                  </span>
+                );
+              })}
+              {report.matrix_drift.note && (
+                <span style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>{report.matrix_drift.note}</span>
+              )}
             </div>
           </div>
         )}

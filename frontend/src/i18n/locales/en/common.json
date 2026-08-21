@@ -438,9 +438,18 @@
         "unrelated": "Unrelated"
       },
       "pairs": {
-        "iit": { "a": "IIT (integrated information)", "b": "GNW (global workspace)" },
-        "oph": { "a": "Observer Patch Holography", "b": "Celestial Holography" },
-        "rovelli": { "a": "Relational QM (Rovelli)", "b": "Consciousness creates reality" }
+        "iit": {
+          "a": "IIT (integrated information)",
+          "b": "GNW (global workspace)"
+        },
+        "oph": {
+          "a": "Observer Patch Holography",
+          "b": "Celestial Holography"
+        },
+        "rovelli": {
+          "a": "Relational QM (Rovelli)",
+          "b": "Consciousness creates reality"
+        }
       },
       "disclaimer": "This compares two positions by evidence level and structure — it does not rank them as true or false. Speculative theories (like OPH) stay tagged speculative; the honest note flags what neither theory settles.",
       "errors": {
@@ -3276,6 +3285,11 @@
       "ragChunks": "excerpts",
       "ragUnavailable": "Local LLM selected, but no ISTQB PDF index was built — add PDFs under docs-ISTQB/ at the repo root and restart the backend.",
       "footnote": "Curated anchors (JSON) apply for every provider. When API Config is set to ItemAI/ItemServerAI, additional verbatim excerpts may be retrieved from your local docs-ISTQB/ PDFs — see the green hint under outputs."
+    },
+    "crossLink": {
+      "title": "Apply this to a real site",
+      "body": "See the same human-vs-AI split applied to a live production website in the Red Cross Web QA Agent.",
+      "cta": "Open Red Cross Web QA Agent →"
     }
   },
   "hologramGuide": {

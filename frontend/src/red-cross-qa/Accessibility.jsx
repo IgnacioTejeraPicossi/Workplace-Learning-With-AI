@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
+import { EnonicPatternBadge, CrossToolRefs } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -316,10 +317,16 @@ const Accessibility = ({ environment }) => {
                       fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
                       backgroundColor: SEV_COLOR[v.severity] || '#64748b',
                     }}>{v.severity}</span>
-                    <span>{v.message || v.rule || JSON.stringify(v)}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div>{v.message || v.rule || JSON.stringify(v)}</div>
+                      {v.enonic_xp_pattern && (
+                        <div style={{ marginTop: 5 }}><EnonicPatternBadge pattern={v.enonic_xp_pattern} /></div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
+              <CrossToolRefs refs={report?.cross_tool_refs} />
             </div>
           </div>
         )}

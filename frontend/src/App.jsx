@@ -547,7 +547,7 @@ function AppContent() {
             {!activeModule && section === "council-agent" && <CouncilAgent />}
             {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
             {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
-            {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent />}
+            {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent onNavigateSection={setSection} />}
             {!activeModule && section === "humanizing-ai" && <HumanizingAI />}
             {!activeModule && section === "self-sim-reality-agent" && <SelfSimRealityAgent />}
             {!activeModule && section === "self-correcting-loop" && <SelfCorrectingLoop />}
@@ -565,7 +565,7 @@ function AppContent() {
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "readme-viewer" && <ReadmeViewer />}
-            {!activeModule && section === "agi-progress" && <AgiProgressPage />}
+            {!activeModule && section === "agi-progress" && <AgiProgressPage onNavigate={setSection} />}
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "security" && <SecurityCenter />}
             {!activeModule && section === "idea-log" && <IdeaLog />}

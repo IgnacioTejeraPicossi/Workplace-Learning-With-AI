@@ -23,7 +23,6 @@
     "tabRiskMatrix": "Risk Matrix",
     "tabRuns": "Runs",
     "tabSettings": "Settings",
-
     "common": {
       "environment": "Environment",
       "envLocal": "Local",
@@ -57,7 +56,6 @@
       "actions": "Actions",
       "time": "Time"
     },
-
     "modes": {
       "title": "Execution Mode",
       "generateOnly": "Generate scripts & reports",
@@ -65,7 +63,6 @@
       "executeDirectly": "Execute tests directly from the app",
       "executeDirectlyDesc": "Run Playwright, Cypress, axe-core, Lighthouse, k6 in-app"
     },
-
     "dashboard": {
       "header": "Quality Status",
       "subheader": "Latest QA runs, blockers, coverage and risks at a glance",
@@ -94,7 +91,6 @@
       "tomTipPostman": "Preferred workflow to test Guillotine/XP GraphQL interactively.",
       "tomTipsAttribution": "Tips from Tom (Tech leder, Røde Kors) — shared in Slack on 2026-05-12."
     },
-
     "testPlan": {
       "header": "Generate Sprint Test Plan",
       "subheader": "Convert an Azure DevOps epic / user story into a complete QA test plan",
@@ -113,7 +109,6 @@
       "outputSuggestedData": "Suggested test data",
       "outputAdoWorkItems": "Azure DevOps work items"
     },
-
     "aiUsage": {
       "title": "AI usage in technical testing",
       "subtitle": "Make explicit what AI is used for, what it must NOT be used for, and who is finally accountable",
@@ -143,7 +138,6 @@
       "hideDetails": "Hide details",
       "compactHeadline": "AI is used as support. Real personal data, production data and API keys do NOT belong in AI."
     },
-
     "playwright": {
       "header": "Playwright Test Generator",
       "subheader": "Cross-browser E2E + accessibility-assisted Playwright scripts",
@@ -164,7 +158,6 @@
       "generatedFile": "Generated file",
       "trace": "Trace"
     },
-
     "cypress": {
       "header": "Cypress Test Generator",
       "subheader": "Developer-friendly component & frontend regression tests",
@@ -177,7 +170,6 @@
       "tomNoticeLabel": "Tom (Tech leder) — recommendation",
       "tomNoticeText": "For the rodekors.no rebuild, Playwright (Tab 3) is the preferred E2E tool because the Storybook integration is already in place. Use this Cypress tab for ad-hoc / non-Storybook needs only."
     },
-
     "apiQa": {
       "header": "API & GraphQL Quality",
       "subheader": "Enonic Guillotine GraphQL + NextJS API routes + external integrations",
@@ -217,7 +209,6 @@
       "btnExportPostman": "Download .postman_collection.json",
       "postmanDownloaded": "Downloaded {{filename}} ({{count}} operations). Import into Postman → set the base_url variable and you're ready."
     },
-
     "cmsQa": {
       "header": "Enonic CMS Quality",
       "subheader": "Visitor experience + editor experience for Enonic Content Studio",
@@ -238,7 +229,6 @@
       "areaIsr": "ISR regeneration",
       "rolesTitle": "Editorial roles"
     },
-
     "formsQa": {
       "header": "Forms QA — Skjemabygger",
       "subheader": "JSON Schema + Adam Silver / gov.uk patterns + APIM prefill + Vipps handoff",
@@ -269,7 +259,6 @@
       "checkInjectionInFormFields": "Injection probe in form fields",
       "checkServiceUrlGeneration": "Service URL via lib-portal"
     },
-
     "contentMigration": {
       "header": "Content Migration Audit",
       "subheader": "Gradvis migrering av innhold — legacy CMS → Enonic XP / Content Studio v.6",
@@ -318,7 +307,6 @@
       "issuesOpen": "Open issues",
       "origin": "Origin"
     },
-
     "accessibility": {
       "header": "Accessibility Copilot",
       "subheader": "axe-core + Lighthouse + manual checklist + screen reader scripts (WCAG 2.2 AA)",
@@ -379,7 +367,6 @@
       "waveColWcag": "WCAG",
       "waveColSeverity": "Severity"
     },
-
     "performance": {
       "header": "Performance Copilot",
       "subheader": "Core Web Vitals, Lighthouse, bundle analysis, GraphQL timings",
@@ -439,7 +426,6 @@
       "checkChangeDetectionPerf": "Change-detection GC pressure",
       "checkConnectionPooling": "Connection pooling per request"
     },
-
     "designsystemet": {
       "header": "Designsystemet (Digdir) Compliance",
       "subheader": "Audit @digdir/designsystemet-react usage, tokens, brand override and accessibility on rodekors.no",
@@ -462,7 +448,6 @@
       "checkDsPackageVersionsAligned": "DS package versions aligned",
       "checkDsHtmlAreaIntegration": "HtmlArea typography integration"
     },
-
     "roleMatrix": {
       "header": "Role Permission Matrix",
       "subheader": "Real authorization tests across 6 editorial roles in Enonic Content Studio",
@@ -490,9 +475,12 @@
       "checkApiAuthZ": "API-level authorization",
       "checkRepositoryAcl": "Repository ACL audit",
       "checkNoQLInjectionInRoleQueries": "NoQL injection in role queries",
-      "checkRoleCacheStaleness": "Role-change cache staleness"
+      "checkRoleCacheStaleness": "Role-change cache staleness",
+      "driftTitle": "Matrix drift vs baseline",
+      "driftAdded": "Added",
+      "driftRemoved": "Removed",
+      "driftChanged": "Changed"
     },
-
     "stressTest": {
       "header": "Stress & Load Testing",
       "subheader": "k6 (protocol-level) + Loadster (browser-level) load profiles for Red Cross usage peaks",
@@ -524,7 +512,6 @@
       "scenarioCmsPublish": "CMS publishing during high traffic",
       "scenarioCachePurge": "Cache purge / regeneration"
     },
-
     "securityPrivacy": {
       "header": "Security & Privacy",
       "subheader": "OWASP Top 10, headers, rate limits, GDPR-related flow checks",
@@ -542,7 +529,6 @@
       "checkLogging": "Logging without sensitive data",
       "checkConsent": "Consent / cookies",
       "checkGdpr": "GDPR-related content & flows",
-
       "snapshotTitle": "Current status",
       "runScan": "Run new scan",
       "lastScanAt": "Last scan",
@@ -550,7 +536,6 @@
       "overall": "Overall",
       "statTotal": "Total checks",
       "statOpenFindings": "Open findings",
-
       "checksTitle": "Security & privacy controls",
       "checksHint": "Click any card to open its detail panel with full evidence, recommendations and linked findings.",
       "noChecksForFilter": "No checks match the current filters.",
@@ -558,21 +543,17 @@
       "findingsCount": "Linked findings",
       "scanType": "Scan type",
       "source": "Source",
-
       "scanType_automatic": "Automatic",
       "scanType_semi_automatic": "Semi-automatic",
       "scanType_manual": "Manual",
-
       "category_security": "Security",
       "category_privacy": "Privacy",
       "category_dpia": "DPIA",
-
       "detailSummary": "Summary",
       "detailEvidence": "Evidence",
       "detailRecommendations": "Recommendations",
       "detailLinkedFindings": "Linked findings",
       "noFindingsForCheck": "No findings linked to this check — green light or audit gap.",
-
       "findingsSectionTitle": "Findings",
       "noFindingsForFilter": "No findings match the current filters. Everything green or no scan yet.",
       "findingStatusLabel": "Status",
@@ -585,19 +566,16 @@
       "findingSave": "Save changes",
       "findingHistory": "Audit history",
       "updatedAt": "Updated",
-
       "findingStatus_open": "Open",
       "findingStatus_accepted_risk": "Accepted risk",
       "findingStatus_fixed": "Fixed",
       "findingStatus_verified": "Verified",
-
       "filterStatus": "Status",
       "filterScanType": "Type",
       "filterCategory": "Category",
       "filterFindingStatus": "Finding state",
       "filterSeverity": "Severity",
       "filterAll": "All",
-
       "historyTitle": "Scan history",
       "historyHint": "Last 5 scan runs with pass/warn/fail counts. Arrow shows trend vs the previous run.",
       "historyTrigger": "Trigger",
@@ -605,7 +583,6 @@
       "trendImproving": "Improving (fewer issues than last run)",
       "trendRegressing": "Regressing (more issues than last run)",
       "trendFlat": "No change vs last run",
-
       "dpiaTitle": "DPIA / Privacy by Design checklist",
       "dpiaHint": "Structured DPIA form per GDPR Art. 35. Edits are saved to the singleton DPIA document and become the source for sprint reports + processor register.",
       "dpiaSave": "Save changes",
@@ -615,7 +592,6 @@
       "dpiaBoolYes": "Yes — special-category data is processed",
       "dpiaBoolNo": "No — only ordinary personal data",
       "dpiaListHint": "one item per line",
-
       "dpiaField_purpose": "Purpose of processing",
       "dpiaField_data_types": "Data types collected",
       "dpiaField_sensitive_data": "Sensitive data (Art. 9)",
@@ -626,7 +602,6 @@
       "dpiaField_legal_basis": "Legal basis (Art. 6 / Art. 9)",
       "dpiaField_risk_notes": "Risk notes for the data subject",
       "dpiaField_mitigations": "Mitigating measures",
-
       "dpiaPlaceholder_purpose": "e.g. Information, contact and support functions for rodekors.no",
       "dpiaPlaceholder_data_types": "navn\\nepost\\ntelefon\\nfritekst",
       "dpiaPlaceholder_storage_location": "Enonic XP + Fundy + Vipps + Dataverse + Okta",
@@ -636,10 +611,8 @@
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) consent for donations; Art. 9(2)(d) for health data",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = Art. 9 data; mishandling = high impact",
       "dpiaPlaceholder_mitigations": "Data minimisation\\nRBAC\\nDeletion policy\\nNo PII in logs",
-
       "exportMarkdownBtn": "Export Markdown",
       "exportSprintPlaceholder": "Optional sprint name",
-
       "findingDispatchAdo": "Send to ADO",
       "findingDispatchAdoTitle": "Create an Azure DevOps work item from this finding. Mock-first today; the same finding always lands on the same work-item ID.",
       "findingAdoLinkTitle": "Open the ADO work item in a new tab.",
@@ -649,7 +622,6 @@
       "findingAdoLiveTitle": "Real Azure DevOps work item — created via the ADO REST API.",
       "findingVerify": "Verify fix",
       "findingVerifyTitle": "Re-run the scan to verify the fix. If not detected → status moves to 'verified'. If re-detected → reopened.",
-
       "diffTitle": "Diff vs previous scan",
       "diffHint": "Compare two scan runs. By default: newest vs previous. Pick a different 'from' run below to compare across longer windows.",
       "diffFromLabel": "Compare from",
@@ -662,14 +634,12 @@
       "diffBucket_persisted": "Persisted",
       "diffBucketEmpty": "No items in this bucket.",
       "diffBucketMore": "+{{count}} more not shown",
-
       "envMatrixTitle": "Environment matrix",
       "envMatrixHint": "Latest snapshot per environment. Click a card to switch the active environment for the rest of this tab.",
       "envMatrixWorst": "Worst overall",
       "envMatrixRefresh": "Refresh",
       "envMatrixPickHint": "Switch to this environment"
     },
-
     "ado": {
       "header": "Azure DevOps Dispatch",
       "subheader": "Convert findings into Azure DevOps work items (Trine's official test tool — Teststrategi 30.3 §5)",
@@ -726,7 +696,6 @@
       "fetchNoItems": "No items found in that iteration.",
       "fetchError": "Fetch failed"
     },
-
     "sprintReport": {
       "header": "Sprint Report",
       "subheader": "Auto-generated end-of-sprint report (status, findings, recommendations) for Trine — per Teststrategi 30.3 §8",
@@ -754,7 +723,6 @@
       "dispatches": "ADO dispatches",
       "workItems": "work items"
     },
-
     "runs": {
       "header": "Run History",
       "subheader": "Past QA executions, logs, artifacts, screenshots, attestation hash",
@@ -766,7 +734,6 @@
       "artifacts": "Artifacts",
       "attestationHash": "Attestation hash"
     },
-
     "settings": {
       "header": "Agent Settings",
       "subheader": "Environments, tools, Azure DevOps, sprint, payment flow, thresholds",
@@ -795,7 +762,6 @@
       "savedAt": "Saved at {{value}}",
       "btnSave": "Save Settings"
     },
-
     "stakeholders": {
       "header": "Stakeholders & Roles — Røde Kors team",
       "subheader": "Single source of truth for who owns decisions on the rodekors.no rebuild. Sourced from the official 'Roller og ansvar' document. Used by UAT support, sprint reports and sign-off forms.",
@@ -865,7 +831,6 @@
         }
       }
     },
-
     "suites": {
       "smokePublic": "redcross-smoke-public",
       "donationFlow": "redcross-donation-flow",
@@ -880,7 +845,6 @@
       "securityBasic": "redcross-security-basic",
       "releaseReadiness": "redcross-release-readiness"
     },
-
     "dpia": {
       "header": "DPIA / Privacy by Design",
       "subheader": "Røde Kors handles sensitive data (health declarations, criminal records, crisis beneficiaries). 12 GDPR Art. 25/35 checks against the data register.",
@@ -893,7 +857,6 @@
       "retention": "Retention",
       "findings": "GDPR findings"
     },
-
     "dod": {
       "header": "Definition of Done verifier",
       "subheader": "Trine §6.1 — per work item: functionality tested ✓ / integrations verified ✓ / known bugs documented ✓ / ready for UAT ✓",
@@ -911,7 +874,6 @@
       "readyForUatCol": "Ready for UAT",
       "dodOverall": "DoD overall"
     },
-
     "resilience": {
       "header": "Resilience / load testing",
       "subheader": "Trine §7 — resilience differs from performance (ytelse). Goes beyond throughput to find breakpoints, recovery, memory leaks under sustained load.",
@@ -928,7 +890,6 @@
       "memoryDriftHint": "Memory growth across the soak window — leak indicator.",
       "findings": "Resilience findings"
     },
-
     "uatSupport": {
       "header": "UAT Support — Acceptance test assistance",
       "subheader": "Item does not run UAT — Røde Kors does. Generates scripts, checklists and sign-off forms for Hilde, Trine and Astri.",
@@ -953,7 +914,6 @@
       "comment": "Comment",
       "supportNotes": "Support notes for Røde Kors"
     },
-
     "riskMatrix": {
       "header": "Risk Matrix input",
       "subheader": "Trine §10 — the matrix lives outside the strategy. Paste CSV/JSON; the agent scores risks (probability × impact) and prioritizes test suites.",
@@ -980,6 +940,15 @@
       "level": "Level",
       "coverageGaps": "Coverage gaps",
       "summary": "Summary"
+    },
+    "crossLink": {
+      "title": "New to the human-vs-AI split?",
+      "body": "The \"Homo Sapiens vs. AI in Testing\" workshop explains when AI leads, when humans lead, and when to pair them — the framing behind this agent.",
+      "cta": "Open the workshop →"
+    },
+    "enonicSignals": {
+      "relatedTools": "Related tools & specs",
+      "compositeScore": "Composite score"
     }
   }
 }

@@ -31,7 +31,7 @@ import Settings from './red-cross-qa/Settings';
  *
  * Two environments (MVP): local (http://localhost:3000) and test.
  */
-const RedCrossWebQAAgent = () => {
+const RedCrossWebQAAgent = ({ onNavigateSection }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [environment, setEnvironment] = useState('local');
@@ -64,7 +64,7 @@ const RedCrossWebQAAgent = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard':         return <Dashboard {...sharedProps} onNavigate={setActiveTab} />;
+      case 'dashboard':         return <Dashboard {...sharedProps} onNavigate={setActiveTab} onNavigateSection={onNavigateSection} />;
       case 'test-plan':         return <TestPlan {...sharedProps} />;
       case 'playwright':        return <Playwright {...sharedProps} />;
       case 'cypress':           return <Cypress {...sharedProps} />;

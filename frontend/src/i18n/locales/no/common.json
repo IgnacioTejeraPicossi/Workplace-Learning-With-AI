@@ -729,9 +729,18 @@
         "unrelated": "Uten sammenheng"
       },
       "pairs": {
-        "iit": { "a": "IIT (integrert informasjon)", "b": "GNW (globalt arbeidsområde)" },
-        "oph": { "a": "Observer Patch Holography", "b": "Celestial Holography" },
-        "rovelli": { "a": "Relasjonell QM (Rovelli)", "b": "Bevissthet skaper virkelighet" }
+        "iit": {
+          "a": "IIT (integrert informasjon)",
+          "b": "GNW (globalt arbeidsområde)"
+        },
+        "oph": {
+          "a": "Observer Patch Holography",
+          "b": "Celestial Holography"
+        },
+        "rovelli": {
+          "a": "Relasjonell QM (Rovelli)",
+          "b": "Bevissthet skaper virkelighet"
+        }
       },
       "disclaimer": "Dette sammenligner to posisjoner etter evidensnivå og struktur — det rangerer dem ikke som sanne eller falske. Spekulative teorier (som OPH) forblir merket spekulative; den ærlige merknaden flagger hva ingen av teoriene avgjør.",
       "errors": {
@@ -4435,6 +4444,11 @@
       "ragChunks": "utdrag",
       "ragUnavailable": "Lokal KI valgt, men ingen ISTQB-PDF-indeks ble bygd — legg PDF-er i docs-ISTQB/ i prosjektroten og start backend på nytt.",
       "footnote": "Håndplukkede anchors (JSON) gjelder for alle leverandører. Når API-innstilling er ItemAI/ItemServerAI, kan ordrette utdrag hentes fra lokale docs-ISTQB/-PDF-er — se grønt hint under output."
+    },
+    "crossLink": {
+      "title": "Bruk dette på en ekte nettside",
+      "body": "Se den samme menneske-vs-KI-fordelingen brukt på en ekte produksjonsnettside i Red Cross Web QA Agent.",
+      "cta": "Åpne Red Cross Web QA Agent →"
     }
   },
   "hologramGuide": {

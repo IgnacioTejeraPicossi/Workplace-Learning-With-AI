@@ -23,7 +23,6 @@
     "tabRiskMatrix": "Matriz de riesgos",
     "tabRuns": "Ejecuciones",
     "tabSettings": "Ajustes",
-
     "common": {
       "environment": "Entorno",
       "envLocal": "Local",
@@ -57,7 +56,6 @@
       "actions": "Acciones",
       "time": "Tiempo"
     },
-
     "modes": {
       "title": "Modo de ejecución",
       "generateOnly": "Generar scripts e informes",
@@ -65,7 +63,6 @@
       "executeDirectly": "Ejecutar pruebas directamente desde la app",
       "executeDirectlyDesc": "Ejecuta Playwright, Cypress, axe-core, Lighthouse, k6 dentro de la app"
     },
-
     "dashboard": {
       "header": "Estado de calidad",
       "subheader": "Últimas ejecuciones QA, bloqueadores, cobertura y riesgos de un vistazo",
@@ -94,7 +91,6 @@
       "tomTipPostman": "Flujo preferido para probar GraphQL de Guillotine/XP de forma interactiva.",
       "tomTipsAttribution": "Tips de Tom (Tech leder, Cruz Roja) — compartidos en Slack el 2026-05-12."
     },
-
     "testPlan": {
       "header": "Generar plan de pruebas de sprint",
       "subheader": "Convierte un épico de Azure DevOps o historia de usuario en un plan QA completo",
@@ -113,7 +109,6 @@
       "outputSuggestedData": "Datos de prueba sugeridos",
       "outputAdoWorkItems": "Elementos de trabajo de Azure DevOps"
     },
-
     "aiUsage": {
       "title": "Uso de la IA en pruebas técnicas",
       "subtitle": "Define con precisión para qué se usa la IA, qué NO debe hacer, y quién tiene la responsabilidad final",
@@ -143,7 +138,6 @@
       "hideDetails": "Ocultar detalles",
       "compactHeadline": "La IA se usa como apoyo. Datos personales reales, datos de producción y claves de API NO deben introducirse en la IA."
     },
-
     "playwright": {
       "header": "Generador de pruebas Playwright",
       "subheader": "E2E multi‑navegador + scripts Playwright con apoyo de accesibilidad",
@@ -164,7 +158,6 @@
       "generatedFile": "Archivo generado",
       "trace": "Traza"
     },
-
     "cypress": {
       "header": "Generador de pruebas Cypress",
       "subheader": "Tests de componentes y regresión frontend cómodos para desarrolladores",
@@ -177,7 +170,6 @@
       "tomNoticeLabel": "Tom (Tech leder) — recomendación",
       "tomNoticeText": "Para la migración de rodekors.no, Playwright (Tab 3) es la herramienta E2E preferida porque la integración con Storybook ya está en su sitio. Usa esta pestaña Cypress solo para necesidades ad-hoc / no-Storybook."
     },
-
     "apiQa": {
       "header": "Calidad de API y GraphQL",
       "subheader": "Enonic Guillotine GraphQL + rutas API NextJS + integraciones externas",
@@ -217,7 +209,6 @@
       "btnExportPostman": "Descargar .postman_collection.json",
       "postmanDownloaded": "Descargado {{filename}} ({{count}} operaciones). Importa en Postman → ajusta la variable base_url y listo."
     },
-
     "cmsQa": {
       "header": "Calidad del CMS Enonic",
       "subheader": "Experiencia del visitante + experiencia del editor en Enonic Content Studio",
@@ -238,7 +229,6 @@
       "areaIsr": "Regeneración ISR",
       "rolesTitle": "Roles editoriales"
     },
-
     "formsQa": {
       "header": "QA de Formularios — Skjemabygger",
       "subheader": "JSON Schema + patrones Adam Silver / gov.uk + prefill APIM + handoff Vipps",
@@ -269,7 +259,6 @@
       "checkInjectionInFormFields": "Sondeo de inyección en campos de formulario",
       "checkServiceUrlGeneration": "URL de servicio vía lib-portal"
     },
-
     "contentMigration": {
       "header": "Auditoría de Migración de Contenido",
       "subheader": "Migración gradual del CMS antiguo a Enonic XP / Content Studio v.6",
@@ -318,7 +307,6 @@
       "issuesOpen": "Asuntos abiertos",
       "origin": "Origen"
     },
-
     "accessibility": {
       "header": "Copiloto de accesibilidad",
       "subheader": "axe‑core + Lighthouse + checklist manual + scripts de lector de pantalla (WCAG 2.2 AA)",
@@ -379,7 +367,6 @@
       "waveColWcag": "WCAG",
       "waveColSeverity": "Severidad"
     },
-
     "performance": {
       "btnRunBoth": "Ejecutar ambos (Lighthouse + Enonic)",
       "presetsTitle": "URLs predefinidas",
@@ -439,7 +426,6 @@
       "checkChangeDetectionPerf": "Presión GC por detección de cambios",
       "checkConnectionPooling": "Pool de conexiones por request"
     },
-
     "designsystemet": {
       "header": "Cumplimiento de Designsystemet (Digdir)",
       "subheader": "Auditoría del uso de @digdir/designsystemet-react, tokens, override de marca y accesibilidad en rodekors.no",
@@ -462,7 +448,6 @@
       "checkDsPackageVersionsAligned": "Versiones de paquetes DS alineadas",
       "checkDsHtmlAreaIntegration": "Integración tipográfica con HtmlArea"
     },
-
     "roleMatrix": {
       "header": "Matriz de permisos por rol",
       "subheader": "Pruebas reales de autorización en 6 roles editoriales en Enonic Content Studio",
@@ -490,9 +475,12 @@
       "checkApiAuthZ": "Autorización a nivel de API",
       "checkRepositoryAcl": "Auditoría de ACL de repositorio",
       "checkNoQLInjectionInRoleQueries": "Inyección NoQL en queries de roles",
-      "checkRoleCacheStaleness": "Caché obsoleta tras cambio de rol"
+      "checkRoleCacheStaleness": "Caché obsoleta tras cambio de rol",
+      "driftTitle": "Deriva de la matriz vs baseline",
+      "driftAdded": "Añadidas",
+      "driftRemoved": "Eliminadas",
+      "driftChanged": "Cambiadas"
     },
-
     "stressTest": {
       "header": "Pruebas de estrés y carga",
       "subheader": "Perfiles de carga k6 (nivel protocolo) + Loadster (nivel navegador) para picos de uso de Cruz Roja",
@@ -524,7 +512,6 @@
       "scenarioCmsPublish": "Publicación CMS bajo alta carga",
       "scenarioCachePurge": "Purga / regeneración de caché"
     },
-
     "securityPrivacy": {
       "header": "Seguridad y privacidad",
       "subheader": "OWASP Top 10, cabeceras, rate limits, comprobaciones GDPR",
@@ -542,7 +529,6 @@
       "checkLogging": "Logging sin datos sensibles",
       "checkConsent": "Consentimiento / cookies",
       "checkGdpr": "Contenido y flujos GDPR",
-
       "snapshotTitle": "Estado actual",
       "runScan": "Ejecutar nuevo escaneo",
       "lastScanAt": "Último escaneo",
@@ -550,7 +536,6 @@
       "overall": "Global",
       "statTotal": "Total de comprobaciones",
       "statOpenFindings": "Hallazgos abiertos",
-
       "checksTitle": "Controles de seguridad y privacidad",
       "checksHint": "Haz clic en cualquier tarjeta para abrir su panel de detalle con evidencias, recomendaciones y hallazgos vinculados.",
       "noChecksForFilter": "Ninguna comprobación coincide con los filtros actuales.",
@@ -558,21 +543,17 @@
       "findingsCount": "Hallazgos vinculados",
       "scanType": "Tipo de escaneo",
       "source": "Fuente",
-
       "scanType_automatic": "Automático",
       "scanType_semi_automatic": "Semi-automático",
       "scanType_manual": "Manual",
-
       "category_security": "Seguridad",
       "category_privacy": "Privacidad",
       "category_dpia": "DPIA",
-
       "detailSummary": "Resumen",
       "detailEvidence": "Evidencia",
       "detailRecommendations": "Recomendaciones",
       "detailLinkedFindings": "Hallazgos vinculados",
       "noFindingsForCheck": "Ningún hallazgo vinculado a esta comprobación — luz verde o gap de auditoría.",
-
       "findingsSectionTitle": "Hallazgos",
       "noFindingsForFilter": "Ningún hallazgo coincide con los filtros. Todo verde o sin escaneo aún.",
       "findingStatusLabel": "Estado",
@@ -585,19 +566,16 @@
       "findingSave": "Guardar cambios",
       "findingHistory": "Historial de auditoría",
       "updatedAt": "Actualizado",
-
       "findingStatus_open": "Abierto",
       "findingStatus_accepted_risk": "Riesgo aceptado",
       "findingStatus_fixed": "Corregido",
       "findingStatus_verified": "Verificado",
-
       "filterStatus": "Estado",
       "filterScanType": "Tipo",
       "filterCategory": "Categoría",
       "filterFindingStatus": "Estado hallazgo",
       "filterSeverity": "Severidad",
       "filterAll": "Todos",
-
       "historyTitle": "Histórico de escaneos",
       "historyHint": "Últimos 5 escaneos con conteos pass/warn/fail. La flecha muestra la tendencia vs el anterior.",
       "historyTrigger": "Trigger",
@@ -605,7 +583,6 @@
       "trendImproving": "Mejorando (menos problemas que el anterior)",
       "trendRegressing": "Regresión (más problemas que el anterior)",
       "trendFlat": "Sin cambios respecto al anterior",
-
       "dpiaTitle": "DPIA / Privacidad por diseño — checklist",
       "dpiaHint": "Formulario DPIA estructurado según RGPD Art. 35. Las ediciones se persisten en el documento singleton DPIA y son la fuente para el informe de sprint + registro de procesadores.",
       "dpiaSave": "Guardar cambios",
@@ -615,7 +592,6 @@
       "dpiaBoolYes": "Sí — se procesan datos de categorías especiales",
       "dpiaBoolNo": "No — solo datos personales ordinarios",
       "dpiaListHint": "un elemento por línea",
-
       "dpiaField_purpose": "Propósito del tratamiento",
       "dpiaField_data_types": "Tipos de datos recopilados",
       "dpiaField_sensitive_data": "Datos sensibles (Art. 9)",
@@ -626,7 +602,6 @@
       "dpiaField_legal_basis": "Base legal (Art. 6 / Art. 9)",
       "dpiaField_risk_notes": "Riesgo para la persona interesada",
       "dpiaField_mitigations": "Medidas de mitigación",
-
       "dpiaPlaceholder_purpose": "p.ej. Información, contacto y funciones de soporte para rodekors.no",
       "dpiaPlaceholder_data_types": "nombre\\ncorreo\\nteléfono\\ntexto libre",
       "dpiaPlaceholder_storage_location": "Enonic XP + Fundy + Vipps + Dataverse + Okta",
@@ -636,10 +611,8 @@
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) consentimiento para donaciones; Art. 9(2)(d) para datos sanitarios",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = datos Art. 9; filtración = alto impacto",
       "dpiaPlaceholder_mitigations": "Minimización de datos\\nRBAC\\nPolítica de borrado\\nNada de PII en logs",
-
       "exportMarkdownBtn": "Exportar Markdown",
       "exportSprintPlaceholder": "Nombre de sprint (opcional)",
-
       "findingDispatchAdo": "Enviar a ADO",
       "findingDispatchAdoTitle": "Crea un work item de Azure DevOps desde este hallazgo. Mock-first por ahora; el mismo hallazgo siempre llega al mismo work-item-ID.",
       "findingAdoLinkTitle": "Abrir el work item de ADO en nueva pestaña.",
@@ -649,7 +622,6 @@
       "findingAdoLiveTitle": "Work item real de Azure DevOps — creado vía la API REST de ADO.",
       "findingVerify": "Verificar fix",
       "findingVerifyTitle": "Re-ejecuta el escaneo para verificar la corrección. Si no se detecta → estado pasa a 'verified'. Si se vuelve a detectar → reabierto.",
-
       "diffTitle": "Diff vs escaneo anterior",
       "diffHint": "Compara dos ejecuciones de escaneo. Por defecto: el más reciente vs el anterior. Elige otra ejecución 'desde' abajo para comparar ventanas más largas.",
       "diffFromLabel": "Comparar desde",
@@ -662,14 +634,12 @@
       "diffBucket_persisted": "Persisten",
       "diffBucketEmpty": "Sin elementos en este grupo.",
       "diffBucketMore": "+{{count}} más no mostrados",
-
       "envMatrixTitle": "Matriz de entornos",
       "envMatrixHint": "Última instantánea por entorno. Pulsa una tarjeta para cambiar el entorno activo para el resto de esta pestaña.",
       "envMatrixWorst": "Peor global",
       "envMatrixRefresh": "Refrescar",
       "envMatrixPickHint": "Cambiar a este entorno"
     },
-
     "ado": {
       "header": "Despacho a Azure DevOps",
       "subheader": "Convierte hallazgos en elementos de trabajo de Azure DevOps (herramienta oficial de pruebas de Trine — Teststrategi 30.3 §5)",
@@ -726,7 +696,6 @@
       "fetchNoItems": "No se encontraron items en esa iteración.",
       "fetchError": "Fallo al traer"
     },
-
     "sprintReport": {
       "header": "Informe de sprint",
       "subheader": "Informe automático de fin de sprint (estado, hallazgos, recomendaciones) para Trine — Teststrategi 30.3 §8",
@@ -754,7 +723,6 @@
       "dispatches": "Despachos a ADO",
       "workItems": "elementos de trabajo"
     },
-
     "runs": {
       "header": "Historial de ejecuciones",
       "subheader": "Ejecuciones QA pasadas, logs, artefactos, capturas, hash de atestación",
@@ -766,7 +734,6 @@
       "artifacts": "Artefactos",
       "attestationHash": "Hash de atestación"
     },
-
     "settings": {
       "header": "Ajustes del agente",
       "subheader": "Entornos, herramientas, Azure DevOps, sprint, flujo de pago, umbrales",
@@ -795,7 +762,6 @@
       "savedAt": "Guardado a las {{value}}",
       "btnSave": "Guardar ajustes"
     },
-
     "stakeholders": {
       "header": "Interesados y roles — equipo Cruz Roja",
       "subheader": "Única fuente de verdad sobre quién posee las decisiones en la migración de rodekors.no. Tomado del documento oficial «Roller og ansvar». Usado por soporte UAT, informes de sprint y formularios de firma.",
@@ -865,7 +831,6 @@
         }
       }
     },
-
     "suites": {
       "smokePublic": "redcross-smoke-public",
       "donationFlow": "redcross-donation-flow",
@@ -880,7 +845,6 @@
       "securityBasic": "redcross-security-basic",
       "releaseReadiness": "redcross-release-readiness"
     },
-
     "dpia": {
       "header": "DPIA / Privacidad por diseño",
       "subheader": "Cruz Roja maneja datos sensibles (declaración sanitaria, antecedentes penales, beneficiarios de emergencias). 12 verificaciones contra GDPR Art. 25/35 y el registro de tratamientos.",
@@ -893,7 +857,6 @@
       "retention": "Retención",
       "findings": "Hallazgos GDPR"
     },
-
     "dod": {
       "header": "Verificador de Definition of Done",
       "subheader": "Trine §6.1 — por elemento de trabajo: funcionalidad probada ✓ / integraciones verificadas ✓ / errores conocidos documentados ✓ / lista para UAT ✓",
@@ -911,7 +874,6 @@
       "readyForUatCol": "Listo para UAT",
       "dodOverall": "DoD total"
     },
-
     "resilience": {
       "header": "Resiliencia / pruebas de carga",
       "subheader": "Trine §7 — la resiliencia no es lo mismo que el rendimiento (ytelse). Va más allá del throughput para encontrar puntos de ruptura, recuperación y fugas de memoria bajo carga sostenida.",
@@ -928,7 +890,6 @@
       "memoryDriftHint": "Crecimiento de memoria a lo largo de la ventana de soak — indicador de fugas.",
       "findings": "Hallazgos de resiliencia"
     },
-
     "uatSupport": {
       "header": "Soporte UAT — Asistencia para pruebas de aceptación",
       "subheader": "Item no ejecuta UAT — lo hace Cruz Roja. Genera scripts, listas de verificación y formularios de firma para Hilde, Trine y Astri.",
@@ -953,7 +914,6 @@
       "comment": "Comentario",
       "supportNotes": "Notas de soporte para Cruz Roja"
     },
-
     "riskMatrix": {
       "header": "Entrada de matriz de riesgos",
       "subheader": "Trine §10 — la matriz vive fuera del documento de estrategia. Pega CSV/JSON; el agente puntúa los riesgos (probabilidad × impacto) y prioriza las suites de pruebas.",
@@ -980,6 +940,15 @@
       "level": "Nivel",
       "coverageGaps": "Brechas de cobertura",
       "summary": "Resumen"
+    },
+    "crossLink": {
+      "title": "¿Nuevo en la división humano-vs-IA?",
+      "body": "El taller \"Homo Sapiens vs. IA en testing\" explica cuándo lidera la IA, cuándo lidera el humano y cuándo combinarlos — el marco detrás de este agente.",
+      "cta": "Abrir el taller →"
+    },
+    "enonicSignals": {
+      "relatedTools": "Herramientas y especificaciones relacionadas",
+      "compositeScore": "Puntuación compuesta"
     }
   }
 }

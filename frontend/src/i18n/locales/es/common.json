@@ -1406,9 +1406,18 @@
         "unrelated": "Sin relación"
       },
       "pairs": {
-        "iit": { "a": "IIT (información integrada)", "b": "GNW (espacio de trabajo global)" },
-        "oph": { "a": "Observer Patch Holography", "b": "Holografía Celeste" },
-        "rovelli": { "a": "MC Relacional (Rovelli)", "b": "La consciencia crea la realidad" }
+        "iit": {
+          "a": "IIT (información integrada)",
+          "b": "GNW (espacio de trabajo global)"
+        },
+        "oph": {
+          "a": "Observer Patch Holography",
+          "b": "Holografía Celeste"
+        },
+        "rovelli": {
+          "a": "MC Relacional (Rovelli)",
+          "b": "La consciencia crea la realidad"
+        }
       },
       "disclaimer": "Esto compara dos posiciones por nivel de evidencia y estructura — no las clasifica como verdaderas o falsas. Las teorías especulativas (como OPH) siguen etiquetadas como especulativas; la nota honesta señala qué no resuelve ninguna.",
       "errors": {
@@ -3238,6 +3247,11 @@
       "ragChunks": "extractos",
       "ragUnavailable": "IA local seleccionada, pero no se construyó índice PDF ISTQB — añade PDF en docs-ISTQB/ en la raíz del repo y reinicia el backend.",
       "footnote": "Las anclas curadas (JSON) aplican a todos los proveedores. Con ItemAI/ItemServerAI en API Config, pueden recuperarse extractos de tus PDF locales en docs-ISTQB/ — ver la nota verde bajo la salida."
+    },
+    "crossLink": {
+      "title": "Aplícalo a un sitio real",
+      "body": "Mira la misma división humano-vs-IA aplicada a un sitio web de producción real en el Red Cross Web QA Agent.",
+      "cta": "Abrir Red Cross Web QA Agent →"
     }
   },
   "security": {

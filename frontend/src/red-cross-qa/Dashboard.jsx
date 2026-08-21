@@ -9,7 +9,7 @@ const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKE
  * Visual language mirrors the ATM V&V Test Copilot Overview:
  * gradient hero → stat cards → quick actions panel → quality gates → recent runs + risks.
  */
-const Dashboard = ({ environment, executionMode, onNavigate }) => {
+const Dashboard = ({ environment, executionMode, onNavigate, onNavigateSection }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalRuns: 12, passRate: 78, openFindings: 9, criticalBlockers: 1,
@@ -132,6 +132,39 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
           mode={executionMode}
           status={health?.status}
         />
+
+        {/* Cross-link → Homo Sapiens vs. AI workshop. The workshop teaches the
+            human-vs-AI framing that this agent applies to a real site. */}
+        {typeof onNavigateSection === 'function' && (
+          <div
+            style={{
+              display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+              padding: '14px 18px', borderRadius: 12,
+              background: 'linear-gradient(135deg,#eff6ff,#eef2ff)',
+              border: '1px solid #bfdbfe',
+            }}
+          >
+            <span style={{ fontSize: 26, lineHeight: 1 }}>🧑‍💻</span>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: 14 }}>
+                {t('redCrossWebQaModule.crossLink.title', { defaultValue: 'New to the human-vs-AI split?' })}
+              </div>
+              <div style={{ fontSize: 12.5, color: '#1e40af', marginTop: 2 }}>
+                {t('redCrossWebQaModule.crossLink.body', { defaultValue: 'The "Homo Sapiens vs. AI in Testing" workshop explains when AI leads, when humans lead, and when to pair them — the framing behind this agent.' })}
+              </div>
+            </div>
+            <button
+              onClick={() => onNavigateSection('agi-progress')}
+              style={{
+                padding: '9px 16px', borderRadius: 999, border: 'none', cursor: 'pointer',
+                background: 'linear-gradient(135deg,#3b82f6,#2563eb)', color: '#fff',
+                fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+              }}
+            >
+              {t('redCrossWebQaModule.crossLink.cta', { defaultValue: 'Open the workshop →' })}
+            </button>
+          </div>
+        )}
 
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
