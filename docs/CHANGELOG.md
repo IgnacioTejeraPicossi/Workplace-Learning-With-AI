@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.42.2] - 2026-08-21
+
+### Changed — Homo-vs-AI workshop page decomposed into modules (audit P5)
+
+Pure structural refactor of `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` — **no behaviour
+change**, verbatim code moves. The 2,768-line monolith is now a **695-line** composing shell
+(−75%) plus a `homo-vs-ai/` module folder:
+- `homo-vs-ai/shared.jsx` (21 lines) — `SectionHeader` shared atom.
+- `homo-vs-ai/DemoSection.jsx` (1,344) — the head-to-head demo cluster: `HeadToHeadDemos`
+  (exported) + `DemoCard` + `ProblemRouter` + `JudgeAdvisoryPanel` + their leaf atoms
+  (`IstqbRagHint`/`IstqbBadge`/`MarkdownLite`/`VoteButton`/`CriteriaCell`) + the `DEMO_TASKS`
+  / `JUDGE_*` tables. Owns all four `agiApi` demo calls, so the main file no longer imports
+  `agiApi` at all.
+- `homo-vs-ai/GovernanceSection.jsx` (733) — Phase-E `PromptEvolutionPanel` (+ `PromptBox`,
+  `RegressionView`, `btnStyle`) and Option-A `FeedbackLogExportPanel`, with their seven
+  governance/export `agiApi` calls.
+The shell keeps the layout-level pieces (WorkshopHero, ActivityMatrix, TrustFramework,
+WorkshopScoreboard, SpeakerCribSheet, FutureImprovementsNote, the P4 cross-link banner, and the
+default component) and imports the three sections. Extraction was done deterministically
+(content-located block moves) to guarantee the moved code is byte-identical.
+
+**Validated**: `@babel/parser` parse of all 4 files (OK); no dangling cross-file references in
+any direction; `npx eslint` clean (0 errors, 0 warnings) on every touched file; **production
+build exit 0**. i18n untouched (all keys unchanged).
+
+**Fix during P5**: `DemoSection.jsx` also calls `proposePromptRevision` (the A→C "propose a
+prompt revision from a demo round's feedback" bridge), which the first extraction did not import
+— caught by the dev server's ESLint (`no-undef`), which the `DISABLE_ESLINT_PLUGIN` production
+build masks. Added the import; also dropped a now-unused `useEffect` from the shell and an unused
+anonymous default export in `_EnonicSignals.jsx`. Lesson: for extractions, validate with
+`npx eslint` (no-undef/no-unused-vars), not only the production build.
+
+Remaining audit item: none — P1–P5 all done. (Optional future polish: extract the scoreboard /
+crib-sheet clusters too, and adopt `_EnonicSignals` in the remaining Red Cross panels.)
+
+---
+
 ## [1.42.1] - 2026-08-21
 
 ### Added — Red Cross QA audit follow-ups P3 (surface Enonic signals) + P4 (cross-link the two modules)

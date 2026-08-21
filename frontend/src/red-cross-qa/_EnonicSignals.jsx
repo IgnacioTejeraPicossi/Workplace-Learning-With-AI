@@ -124,4 +124,4 @@ export const CrossToolRefs = ({ refs, style = {} }) => {
   );
 };
 
-export default { EnonicPatternBadge, DeltaPct, CompositeScore, CrossToolRefs };
+// All components are consumed via named imports; no default export needed.
