@@ -39,6 +39,29 @@ else:
 # API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
+
+# ---------------------------------------------------------------------------
+# Offline fast-mock switch (P2, 2026-08-20)
+# ---------------------------------------------------------------------------
+# When AI_FORCE_MOCK is truthy, ask_ai_unified / ask_ai_unified_sync return a
+# mock response IMMEDIATELY, without touching the network. This exists so the
+# offline smoke tests (Red Cross QA, Homo-vs-AI, …) can run as a fast CI gate:
+# without it, every LLM call with no keys/headers still tries the local
+# endpoints (localhost:1234, 192.168.50.142:1234) and waits ~seconds per call
+# for a connection timeout before falling back to mock — turning the Red Cross
+# smoke into a ~3-minute run. The returned string starts with the canonical
+# "[MOCKED RESPONSE" sentinel, so every downstream service's existing
+# mock-first deterministic fallback (is_mock path) triggers exactly as it does
+# when all providers are genuinely unavailable. Default OFF → zero impact on
+# production / local dev; opt-in only via the env var (CI sets AI_FORCE_MOCK=1).
+_FORCE_MOCK_MESSAGE = "[MOCKED RESPONSE] AI_FORCE_MOCK is enabled (offline test mode)"
+
+
+def _force_mock_enabled():
+    """True when AI_FORCE_MOCK is set to a truthy value ('1','true','yes','on')."""
+    return os.getenv("AI_FORCE_MOCK", "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def _normalize_temperature(value):
     """
     Normalize temperature to a safe float within [0.0, 2.0].
@@ -152,6 +175,8 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     Synchronous version of unified AI system
     ItemAI (local) → OpenRouter → OpenAI with automatic fallback
     """
+    if _force_mock_enabled():
+        return _FORCE_MOCK_MESSAGE
     config = get_api_config_from_headers(request_headers)
     temperature = _normalize_temperature(temperature)
     
@@ -319,6 +344,8 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     Unified AI system that reads configuration from API Config and tries all providers
     ItemAI (local) → OpenRouter → OpenAI with automatic fallback
     """
+    if _force_mock_enabled():
+        return _FORCE_MOCK_MESSAGE
     config = get_api_config_from_headers(request_headers)
     temperature = _normalize_temperature(temperature)
     

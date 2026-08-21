@@ -5,10 +5,11 @@ name: CI
 # - frontend: install + production build
 # Kept intentionally lightweight so it stays green and fast; it does NOT
 # require MongoDB, Firebase or any secret. The test step runs only the
-# mock-first suites (13 files, 171 tests) that are verified to pass with no database, no LLM key
-# and no Firebase credentials. Extend with the Mongo-backed suites (e.g.
-# smoke_red_cross_qa baselines, robomind contracts) once a MongoDB service
-# container + CI fixtures are added.
+# mock-first suites (15 files) that are verified to pass with no database, no
+# LLM key and no Firebase credentials. AI_FORCE_MOCK=1 makes every LLM call
+# return an instant mock (no network probe), and a short Mongo server-selection
+# timeout makes any DB access fail fast to its in-memory fallback — together
+# these keep the Red Cross QA + Homo-vs-AI smoke wrappers fast and hermetic.
 
 on:
   push:
@@ -35,14 +36,22 @@ jobs:
       - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
 
-      # Offline, mock-first suites only (56 tests): voice examples, the 6
-      # language agents' contracts, and the MCP manifest smoke. These are
-      # verified to pass without MongoDB, an LLM key or Firebase creds.
-      # MONGO_URI points at an unreachable host with a short server-selection
-      # timeout so any accidental DB access fails fast instead of hanging.
+      # Offline, mock-first suites: voice examples, the 6 language agents'
+      # contracts, the MCP manifest smoke, and the two QA-module smoke wrappers
+      # (Red Cross Web QA + Homo-vs-AI workshop). All verified to pass without
+      # MongoDB, an LLM key or Firebase creds.
+      # - MONGO_URI points at an unreachable host with a SHORT server-selection
+      #   timeout (100 ms) so any DB access fails fast to its in-memory fallback
+      #   instead of hanging — critical for the Red Cross smoke's ~500 DB ops.
+      # - AI_FORCE_MOCK=1 short-circuits ask_ai_unified to an instant mock, so no
+      #   LLM network probe happens even if an OPENAI_API_KEY is present.
+      # (conftest.py sets both as setdefaults too; these explicit values win and
+      #  document the intent.) The ISTQB PDFs (docs-ISTQB/, gitignored) are absent
+      #  in CI, so the Homo RAG index is empty and its smoke stays instant.
       - name: Run offline test suites (no DB / no secrets)
         env:
-          MONGO_URI: "mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=2000"
+          MONGO_URI: "mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=100"
+          AI_FORCE_MOCK: "1"
           PYTHONIOENCODING: "utf-8"
         run: |
           python -m pytest -q \
@@ -58,7 +67,9 @@ jobs:
             backend/tests/test_web_search_ai_contracts.py \
             backend/tests/test_babel_contracts.py \
             backend/tests/test_team_dynamics_contracts.py \
-            backend/tests/test_andres_robot_contracts.py
+            backend/tests/test_andres_robot_contracts.py \
+            backend/tests/test_red_cross_qa_smoke.py \
+            backend/tests/test_homo_vs_ai_smoke.py
 
   frontend:
     name: Frontend (install + build)

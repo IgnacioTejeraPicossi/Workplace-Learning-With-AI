@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.42.0] - 2026-08-20
+
+### Added — CI safety net for the two Red Cross QA modules + offline fast-mock (audit P1+P2)
+
+Follow-up to the read-only audit of "Homo Sapiens vs. AI in Testing" + "Red Cross Web QA
+Agent". Both flagship QA modules (~14k LOC combined) had **zero CI coverage**: their
+`smoke_*.py` files are standalone `__main__` scripts with no `def test_` functions, so
+pytest never collected them and the CI allow-list never ran them — despite ~330 assertions
+in `smoke_red_cross_qa.py` alone. This closes that gap (deferred item #6 from the 2026-05
+Enonic roundup) and adds the offline fast-path that makes it viable.
+
+**P2 — offline fast-mock (`backend/llm.py` + `backend/tests/conftest.py`)**
+- New `AI_FORCE_MOCK` env switch: when truthy, `ask_ai_unified` / `ask_ai_unified_sync`
+  return an instant `"[MOCKED RESPONSE …]"` **without touching the network**. Default OFF →
+  zero impact on production/local dev. Without it, every LLM call with no keys still probed
+  the local endpoints (`localhost:1234`, `192.168.50.142:1234`) and waited seconds per call
+  for a connection timeout before falling back to mock. Downstream services detect the same
+  `[MOCKED RESPONSE` sentinel via their existing `is_mock` path, so behaviour is identical —
+  only faster. (Root cause of the smoke slowness was measured: the Red Cross smoke ran 3m16s
+  offline; a real `OPENAI_API_KEY` in `.env` meant its LLM calls were hitting real OpenAI.)
+- `conftest.py` now sets `AI_FORCE_MOCK=1` and a fast-failing `MONGO_URI`
+  (`serverSelectionTimeoutMS=100`) as **setdefaults** (explicit env always wins), so the whole
+  suite runs fast and hermetically offline.
+
+**P1 — wire the smokes into CI (2 new pytest wrappers)**
+- `backend/tests/test_red_cross_qa_smoke.py` — runs `smoke_red_cross_qa.main()` (~330 asserts)
+  + `smoke_qa_security.main()` (Phase-H workbench).
+- `backend/tests/test_homo_vs_ai_smoke.py` — runs `smoke_feedback_log`, `smoke_prompt_evolution`
+  and `smoke_istqb_rag_translation` `main()`s (handles both the raises-on-fail and the
+  returns-int conventions).
+- `.github/workflows/ci.yml` — added both wrappers to the offline allow-list (13 → 15 files),
+  lowered `MONGO_URI` server-selection timeout 2000 → 100 ms, and set `AI_FORCE_MOCK=1`.
+
+**Validated**
+- Full CI set + the 2 new wrappers, with `docs-ISTQB/` hidden to mirror CI (the gitignored
+  ISTQB PDFs are absent there, so the Homo RAG index is empty and instant): **178 passed in
+  24.6s**. My conftest/llm changes break none of the existing 13 suites.
+- Locally (PDFs present, real key): Red Cross wrapper 50s, Homo wrapper 9.8s with PDFs hidden.
+- `compileall` syntax gate OK; `ci.yml` YAML valid.
+
+Frontend untouched. Low risk, additive. Remaining audit items (P3 surface Enonic signals in
+the UI, P4 cross-link the two modules, P5 componentise the 2.7k-line Homo page) are deferred.
+
+---
+
 ## [1.41.3] - 2026-08-17
 
 ### Added — Norwegian Mentor AI: "Conversation Audio" hands-free spoken tab
