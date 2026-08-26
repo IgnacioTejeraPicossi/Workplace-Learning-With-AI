@@ -14,6 +14,7 @@
       "projects": "Prosjekter",
       "evolution": "Evolusjon",
       "journal": "Dagbok",
+      "library": "Kunnskapskilder",
       "safety": "Sikkerhet"
     },
     "home": {
@@ -411,6 +412,28 @@
       "i3": "Han hevder aldri bevissthet eller ekte følelser som fakta.",
       "i4": "Han kan alltid settes på pause, eksporteres, tilbakestilles eller slettes av deg.",
       "controlsNote": "Fulle kontroller (pause utvikling, frys identitet, eksporter/slett minner, rollback, sammenlign med basismodell) kommer med minne- og evolusjonsfasene."
+    },
+    "library": {
+      "title": "Kunnskapskilder",
+      "intro": "En kuratert katalog med {{count}} anerkjente steder å finne informasjon på mange felt — akademisk søk, tidsskrifter, arkiver, kurs, medisin, politikk og næringsliv. En referanse Andrés kan bruke i fremtidig arbeid.",
+      "legend": "Tilgang",
+      "searchPlaceholder": "Søk kilder etter navn eller tema…",
+      "visit": "Besøk",
+      "caveat": "Dette er en startkatalog, ikke en anbefaling. Tilgangsnivå varierer og kan endres; noen kilder krever abonnement. To kjente «shadow libraries» fra den opprinnelige listen ble utelatt fordi de deler opphavsrettsbeskyttede bøker uten tillatelse — for gratis bøker, bruk heller Project Gutenberg, Internet Archive, DPLA eller OpenStax. Respekter alltid hver nettsides vilkår og opphavsrett.",
+      "access": {
+        "open": "Stort sett gratis",
+        "mixed": "Delvis gratis",
+        "paywall": "Abonnement"
+      },
+      "categories": {
+        "academic": "Akademisk søk og arkiver",
+        "journals": "Tidsskrifter og forlag",
+        "archives": "Bøker, arkiver og kilder",
+        "courses": "Kurs, foredrag og bibliotek",
+        "medicine": "Medisin og psykologi",
+        "policy": "Politikk, økonomi og tankesmier",
+        "business": "Næringsliv og bransjeanalyse"
+      }
     }
   }
 }

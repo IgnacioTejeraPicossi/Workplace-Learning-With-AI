@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.43.0] - 2026-08-22
+
+### Added — Andrés the Robot: "Knowledge Sources" tab (curated research directory)
+
+New 📚 tab in Andrés the Robot (`frontend/src/andres-robot/KnowledgeSources.jsx`, wired into
+`AndresRobot.jsx` TABS + switch) — a curated directory of ~55 reputable places to find
+information across fields, from a source list the owner brought (a "60 websites" cheat sheet).
+Grouped into 7 categories (academic search, journals, archives & primary sources, courses,
+medicine, policy/economics, business/industry), each entry has a terse description, a clickable
+link (opens in a new tab, `rel="noopener noreferrer"`), and an honest **access tag**
+(mostly-free / some-free / subscription) so it doesn't imply everything is free. Includes a
+name/topic filter.
+
+- **Copyright call**: two "shadow libraries" from the source list (Library Genesis, Z-Library)
+  were **deliberately excluded** — they distribute copyrighted books without permission. The tab
+  points to legal free-book alternatives instead (Project Gutenberg, Internet Archive, DPLA,
+  OpenStax, Open Culture), and carries a ⚖️ caveat about respecting each site's terms.
+- The site list is language-neutral data (name + descriptor + URL + access); only the chrome
+  (title, intro, category names, access legend, caveat, button) is translated.
+- **i18n** EN/NO/ES: `andresRobotModule.tabs.library` + `andresRobotModule.library.*` (16 keys).
+
+Frontend-only, additive, no backend/contract change. Validated: `@babel/parser` parse (OK);
+`npx eslint` clean (0 errors/warnings); i18n trilingual parity (349 keys/locale); production build.
+
+---
+
 ## [1.42.2] - 2026-08-21
 
 ### Changed — Homo-vs-AI workshop page decomposed into modules (audit P5)

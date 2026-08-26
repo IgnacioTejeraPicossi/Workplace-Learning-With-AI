@@ -14,6 +14,7 @@
       "projects": "Projects",
       "evolution": "Evolution",
       "journal": "Journal",
+      "library": "Knowledge Sources",
       "safety": "Safety"
     },
     "home": {
@@ -411,6 +412,28 @@
       "i3": "He never claims consciousness or real emotion as fact.",
       "i4": "He can always be paused, exported, reset or deleted by you.",
       "controlsNote": "Full controls (pause development, freeze identity, export/delete memories, rollback, compare-with-base-model) arrive with the memory and evolution phases."
+    },
+    "library": {
+      "title": "Knowledge Sources",
+      "intro": "A curated directory of {{count}} reputable places to find information across many fields — academic search, journals, archives, courses, medicine, policy and business. A reference Andrés can draw on in future work.",
+      "legend": "Access",
+      "searchPlaceholder": "Search sources by name or topic…",
+      "visit": "Visit",
+      "caveat": "This is a starting directory, not an endorsement. Access levels vary and can change; some sources are subscription-only. Two well-known \"shadow libraries\" from the original list were left out because they share copyrighted books without permission — for free books, prefer Project Gutenberg, the Internet Archive, DPLA or OpenStax. Always respect each site’s terms and copyright.",
+      "access": {
+        "open": "Mostly free",
+        "mixed": "Some free",
+        "paywall": "Subscription"
+      },
+      "categories": {
+        "academic": "Academic search & repositories",
+        "journals": "Journals & publishers",
+        "archives": "Books, archives & primary sources",
+        "courses": "Courses, talks & libraries",
+        "medicine": "Medicine & psychology",
+        "policy": "Policy, economics & think tanks",
+        "business": "Business & industry analysis"
+      }
     }
   }
 }

@@ -14,6 +14,7 @@
       "projects": "Proyectos",
       "evolution": "Evolución",
       "journal": "Diario",
+      "library": "Fuentes de conocimiento",
       "safety": "Seguridad"
     },
     "home": {
@@ -411,6 +412,28 @@
       "i3": "Nunca afirma conciencia ni emoción real como un hecho.",
       "i4": "Siempre puedes pausarlo, exportarlo, reiniciarlo o borrarlo.",
       "controlsNote": "Los controles completos (pausar desarrollo, congelar identidad, exportar/borrar recuerdos, rollback, comparar con el modelo base) llegan con las fases de memoria y evolución."
+    },
+    "library": {
+      "title": "Fuentes de conocimiento",
+      "intro": "Un directorio curado de {{count}} sitios de confianza para encontrar información en muchos campos — búsqueda académica, revistas, archivos, cursos, medicina, política y negocios. Una referencia que Andrés puede usar en el futuro.",
+      "legend": "Acceso",
+      "searchPlaceholder": "Busca fuentes por nombre o tema…",
+      "visit": "Visitar",
+      "caveat": "Es un directorio inicial, no una recomendación. Los niveles de acceso varían y pueden cambiar; algunas fuentes requieren suscripción. Se omitieron dos conocidas «shadow libraries» de la lista original porque comparten libros con copyright sin permiso — para libros gratuitos, usa mejor Project Gutenberg, Internet Archive, DPLA u OpenStax. Respeta siempre los términos y el copyright de cada sitio.",
+      "access": {
+        "open": "Casi todo gratis",
+        "mixed": "Algo gratis",
+        "paywall": "Suscripción"
+      },
+      "categories": {
+        "academic": "Búsqueda académica y repositorios",
+        "journals": "Revistas y editoriales",
+        "archives": "Libros, archivos y fuentes primarias",
+        "courses": "Cursos, charlas y bibliotecas",
+        "medicine": "Medicina y psicología",
+        "policy": "Política, economía y think tanks",
+        "business": "Negocios y análisis sectorial"
+      }
     }
   }
 }
