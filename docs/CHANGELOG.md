@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.43.2] - 2026-08-22
+
+### Fixed — API Config "Test API" now falls back to the server `.env` key
+
+The API Config **Test API** button sends the key from the UI field, which is empty when the
+user relies on the server-side `.env` `OPENAI_API_KEY`. `backend/api_test.py::/api/test-api`
+required the request key and never used the environment, so the test failed — and the error
+stringified empty, producing the confusing **"API test failed: API test failed:"** overlay.
+
+- The OpenAI and OpenRouter branches now use `request.<key> or os.getenv("OPENAI_API_KEY" /
+  "OPENROUTER_API_KEY")`, so "Test API" works with the internally-configured key without pasting
+  it (mirroring how the rest of the app resolves the key). The `.env` key itself was valid the
+  whole time (verified: `gpt-5.4-nano` returned a live response).
+- The `except` now guarantees a **non-empty** error string (`str(e) or repr(e) or type(e).__name__`)
+  and surfaces `HTTPException.detail`, so a real reason always shows.
+- Regression test `backend/tests/test_api_test_fallback.py` (3, offline, OpenAI SDK mocked) — env
+  fallback succeeds, field key wins when present, missing-everywhere returns a non-empty error.
+  Added to the CI allow-list.
+
+Backend-only. **Requires a backend restart** to take effect (no frontend change).
+
+---
+
 ## [1.43.1] - 2026-08-22
 
 ### Added — Andrés the Robot: "Ask Andrés where to research" (LLM source suggester)
