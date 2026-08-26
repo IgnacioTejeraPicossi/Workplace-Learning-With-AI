@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.44.0] - 2026-08-22
+
+### Added — Andrés the Robot: grounds Conversation in real open research APIs (Knowledge Sources V1)
+
+Andrés no longer only *recommends* where to research — when the 🌐 web tier is on he now actually
+**consults the open subset of the directory and grounds his reply in real results**, citing them.
+
+- **Backend** `backend/services/andres/scholarly_research.py` — a sibling of `web_research.py` that
+  queries three free, no-key, ToS-friendly APIs **in parallel** with a short timeout: **arXiv**
+  (Atom XML), **Semantic Scholar** (JSON), **Wikipedia** (MediaWiki search). Deliberately the OPEN
+  subset only — no paywalled sources, no login/paywall bypass. Each source is isolated
+  (`asyncio.gather(..., return_exceptions=True)`) so one 429/403/timeout can't hang the turn or
+  break the others; never raises; returns an explicit `access` status. Results are numbered
+  **[S1], [S2]…** (distinct from the web block's [1], [2]) and injected as a `[SCHOLARLY SOURCES]`
+  system layer telling Andrés to prefer them for factual/academic claims, cite inline, and stay
+  honest that he only has the snippets, not the full text.
+- **Chat wiring** (`backend/routers/andres_robot.py`) — under the SAME tier-3 permission + per-turn
+  🌐 toggle, the general web (DuckDuckGo) and the scholarly APIs now run together
+  (`asyncio.gather`); the response carries a new `scholarly` block (status + citations).
+- **Frontend** `AndresRobot.jsx` — a 📚 "consulted research sources" line under each reply mirroring
+  the 🌐 web citations, so the papers/pages Andrés used are visible and clickable. i18n EN/NO/ES
+  (`andresRobotModule.conversation.scholarly.status.*`).
+- **Wikimedia UA policy**: Wikipedia's API returns 403 without a contact in the User-Agent. The
+  service sends a compliant UA (+ `Api-User-Agent` header) using the project's **public repo URL**
+  as contact (no personal data), overridable via `SCHOLARLY_CONTACT`.
+- **Tests** `backend/tests/test_andres_scholarly.py` — 5 offline (fetchers mocked): aggregation +
+  S-numbered citations, per-source failure isolation, all-fail graceful degradation, empty-query
+  guard, prompt block. Added to the CI allow-list.
+
+Verified live: `"the poetry of Federico García Lorca"` → Wikipedia returned *Federico García Lorca*
++ *Romancero gitano* (Semantic Scholar was rate-limited that call and isolated cleanly). Validated:
+backend compile; 5 offline tests + 54 existing Andrés contract tests pass; `npx eslint` clean;
+i18n parity (363 keys); production build. Only runs when the user opts in via 🌐 (off by default).
+
+Future (deferred): V2 open-access full text (PubMed/Gutenberg/Internet Archive/Europeana) + a
+Wikipedia summary fetch; route the query through the "Ask Andrés where to research" suggester so he
+picks which API to call.
+
+---
+
 ## [1.43.2] - 2026-08-22
 
 ### Fixed — API Config "Test API" now falls back to the server `.env` key

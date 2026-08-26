@@ -91,6 +91,15 @@
           "balanced": "Balansert",
           "agile": "Kvikk"
         }
+      },
+      "scholarly": {
+        "status": {
+          "available": "Konsulterte forskningskilder",
+          "unavailable": "Søkte — ingen forskningstreff",
+          "failed": "Forskningsoppslag feilet",
+          "off": "Svarte fra tidligere kunnskap",
+          "disabled": "Web er av i forskningsnivåene dine"
+        }
       }
     },
     "memory": {

@@ -91,6 +91,15 @@
           "balanced": "Balanced",
           "agile": "Agile"
         }
+      },
+      "scholarly": {
+        "status": {
+          "available": "Consulted research sources",
+          "unavailable": "Searched — no research results",
+          "failed": "Research lookup failed",
+          "off": "Answered from prior knowledge",
+          "disabled": "Web is off in your research tiers"
+        }
       }
     },
     "memory": {

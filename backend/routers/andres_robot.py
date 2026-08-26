@@ -7,6 +7,7 @@ memories; is_mock offline fallback). V1 adds memory CRUD + retrieval. V2 adds
 reflections/journal, a curiosity queue, projects, and user-approved evolution
 (propose/approve/reject + versioning/rollback). See docs/andres-robot-plan.md.
 """
+import asyncio
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Request
@@ -26,6 +27,7 @@ from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
     development_service, web_research, curriculum_service, research_service,
+    scholarly_research,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -269,13 +271,24 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
 
     # Research tier 3 (external web): only if the user toggled 🌐 AND the web tier is
     # enabled — otherwise report an honest disabled/off status, never a silent search.
+    # Tier 3a — general web (DuckDuckGo) and tier 3b — open scholarly APIs (arXiv,
+    # Semantic Scholar, Wikipedia). Both share the same tier-3 permission + 🌐 toggle,
+    # and both are read-only. Scholarly grounds factual/academic claims in real papers
+    # (V1 of "actually use the Knowledge-Sources directory"); it only queries the OPEN
+    # subset — no paywalled sources, no login/paywall bypass.
     web = web_research.off_state()
+    scholarly = scholarly_research.off_state()
     if body.use_web:
         if tiers["web"] and not profile_doc.get("development_paused"):
-            web = await web_research.research(body.message, limit=5)
+            web, scholarly = await asyncio.gather(
+                web_research.research(body.message, limit=5),
+                scholarly_research.research(body.message, limit_per_source=3),
+            )
             messages.append({"role": "system", "content": web_research.prompt_block(web)})
+            messages.append({"role": "system", "content": scholarly_research.prompt_block(scholarly)})
         else:
             web = web_research.disabled_state()
+            scholarly = scholarly_research.disabled_state()
 
     # Research tier 2b (image / limited perception): a picture the user shows him
     # this turn. Reuses the documents-tier consent (it is user-provided content).
@@ -405,6 +418,13 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
             "sources_consulted": web.get("sources_consulted", 0),
             "citations": web.get("citations", []),
             "fallback_url": web.get("fallback_url"),
+        },
+        "scholarly": {
+            "used": scholarly.get("used", False),
+            "access": scholarly.get("access", "off"),
+            "providers": scholarly.get("providers"),
+            "sources_consulted": scholarly.get("sources_consulted", 0),
+            "citations": scholarly.get("citations", []),
         },
     }
 

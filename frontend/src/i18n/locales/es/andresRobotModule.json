@@ -91,6 +91,15 @@
           "balanced": "Equilibrada",
           "agile": "Ágil"
         }
+      },
+      "scholarly": {
+        "status": {
+          "available": "Consultó fuentes de investigación",
+          "unavailable": "Buscó — sin resultados de investigación",
+          "failed": "Falló la consulta de investigación",
+          "off": "Respondió con conocimiento previo",
+          "disabled": "La web está desactivada en tus niveles de investigación"
+        }
       }
     },
     "memory": {

@@ -553,6 +553,23 @@ export default function AndresRobot() {
                 )}
               </div>
             )}
+            {m.scholarly && m.scholarly.used && (
+              <div style={{ marginTop: 4, fontSize: 11, color: colors.textSecondary }}>
+                <span style={{ fontWeight: 600 }}>
+                  📚 {t(`andresRobotModule.conversation.scholarly.status.${m.scholarly.access}`, m.scholarly.access)}
+                </span>
+                {(m.scholarly.citations || []).length > 0 && (
+                  <div style={{ marginTop: 3, display: "grid", gap: 2 }}>
+                    {m.scholarly.citations.map((c) => (
+                      <a key={c.n} href={c.url} target="_blank" rel="noopener noreferrer"
+                         style={{ color: colors.primary, textDecoration: "none" }}>
+                        [{c.n}] {c.source ? `${c.source}: ` : ""}{c.title}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
