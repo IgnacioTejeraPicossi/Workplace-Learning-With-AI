@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../ThemeContext";
+import { andresResearchSuggest } from "../api";
 
 /**
  * Andrés — Knowledge Sources tab.
@@ -122,11 +123,31 @@ const ACCESS_COLORS = {
 };
 
 export default function KnowledgeSources() {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const { colors } = useTheme();
   const [query, setQuery] = useState("");
 
+  // "Ask Andrés where to research" state
+  const [ask, setAsk] = useState("");
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
+  const [suggestErr, setSuggestErr] = useState(false);
+
   const total = useMemo(() => SOURCES.reduce((n, c) => n + c.items.length, 0), []);
+
+  const askAndres = async () => {
+    const qy = ask.trim();
+    if (!qy || suggesting) return;
+    setSuggesting(true); setSuggestErr(false); setSuggestion(null);
+    try {
+      const lang = i18n.language?.startsWith("no") ? "no" : i18n.language?.startsWith("es") ? "es" : "en";
+      const res = await andresResearchSuggest(qy, SOURCES, lang);
+      setSuggestion(res && Array.isArray(res.picks) ? res : { picks: [] });
+    } catch (e) {
+      setSuggestErr(true);
+    }
+    setSuggesting(false);
+  };
 
   const q = query.trim().toLowerCase();
   const filtered = useMemo(() => {
@@ -185,6 +206,93 @@ export default function KnowledgeSources() {
             border: `1px solid ${colors.border}`, background: colors.background, color: colors.text,
           }}
         />
+      </div>
+
+      {/* Ask Andrés where to research */}
+      <div style={{ ...card, borderLeft: `4px solid ${colors.primary}` }}>
+        <h3 style={{ margin: "0 0 6px", fontSize: 15, color: colors.text }}>
+          🧭 {t("andresRobotModule.library.suggest.title")}
+        </h3>
+        <p style={{ margin: "0 0 10px", fontSize: 12.5, color: colors.textSecondary }}>
+          {t("andresRobotModule.library.suggest.subtitle")}
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input
+            type="text"
+            value={ask}
+            onChange={(e) => setAsk(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") askAndres(); }}
+            placeholder={t("andresRobotModule.library.suggest.placeholder")}
+            style={{
+              flex: 1, minWidth: 220, boxSizing: "border-box",
+              padding: "10px 12px", fontSize: 13, borderRadius: 8,
+              border: `1px solid ${colors.border}`, background: colors.background, color: colors.text,
+            }}
+          />
+          <button
+            onClick={askAndres}
+            disabled={suggesting || !ask.trim()}
+            style={{
+              padding: "10px 18px", fontSize: 13, fontWeight: 700, borderRadius: 8, border: "none",
+              background: (suggesting || !ask.trim()) ? colors.border : colors.primary,
+              color: "#fff", cursor: (suggesting || !ask.trim()) ? "not-allowed" : "pointer", whiteSpace: "nowrap",
+            }}
+          >
+            {suggesting ? t("andresRobotModule.library.suggest.thinking") : t("andresRobotModule.library.suggest.button")}
+          </button>
+        </div>
+
+        {suggestErr && (
+          <p style={{ marginTop: 10, fontSize: 12.5, color: "#b91c1c" }}>
+            {t("andresRobotModule.library.suggest.error")}
+          </p>
+        )}
+
+        {suggestion && (
+          <div style={{ marginTop: 14 }}>
+            {suggestion.strategy && (
+              <p style={{ margin: "0 0 10px", fontSize: 13, color: colors.text, lineHeight: 1.55 }}>
+                <strong>{t("andresRobotModule.library.suggest.strategyLabel")}:</strong> {suggestion.strategy}
+              </p>
+            )}
+            {suggestion.picks.length === 0 ? (
+              <p style={{ fontSize: 12.5, color: colors.textSecondary }}>
+                {t("andresRobotModule.library.suggest.empty")}
+              </p>
+            ) : (
+              <div style={{ display: "grid", gap: 8 }}>
+                {suggestion.picks.map((p, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+                    padding: "10px 12px", borderRadius: 10,
+                    background: colors.background, border: `1px solid ${colors.border}`,
+                  }}>
+                    <div style={{ flex: 1, minWidth: 180 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <strong style={{ fontSize: 14, color: colors.text }}>{p.name}</strong>
+                        <AccessTag level={p.access} />
+                      </div>
+                      {p.reason && <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{p.reason}</div>}
+                    </div>
+                    {p.url && (
+                      <a href={p.url} target="_blank" rel="noopener noreferrer" style={{
+                        fontSize: 12.5, fontWeight: 700, color: "#fff", textDecoration: "none",
+                        background: colors.primary, borderRadius: 999, padding: "7px 14px", whiteSpace: "nowrap",
+                      }}>
+                        {t("andresRobotModule.library.visit")} ↗
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {suggestion.is_mock && (
+              <p style={{ margin: "10px 0 0", fontSize: 11, color: colors.textSecondary, fontStyle: "italic" }}>
+                {t("andresRobotModule.library.suggest.mockNote")}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Categories */}

@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.43.1] - 2026-08-22
+
+### Added — Andrés the Robot: "Ask Andrés where to research" (LLM source suggester)
+
+Builds on the Knowledge Sources tab (1.43.0): a panel where the user types a topic and Andrés
+recommends the best 3-5 sources from the directory, each with a one-line reason.
+
+- **Backend** `backend/services/andres/research_service.py::suggest_sources` — mock-first, same
+  `is_mock` contract as the rest of the module. The **frontend owns the catalog** and sends it in
+  (single source of truth), so the service never duplicates the list. LLM path builds a grounded
+  prompt (directory + question → STRICT JSON of `{source, reason}`), validates every returned name
+  against the sent catalog (drops hallucinated ones), and resolves each to its full entry. Offline
+  fallback is a deterministic keyword→category scorer (`_CATEGORY_KEYWORDS`) that picks a few
+  open-access-first sources — so it works with no AI key.
+- **Endpoint** `POST /api/andres/research/suggest` (`ResearchSuggestRequest{question, catalog[], lang}`),
+  auth-guarded like the rest of `/api/andres/*`, forwards request headers to the gateway.
+- **Frontend** `andres-robot/KnowledgeSources.jsx` — a 🧭 ask panel (input + button) rendering the
+  picks as source cards (name + access tag + reason + Visit link), plus an honest "offline
+  suggestion" note when `is_mock`. New api helper `andresResearchSuggest` in `api.js`.
+- **i18n** EN/NO/ES: `andresRobotModule.library.suggest.*` (9 keys).
+- **Tests** `backend/tests/test_andres_robot_contracts.py` — 2 offline: keyword fallback returns
+  is_mock + catalog-only picks; empty question → 422. (This file is already in the CI allow-list.)
+
+Validated: backend compile + the 2 new offline contract tests pass (`AI_FORCE_MOCK=1`);
+`npx eslint` clean on the touched frontend files (0 errors); i18n parity (358 keys/locale);
+production build.
+
+---
+
 ## [1.43.0] - 2026-08-22
 
 ### Added — Andrés the Robot: "Knowledge Sources" tab (curated research directory)

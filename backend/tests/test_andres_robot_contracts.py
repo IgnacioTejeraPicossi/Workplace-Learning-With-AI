@@ -1037,3 +1037,40 @@ async def test_development_accept_project_creates_project(mock_sugg, mock_proj):
     assert d["status"] == "accepted"
     assert d["created"]["project_id"] == "p9"
     mock_proj.insert_one.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_research_suggest_offline():
+    """POST /research/suggest maps a question to catalog sources. With no AI key
+    (conftest sets AI_FORCE_MOCK=1) it returns the deterministic keyword-matched
+    fallback: is_mock True, non-empty picks, all drawn from the sent catalog."""
+    catalog = [
+        {"cat": "academic", "items": [
+            {"name": "arXiv", "url": "https://arxiv.org", "desc": "preprints", "access": "open"},
+            {"name": "JSTOR", "url": "https://www.jstor.org", "desc": "journals", "access": "mixed"},
+        ]},
+        {"cat": "policy", "items": [
+            {"name": "Brookings Institution", "url": "https://www.brookings.edu", "desc": "policy", "access": "open"},
+            {"name": "NBER", "url": "https://www.nber.org", "desc": "economics", "access": "open"},
+        ]},
+    ]
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/research/suggest",
+                         json={"question": "the economic policy impact of remote work",
+                               "catalog": catalog, "lang": "en"})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["is_mock"] is True
+    assert isinstance(d["picks"], list) and len(d["picks"]) > 0
+    known = {"arXiv", "JSTOR", "Brookings Institution", "NBER"}
+    for p in d["picks"]:
+        assert p["name"] in known
+        assert "url" in p and "access" in p and "reason" in p
+
+
+@pytest.mark.asyncio
+async def test_research_suggest_validation():
+    """A too-short question is rejected by the request model (422)."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/research/suggest", json={"question": "", "catalog": []})
+    assert r.status_code == 422

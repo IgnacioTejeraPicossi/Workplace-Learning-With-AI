@@ -433,6 +433,17 @@
         "medicine": "Medicine & psychology",
         "policy": "Policy, economics & think tanks",
         "business": "Business & industry analysis"
+      },
+      "suggest": {
+        "title": "Ask Andrés where to research",
+        "subtitle": "Describe your topic and Andrés picks the best few sources above for it.",
+        "placeholder": "e.g. the economic impact of remote work…",
+        "button": "Suggest sources",
+        "thinking": "Thinking…",
+        "strategyLabel": "Approach",
+        "empty": "No clear match — try rephrasing, or browse the categories below.",
+        "error": "Could not reach Andrés. Please try again.",
+        "mockNote": "Offline suggestion (keyword-matched) — connect an AI provider for a reasoned pick."
       }
     }
   }

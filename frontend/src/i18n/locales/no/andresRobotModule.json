@@ -433,6 +433,17 @@
         "medicine": "Medisin og psykologi",
         "policy": "Politikk, økonomi og tankesmier",
         "business": "Næringsliv og bransjeanalyse"
+      },
+      "suggest": {
+        "title": "Spør Andrés hvor du bør undersøke",
+        "subtitle": "Beskriv temaet ditt, så velger Andrés de beste kildene ovenfor for det.",
+        "placeholder": "f.eks. den økonomiske effekten av hjemmekontor…",
+        "button": "Foreslå kilder",
+        "thinking": "Tenker…",
+        "strategyLabel": "Tilnærming",
+        "empty": "Ingen tydelig treff — prøv å omformulere, eller bla i kategoriene under.",
+        "error": "Fikk ikke kontakt med Andrés. Prøv igjen.",
+        "mockNote": "Frakoblet forslag (nøkkelord-basert) — koble til en AI-leverandør for et begrunnet valg."
       }
     }
   }

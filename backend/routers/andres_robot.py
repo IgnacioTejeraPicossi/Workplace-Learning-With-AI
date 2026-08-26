@@ -55,6 +55,24 @@ class ResearchTiers(BaseModel):
     web: Optional[bool] = None
 
 
+class CatalogItem(BaseModel):
+    name: str = Field(..., max_length=200)
+    url: str = Field("", max_length=500)
+    desc: str = Field("", max_length=400)
+    access: str = Field("mixed", max_length=20)
+
+
+class CatalogCategory(BaseModel):
+    cat: str = Field(..., max_length=60)
+    items: List[CatalogItem] = Field(default_factory=list)
+
+
+class ResearchSuggestRequest(BaseModel):
+    question: str = Field(..., min_length=2, max_length=2000)
+    catalog: List[CatalogCategory] = Field(default_factory=list)
+    lang: Optional[str] = None
+
+
 class MemoryCreate(BaseModel):
     content: str = Field(..., min_length=1, max_length=4000)
     type: str = "episodic"
@@ -201,6 +219,24 @@ async def set_research_tiers(body: ResearchTiers, user=Depends(_verify_token)):
     await get_or_create_profile(uid)
     tiers = await research_service.set_tiers(uid, body.model_dump(exclude_none=True))
     return {"tiers": tiers}
+
+
+@router.post("/research/suggest")
+async def research_suggest(body: ResearchSuggestRequest, http_request: Request,
+                           user=Depends(_verify_token)):
+    """Suggest the best few Knowledge-Sources entries for a research question.
+
+    The frontend owns the sources directory and sends it in as ``catalog`` (so it
+    stays the single source of truth); Andrés maps the question to the 3-5 most
+    relevant entries. Mock-first: works with no AI key (deterministic keyword
+    fallback), returning ``is_mock: true`` in that case.
+    """
+    return await research_service.suggest_sources(
+        question=body.question,
+        catalog=[c.model_dump() for c in (body.catalog or [])],
+        lang=body.lang,
+        request_headers=http_request.headers,
+    )
 
 
 @router.post("/chat")

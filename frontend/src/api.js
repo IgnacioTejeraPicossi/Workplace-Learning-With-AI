@@ -195,6 +195,9 @@ export async function andresChat(message, useWeb = false, document = "", image =
 export async function getAndresResearchTiers() {
   return apiCall("/api/andres/research/tiers", "GET");
 }
+export async function andresResearchSuggest(question, catalog, lang) {
+  return apiCall("/api/andres/research/suggest", "POST", { question, catalog, lang });
+}
 export async function setAndresResearchTiers(tiers) {
   return apiCall("/api/andres/research/tiers", "PATCH", tiers);
 }

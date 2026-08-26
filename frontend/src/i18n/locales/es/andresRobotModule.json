@@ -433,6 +433,17 @@
         "medicine": "Medicina y psicología",
         "policy": "Política, economía y think tanks",
         "business": "Negocios y análisis sectorial"
+      },
+      "suggest": {
+        "title": "Pregúntale a Andrés dónde investigar",
+        "subtitle": "Describe tu tema y Andrés elige las mejores fuentes de arriba para él.",
+        "placeholder": "p. ej. el impacto económico del teletrabajo…",
+        "button": "Sugerir fuentes",
+        "thinking": "Pensando…",
+        "strategyLabel": "Enfoque",
+        "empty": "Sin coincidencia clara — reformula o explora las categorías de abajo.",
+        "error": "No se pudo contactar con Andrés. Inténtalo de nuevo.",
+        "mockNote": "Sugerencia sin conexión (por palabras clave) — conecta un proveedor de IA para una elección razonada."
       }
     }
   }
