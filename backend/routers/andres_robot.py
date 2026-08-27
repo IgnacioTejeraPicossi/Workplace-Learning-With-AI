@@ -282,7 +282,7 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         if tiers["web"] and not profile_doc.get("development_paused"):
             web, scholarly = await asyncio.gather(
                 web_research.research(body.message, limit=5),
-                scholarly_research.research(body.message, limit_per_source=3),
+                scholarly_research.research(body.message, limit_per_source=2),
             )
             messages.append({"role": "system", "content": web_research.prompt_block(web)})
             messages.append({"role": "system", "content": scholarly_research.prompt_block(scholarly)})

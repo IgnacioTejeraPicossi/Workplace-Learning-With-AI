@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.44.1] - 2026-08-23
+
+### Added — Andrés the Robot: source routing + more open sources (Knowledge Sources V2)
+
+Builds on V1 (1.44.0). Andrés now develops a "bibliographic nose": instead of always hitting the
+same three APIs, he **routes each question to the source(s) that actually fit it**, and the open
+pool is larger. Backend-only; the 🌐-gated, cited, honest contract is unchanged.
+
+- **More open sources** (`backend/services/andres/scholarly_research.py`), all free / no key unless
+  noted: **PubMed** (NCBI E-utilities — medicine), **Project Gutenberg** (Gutendex — public-domain
+  books), **Internet Archive** (advancedsearch — texts/media), and **Europeana** (cultural heritage,
+  OPTIONAL — self-skips unless `EUROPEANA_KEY` is set). Joins V1's arXiv + Semantic Scholar +
+  Wikipedia. Still the OPEN subset only — no paywalled sources, no login/paywall bypass.
+- **Topic routing** — a dedicated keyword map (`_ROUTE_KEYWORDS`/`_ROUTE_SOURCES`), separate from
+  the suggester's directory map which proved too coarse (it sent *Romancero gitano* to arXiv and a
+  machine-learning query to "courses"). Wikipedia is always included; the no-match default is
+  Wikipedia + Semantic Scholar (cross-domain) — **never arXiv**, so a humanities question is never
+  polluted with physics preprints. Verified live: *Romancero gitano* → Wikipedia + Gutenberg +
+  Internet Archive (no arXiv); RAG-in-education → Wikipedia + arXiv + Semantic Scholar; "teach
+  poetry with AI" → both (mixed). `research()` accepts an explicit `sources=` list too.
+- **Query cleanup** — `_search_terms()` strips EN+ES question scaffolding/stopwords so the APIs see
+  salient keywords ("poetry of Lorca") rather than a whole sentence, which badly hurts keyword
+  search. Routing still uses the full phrasing.
+- Combined results capped at `_MAX_TOTAL=10`; the response's `providers` now reflects the actually
+  routed sources so Andrés can say which he consulted.
+- **Tests** `backend/tests/test_andres_scholarly.py` — expanded to 12 offline (aggregation with
+  explicit sources, failure isolation, all-fail, empty query, total cap, new-source plumbing,
+  prompt block, + 5 routing tests: medicine→PubMed, STEM→arXiv, books→archives, always-Wikipedia /
+  no-Europeana-without-key, never-empty). Fixed a subtlety: routing resolves fetchers via
+  `globals()` at call time so `patch.object` in tests actually takes effect.
+
+Validated: backend compile; 12 scholarly + 54 Andrés contract tests pass; live routing confirmed on
+Andrés' own three example queries. Frontend unchanged (V1 already renders the 📚 cited sources).
+Deferred V3: route via the LLM "Ask Andrés where to research" suggester; language-aware Wikipedia
+(es.wikipedia for Spanish queries); open-access full-text fetch.
+
+---
+
 ## [1.44.0] - 2026-08-22
 
 ### Added — Andrés the Robot: grounds Conversation in real open research APIs (Knowledge Sources V1)
