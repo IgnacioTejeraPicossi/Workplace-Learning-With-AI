@@ -17,16 +17,18 @@ Root cause: the `@react-three/postprocessing` / `postprocessing` version expects
 the pinned `three@0.155` (the same peer mismatch noted for the frontend build), so the Bloom/Vignette
 pass can hit a null render-target texture during a WebGL init race.
 
-- `frontend/src/components/HologramPortal3D.jsx` — the `<EffectComposer>` (Bloom + Vignette) is now
-  wrapped in a `PostFXBoundary` error boundary: if the post-processing pass fails it is dropped and
-  the 3D avatar (robot + ring + sparkles + environment) still renders — no app crash.
-- `frontend/src/AndresRobot.jsx` — belt-and-suspenders: the whole `<HologramPortal3D>` is wrapped in
-  an `AvatarBoundary`, so ANY WebGL/3D failure just hides the avatar and the conversation keeps working.
+- **First tried** an error boundary around the effect (`PostFXBoundary`) + around the avatar
+  (`AvatarBoundary`), but it recurred: a React error boundary does **not** reliably catch errors
+  thrown inside react-three-fiber's own reconciler commit, so the overlay still fired.
+- **Definitive fix** — `frontend/src/components/HologramPortal3D.jsx` now **removes the
+  `<EffectComposer>` (Bloom + Vignette) entirely**, so the crashing code path never runs (dev and
+  prod). The avatar keeps its glow from the emissive pulsing ring + Sparkles + environment lighting;
+  only the soft bloom halo is gone. The `AvatarBoundary` around `<HologramPortal3D>` in
+  `AndresRobot.jsx` stays as a general safety net for any other 3D failure.
 
-Frontend-only, defensive (no dependency change). Validated: `@babel/parser` parse; production build.
-Note: in the CRA dev server the error overlay may still flash on a bad init before the boundary
-recovers (dev-only); production is clean. A full fix would align the three/postprocessing versions —
-deferred as a higher-risk dependency change.
+Frontend-only, no dependency change. Validated: `@babel/parser` parse; production build. Re-adding
+post-processing needs the three (0.155) ↔ `postprocessing` versions aligned first — deferred as a
+higher-risk dependency upgrade.
 
 ---
 
@@ -43,6 +45,9 @@ cleaned first; the visible chat keeps its formatting.
   fences and images, and converts `[label](url)` → `label` (so the URL isn't read either).
 - Fixes it for **both** consumers of the hook (Andrés + the Hologram chat) in one place. No visual
   change to the rendered messages; frontend-only.
+- **Follow-up**: also normalise arrows (`→ ← ↔ ⇒ ->  =>  <-` …) and space-delimited em/en dashes to
+  a comma, so a list like "language → use in AI → strengths" is read with natural pauses instead of
+  "arrow"/"flecha". Hyphenated words (`retrieval-augmented`, `state-of-the-art`) are left intact.
 
 Validated: `npx eslint` clean; sanitizer checked on the reported text (`**algo**` → `algo`,
 `[Wikipedia](url)` → `Wikipedia`); production build.

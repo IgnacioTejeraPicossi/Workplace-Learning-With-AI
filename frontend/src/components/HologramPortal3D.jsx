@@ -2,32 +2,14 @@ import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, Float, Sparkles } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-
-/**
- * Contains failures from the post-processing pass (Bloom/Vignette). The
- * `@react-three/postprocessing` / `postprocessing` version can be incompatible
- * with the pinned three@0.155 (it expects a newer three), which surfaces as
- * `EffectComposer.addPass → Cannot read properties of null (reading 'alpha')`
- * and would otherwise crash the whole chat. When the effects fail we simply drop
- * them: the 3D avatar (robot + ring + sparkles + environment) still renders.
- */
-class PostFXBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { failed: false };
-  }
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  componentDidCatch(error) {
-    // eslint-disable-next-line no-console
-    console.warn('[Hologram] post-processing disabled (WebGL/postprocessing incompatibility):', error?.message);
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
+// NOTE: @react-three/postprocessing (EffectComposer/Bloom/Vignette) was removed
+// deliberately. Its `postprocessing` peer expects a newer three than the pinned
+// three@0.155, so `EffectComposer.addPass` intermittently crashed with
+// "Cannot read properties of null (reading 'alpha')" and took down the whole chat
+// — and a React error boundary does NOT reliably catch errors from R3F's own
+// reconciler. The avatar keeps its glow from the emissive ring + sparkles +
+// environment lighting. Re-add post-processing only after aligning three/
+// postprocessing versions (a higher-risk dependency change).
 
 function canCreateWebGLContext() {
   if (typeof document === 'undefined') return false;
@@ -109,12 +91,6 @@ export default function HologramPortal3D({ onClick, embed = false, activity = 'i
         <Suspense fallback={null}>
           <Scene modelScale={modelScale} modelOffsetY={modelOffsetY} modelUrl={activeUrl} activity={activity} />
         </Suspense>
-        <PostFXBoundary>
-          <EffectComposer>
-            <Bloom intensity={0.8} luminanceThreshold={0.2} luminanceSmoothing={0.9} />
-            <Vignette eskil={false} offset={0.2} darkness={0.8} />
-          </EffectComposer>
-        </PostFXBoundary>
       </Canvas>
       {/* Controls overlay (works even when embed true; hidden when showControls=false) */}
       {showControls && (

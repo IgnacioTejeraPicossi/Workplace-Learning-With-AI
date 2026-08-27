@@ -11,6 +11,10 @@ export function stripMarkdownForSpeech(text) {
     .replace(/`([^`]*)`/g, "$1")                 // inline code
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")       // images
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")      // links → label
+    // Arrows read aloud as "arrow"/"flecha" — turn them into a natural pause.
+    .replace(/\s*(?:→|←|↔|⇒|⇐|⟶|⟵|➜|➔|-->|<--|->|<-|=>|<=)\s*/g, ", ")
+    // Em/en dash used as a separator (spaces around it) → comma (keeps hyphenated words intact).
+    .replace(/\s+[—–]\s+/g, ", ")
     .replace(/^\s{0,3}#{1,6}\s+/gm, "")           // headings
     .replace(/^\s{0,3}>\s?/gm, "")                // blockquotes
     .replace(/^\s*[-*+•]\s+/gm, "")               // list bullets
