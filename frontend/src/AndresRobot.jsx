@@ -18,6 +18,29 @@ import Skills from "./andres-robot/Skills";
 import HumanLab from "./andres-robot/HumanLab";
 import KnowledgeSources from "./andres-robot/KnowledgeSources";
 
+/**
+ * Safety net around the WebGL/3D avatar: a WebGL or three/postprocessing failure
+ * (e.g. `EffectComposer.addPass` reading null 'alpha' from the three@0.155 ↔
+ * postprocessing version mismatch) must never take down the whole chat. If the
+ * avatar crashes, we just hide it and the conversation keeps working.
+ */
+class AvatarBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error) {
+    // eslint-disable-next-line no-console
+    console.warn('[Andrés] 3D avatar disabled after a render error:', error?.message);
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
 const MEMORY_TYPES = [
   "episodic", "semantic", "relational", "creative", "procedural", "reflective", "working",
 ];
@@ -478,11 +501,13 @@ export default function AndresRobot() {
       {voiceMode && showAvatar && (
         <div style={{ display: "grid", gap: 4 }}>
           <div style={{ height: 260, borderRadius: 12, overflow: "hidden", border: `1px solid ${colors.border}`, background: "#0b1220" }}>
-            <HologramPortal3D
-              embed
-              showControls={false}
-              activity={tts.isSpeaking ? "speaking" : (asr.isListening ? "listening" : "idle")}
-            />
+            <AvatarBoundary>
+              <HologramPortal3D
+                embed
+                showControls={false}
+                activity={tts.isSpeaking ? "speaking" : (asr.isListening ? "listening" : "idle")}
+              />
+            </AvatarBoundary>
           </div>
           <div style={{ fontSize: 11, color: colors.textSecondary, textAlign: "center" }}>
             {tts.isSpeaking

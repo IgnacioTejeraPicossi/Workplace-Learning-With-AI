@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.44.3] - 2026-08-23
+
+### Fixed — 3D avatar crash no longer takes down the Andrés chat
+
+Starting the Andrés chat sometimes threw an uncaught `TypeError: Cannot read properties of null
+(reading 'alpha')` at `EffectComposer.addPass`, which crashed the whole React tree (red overlay).
+Root cause: the `@react-three/postprocessing` / `postprocessing` version expects a newer three than
+the pinned `three@0.155` (the same peer mismatch noted for the frontend build), so the Bloom/Vignette
+pass can hit a null render-target texture during a WebGL init race.
+
+- `frontend/src/components/HologramPortal3D.jsx` — the `<EffectComposer>` (Bloom + Vignette) is now
+  wrapped in a `PostFXBoundary` error boundary: if the post-processing pass fails it is dropped and
+  the 3D avatar (robot + ring + sparkles + environment) still renders — no app crash.
+- `frontend/src/AndresRobot.jsx` — belt-and-suspenders: the whole `<HologramPortal3D>` is wrapped in
+  an `AvatarBoundary`, so ANY WebGL/3D failure just hides the avatar and the conversation keeps working.
+
+Frontend-only, defensive (no dependency change). Validated: `@babel/parser` parse; production build.
+Note: in the CRA dev server the error overlay may still flash on a bad init before the boundary
+recovers (dev-only); production is clean. A full fix would align the three/postprocessing versions —
+deferred as a higher-risk dependency change.
+
+---
+
 ## [1.44.2] - 2026-08-23
 
 ### Fixed — TTS no longer reads Markdown symbols aloud ("asterisco")
