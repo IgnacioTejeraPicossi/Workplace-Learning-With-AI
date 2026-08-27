@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.44.2] - 2026-08-23
+
+### Fixed — TTS no longer reads Markdown symbols aloud ("asterisco")
+
+Andrés' replies use Markdown (`**bold**`, `*italic*`, links…). Browser speech synthesis reads
+every `*` as "asterisk"/"asterisco", which was jarring when Andrés spoke. Now the spoken copy is
+cleaned first; the visible chat keeps its formatting.
+
+- `frontend/src/components/hologram/useSpeechOutput.js` — new `stripMarkdownForSpeech()` applied
+  inside `speak()` before building the utterance: strips `*`/`_`/`` ` ``/`#`/`>`/bullets, drops code
+  fences and images, and converts `[label](url)` → `label` (so the URL isn't read either).
+- Fixes it for **both** consumers of the hook (Andrés + the Hologram chat) in one place. No visual
+  change to the rendered messages; frontend-only.
+
+Validated: `npx eslint` clean; sanitizer checked on the reported text (`**algo**` → `algo`,
+`[Wikipedia](url)` → `Wikipedia`); production build.
+
+---
+
 ## [1.44.1] - 2026-08-23
 
 ### Added — Andrés the Robot: source routing + more open sources (Knowledge Sources V2)

@@ -1,6 +1,27 @@
 import { useState } from "react";
 
 /**
+ * Strip Markdown so the TTS voice doesn't read punctuation/markup aloud (browsers
+ * say "asterisk" for every `*`, "pound" for `#`, etc.). The visible chat keeps its
+ * formatting — only the spoken copy is cleaned. Converts `[label](url)` to `label`.
+ */
+export function stripMarkdownForSpeech(text) {
+  return String(text || "")
+    .replace(/```[\s\S]*?```/g, " ")            // fenced code blocks
+    .replace(/`([^`]*)`/g, "$1")                 // inline code
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")       // images
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")      // links → label
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")           // headings
+    .replace(/^\s{0,3}>\s?/gm, "")                // blockquotes
+    .replace(/^\s*[-*+•]\s+/gm, "")               // list bullets
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")           // bold
+    .replace(/(\*|_)(.*?)\1/g, "$2")              // italic
+    .replace(/[*_`#>]/g, " ")                     // any leftover markers
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+/**
  * Speak text using SpeechSynthesis (browser TTS).
  */
 export function useSpeechOutput(options = {}) {
@@ -27,8 +48,10 @@ export function useSpeechOutput(options = {}) {
 
   const speak = (text) => {
     if (!supported || !text || muted) return;
+    const spoken = stripMarkdownForSpeech(text);   // don't read "asterisk", "pound", etc.
+    if (!spoken) return;
     window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
+    const utter = new SpeechSynthesisUtterance(spoken);
     utter.lang = lang;
     utter.rate = rate;
     utter.pitch = pitch;
