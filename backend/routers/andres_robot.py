@@ -27,7 +27,7 @@ from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
     development_service, web_research, curriculum_service, research_service,
-    scholarly_research,
+    scholarly_research, progress_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -719,6 +719,15 @@ async def development_list(status: str = None, user=Depends(_verify_token)):
 async def development_act(suggestion_id: str, body: SuggestionAction, user=Depends(_verify_token)):
     """Accept (may create a project) or dismiss one of Andrés' suggestions."""
     return await development_service.act_on_suggestion(user.get("uid"), suggestion_id, body.action)
+
+
+@router.get("/development/timeline")
+async def development_timeline(days: int = 14, user=Depends(_verify_token)):
+    """A read-only snapshot of Andrés' growth over time (age, identity versions,
+    memory counts by type, reflections, skills/projects, and a recent-activity
+    series) — for measuring and documenting his development."""
+    days = max(7, min(int(days or 14), 90))
+    return await progress_service.development_timeline(user.get("uid"), activity_days=days)
 
 
 # ── V5: curriculum ("a compass, not a school"; modules share the archive lifecycle) ─

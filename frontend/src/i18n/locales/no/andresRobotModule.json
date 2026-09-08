@@ -14,6 +14,7 @@
       "projects": "Prosjekter",
       "evolution": "Evolusjon",
       "journal": "Dagbok",
+      "progress": "Fremgang",
       "library": "Kunnskapskilder",
       "safety": "Sikkerhet"
     },
@@ -454,6 +455,25 @@
         "error": "Fikk ikke kontakt med Andrés. Prøv igjen.",
         "mockNote": "Frakoblet forslag (nøkkelord-basert) — koble til en AI-leverandør for et begrunnet valg."
       }
+    },
+    "progress": {
+      "title": "Utviklingstidslinje",
+      "subtitle": "Et øyeblikksbilde av hvordan Andrés har vokst — for å måle og dokumentere utviklingen over tid.",
+      "loading": "Laster fremgang…",
+      "error": "Kunne ikke laste tidslinjen.",
+      "empty": "Ingen data ennå.",
+      "ageDays": "Alder (dager)",
+      "identity": "Identitet",
+      "memories": "Minner",
+      "reflections": "Refleksjoner",
+      "skills": "Ferdigheter (aktive/totalt)",
+      "projects": "Prosjekter (aktive/totalt)",
+      "creative": "Kreative verk",
+      "conversations": "Samtaler",
+      "byType": "Minner etter type",
+      "activity": "Nylig aktivitet (14 dager)",
+      "activityHint": "Søyler = minner + refleksjoner opprettet per dag.",
+      "identityHistory": "Identitetsversjoner"
     }
   }
 }

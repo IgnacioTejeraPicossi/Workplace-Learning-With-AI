@@ -17,6 +17,7 @@ import Creative from "./andres-robot/Creative";
 import Skills from "./andres-robot/Skills";
 import HumanLab from "./andres-robot/HumanLab";
 import KnowledgeSources from "./andres-robot/KnowledgeSources";
+import Progress from "./andres-robot/Progress";
 
 /**
  * Safety net around the WebGL/3D avatar: a WebGL or three/postprocessing failure
@@ -146,6 +147,7 @@ const TABS = [
   { id: "projects", icon: "📌" },
   { id: "evolution", icon: "🧬" },
   { id: "journal", icon: "📔" },
+  { id: "progress", icon: "📈" },
   { id: "library", icon: "📚" },
   { id: "safety", icon: "🛡️" },
 ];
@@ -847,6 +849,7 @@ export default function AndresRobot() {
     if (activeTab === "projects") return <Projects onProfileChange={loadProfile} />;
     if (activeTab === "journal") return <Journal onProfileChange={loadProfile} />;
     if (activeTab === "evolution") return <Evolution profile={profile} onProfileChange={loadProfile} />;
+    if (activeTab === "progress") return <Progress />;
     if (activeTab === "library") return <KnowledgeSources />;
     if (activeTab === "safety") return renderSafety();
     const tab = TABS.find((x) => x.id === activeTab);

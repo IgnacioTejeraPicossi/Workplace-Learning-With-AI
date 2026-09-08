@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.1] - 2026-08-24
+
+### Added — Andrés the Robot: development-timeline / progress panel (audit P4)
+
+A read-only snapshot of how Andrés has grown, so the owner and the University-of-Granada
+collaborator can **measure and document his development over time**.
+
+- **Backend** `backend/services/andres/progress_service.py::development_timeline(user_id)` +
+  `GET /api/andres/development/timeline?days=N` (7–90, default 14). Aggregates, per user and
+  best-effort (a failing collection contributes zeros, never a 500): developmental age, identity
+  versions over time, memory counts **by type**, reflections, skills (active/total), projects
+  (active/total), creative artifacts, curiosity items, approved evolutions, conversations, and a
+  fixed-length **day-by-day activity series** (memories + reflections).
+- **Frontend** `frontend/src/andres-robot/Progress.jsx` + a 📈 "Progress" tab in `AndresRobot.jsx`
+  (after Journal): stat cards, a memory-by-type bar breakdown, a 14-day activity mini-chart
+  (pure CSS, no chart lib), and the identity-version history. api helper `getAndresTimeline`.
+- **i18n** EN/NO/ES: `andresRobotModule.tabs.progress` + `andresRobotModule.progress.*` (17 keys).
+- **Tests** `backend/tests/test_andres_progress.py` (2 offline: snapshot shape incl. by-type +
+  fixed-length series; graceful degradation when every collection errors). Added to CI allow-list.
+
+Validated: backend compile; 72 Andrés offline tests pass (54 contracts + 12 scholarly + 4 semantic
++ 2 progress); i18n parity (381 keys); production build. Deferred (P3/P5): memory consolidation +
+Mongo `user_id` index; `/chat` rate/cost limits; scholarly V3.
+
+---
+
 ## [1.45.0] - 2026-08-24
 
 ### Added — Andrés the Robot: semantic memory + multi-user hardening (audit P1 + P2)

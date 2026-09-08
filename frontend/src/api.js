@@ -198,6 +198,9 @@ export async function getAndresResearchTiers() {
 export async function andresResearchSuggest(question, catalog, lang) {
   return apiCall("/api/andres/research/suggest", "POST", { question, catalog, lang });
 }
+export async function getAndresTimeline(days = 14) {
+  return apiCall(`/api/andres/development/timeline?days=${days}`, "GET");
+}
 export async function setAndresResearchTiers(tiers) {
   return apiCall("/api/andres/research/tiers", "PATCH", tiers);
 }

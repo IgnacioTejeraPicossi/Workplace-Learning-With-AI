@@ -14,6 +14,7 @@
       "projects": "Projects",
       "evolution": "Evolution",
       "journal": "Journal",
+      "progress": "Progress",
       "library": "Knowledge Sources",
       "safety": "Safety"
     },
@@ -454,6 +455,25 @@
         "error": "Could not reach Andrés. Please try again.",
         "mockNote": "Offline suggestion (keyword-matched) — connect an AI provider for a reasoned pick."
       }
+    },
+    "progress": {
+      "title": "Development timeline",
+      "subtitle": "A snapshot of how Andrés has grown — to measure and document his development over time.",
+      "loading": "Loading progress…",
+      "error": "Could not load the timeline.",
+      "empty": "No data yet.",
+      "ageDays": "Age (days)",
+      "identity": "Identity",
+      "memories": "Memories",
+      "reflections": "Reflections",
+      "skills": "Skills (active/total)",
+      "projects": "Projects (active/total)",
+      "creative": "Creative works",
+      "conversations": "Conversations",
+      "byType": "Memories by type",
+      "activity": "Recent activity (14 days)",
+      "activityHint": "Bars = memories + reflections created per day.",
+      "identityHistory": "Identity versions"
     }
   }
 }

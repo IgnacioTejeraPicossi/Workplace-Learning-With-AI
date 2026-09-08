@@ -14,6 +14,7 @@
       "projects": "Proyectos",
       "evolution": "Evolución",
       "journal": "Diario",
+      "progress": "Avance",
       "library": "Fuentes de conocimiento",
       "safety": "Seguridad"
     },
@@ -454,6 +455,25 @@
         "error": "No se pudo contactar con Andrés. Inténtalo de nuevo.",
         "mockNote": "Sugerencia sin conexión (por palabras clave) — conecta un proveedor de IA para una elección razonada."
       }
+    },
+    "progress": {
+      "title": "Línea de desarrollo",
+      "subtitle": "Una instantánea de cómo ha crecido Andrés — para medir y documentar su desarrollo con el tiempo.",
+      "loading": "Cargando avance…",
+      "error": "No se pudo cargar la línea de tiempo.",
+      "empty": "Aún no hay datos.",
+      "ageDays": "Edad (días)",
+      "identity": "Identidad",
+      "memories": "Memorias",
+      "reflections": "Reflexiones",
+      "skills": "Habilidades (activas/total)",
+      "projects": "Proyectos (activos/total)",
+      "creative": "Obras creativas",
+      "conversations": "Conversaciones",
+      "byType": "Memorias por tipo",
+      "activity": "Actividad reciente (14 días)",
+      "activityHint": "Barras = memorias + reflexiones creadas por día.",
+      "identityHistory": "Versiones de identidad"
     }
   }
 }
