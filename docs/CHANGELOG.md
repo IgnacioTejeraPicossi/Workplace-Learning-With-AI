@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.0] - 2026-08-24
+
+### Added — Andrés the Robot: semantic memory + multi-user hardening (audit P1 + P2)
+
+Follow-up to the full read-only audit of Andrés (prompted by a research collaboration with a
+professor at the University of Granada). The audit confirmed the module is in good shape — 66
+offline tests green, 51 endpoints, an exemplary honesty-first constitution, and (verified) **every
+`andres_*` collection is already scoped by `user_id`, so there is no cross-user data leak**. Two
+improvements shipped:
+
+**P1 — multi-user readiness.** `verify_token` was already fail-closed (503 when Firebase is down and
+`ALLOW_MOCK_AUTH` is off; a shared mock user only with the explicit opt-in), and per-user isolation
+is correct, so the only code fix was the default identity hardcoding a name: `constitution.py`
+`default_identity()` now describes growing "together with the person I am getting to know" instead
+of "with Ignacio", so a second user's Andrés starts neutral. (Real per-user Andrés still requires
+Firebase active — a deployment/config decision, not code.)
+
+**P2 — semantic memory recall (the core "continuity" upgrade).** Memory recall moves from pure
+keyword overlap to **meaning-based ranking**:
+- New `backend/services/andres/semantic_memory.py` — `embed_text()` (OpenAI `text-embedding-3-small`)
+  + `cosine()`. Embeddings are **off under `AI_FORCE_MOCK` / no key**, returning None, so offline and
+  CI stay deterministic and network-free.
+- `memory_service.save_memory()` stores an `embedding` per memory at write time; `retrieve_relevant()`
+  now blends cosine similarity (weight ×3) with the existing keyword + importance + recency + verified
+  signals, so a memory can surface with **zero literal word overlap**. Offline it reduces EXACTLY to
+  the previous keyword behaviour (no regression). Legacy memories are back-filled lazily (≤5 per
+  retrieval) once embeddings are on. The internal vector is stripped from every API/prompt response.
+
+**Tests**: `backend/tests/test_andres_semantic_memory.py` (4 offline — embeddings-off gating, cosine
+maths, keyword fallback, semantic-beats-keyword, no-vector-leak), added to the CI allow-list. All 70
+Andrés offline tests pass (54 contracts + 12 scholarly + 4 semantic). Backend-only; no frontend change.
+
+Deferred (audit P3–P5): memory consolidation/summarisation + a Mongo `user_id` index; a
+development-progress dashboard/export for the collaboration; rate/cost limits on `/chat`; scholarly V3
+(es.wikipedia, LLM-routed sources, citation taxonomy).
+
+---
+
 ## [1.44.3] - 2026-08-23
 
 ### Fixed — 3D avatar crash no longer takes down the Andrés chat
