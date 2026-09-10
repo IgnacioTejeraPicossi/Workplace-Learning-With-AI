@@ -127,7 +127,17 @@
       "unprotect": "Unprotect",
       "forget": "Forget",
       "loading": "Recalling…",
-      "empty": "No memories yet. Talk with Andrés, or teach him something above."
+      "empty": "No memories yet. Talk with Andrés, or teach him something above.",
+      "consolidate": {
+        "title": "Memory consolidation",
+        "hint": "Fold an old cluster of small memories into one durable semantic memory. Nothing changes until you approve.",
+        "propose": "Propose",
+        "working": "Working…",
+        "folds": "Folds {{count}} old memories",
+        "offline": "offline summary",
+        "approve": "Approve",
+        "reject": "Reject"
+      }
     },
     "common": {
       "loading": "Loading…"

@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.2] - 2026-09-10
+
+### Added — Andrés the Robot: memory consolidation + user_id index (audit P3)
+
+Keeps recall sharp as a biography grows, the last of the audit's high-value items.
+
+**Part A — Mongo index.** `memory_service._ensure_indexes()` — a best-effort, once-per-process
+compound index on `andres_memories (user_id, created_at)`, so the per-user memory scan stays fast.
+Idempotent; a no-op when Mongo is unavailable. `retrieve_relevant` now also excludes `archived`
+memories (their meaning lives in the consolidated one), keeping recall uncluttered.
+
+**Part B — memory consolidation (consent-first).** Folds an old, low-salience episodic cluster into
+one durable semantic memory — as a **proposal the user approves**, honouring the constitution:
+- `backend/services/andres/consolidation_service.py` — `propose_consolidation` picks the least-
+  important / least-recalled / oldest non-protected episodic memories, and the LLM writes ONE
+  semantic summary grounded ONLY in them (mock-first deterministic offline). Nothing is touched yet.
+  `act_on_consolidation` on **approve** creates the semantic memory (`source: consolidation`,
+  `supersedes` = source ids, embedded) and **ARCHIVES** the sources (`archived: True`,
+  `consolidated_into`) — never deletes them, so it is fully reversible and nothing is hidden;
+  **reject** discards the proposal untouched.
+- Endpoints `POST /api/andres/memory/consolidate`, `GET /api/andres/memory/consolidations`,
+  `POST /api/andres/memory/consolidations/{id}` (approve/reject). New collection
+  `andres_memory_consolidations`.
+- Frontend: a 🧹 consolidation panel in the Memory Garden (propose + pending proposals with
+  Approve/Reject). api helpers `proposeAndresConsolidation` / `listAndresConsolidations` /
+  `actAndresConsolidation`. i18n EN/NO/ES `andresRobotModule.memory.consolidate.*`.
+
+**Tests** `backend/tests/test_andres_consolidation.py` (4 offline: min-cluster guard, grounded
+offline summary, approve creates-semantic-and-archives-not-deletes, reject touches nothing), added
+to the CI allow-list. All 76 Andrés offline tests pass. Validated: backend compile; i18n parity
+(389 keys); production build. **All audit items P1–P5 except the P5 quick-wins are now done.**
+
+---
+
 ## [1.45.1] - 2026-08-24
 
 ### Added — Andrés the Robot: development-timeline / progress panel (audit P4)

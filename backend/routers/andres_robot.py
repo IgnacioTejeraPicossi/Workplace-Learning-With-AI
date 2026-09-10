@@ -27,7 +27,7 @@ from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
     development_service, web_research, curriculum_service, research_service,
-    scholarly_research, progress_service,
+    scholarly_research, progress_service, consolidation_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -165,6 +165,10 @@ class CapsuleBody(BaseModel):
 
 class SuggestionAction(BaseModel):
     action: str = Field(..., pattern="^(accept|dismiss)$")
+
+
+class ConsolidationAction(BaseModel):
+    action: str = Field(..., pattern="^(approve|reject)$")
 
 
 class DevSuggestRequest(BaseModel):
@@ -453,6 +457,30 @@ async def patch_memory(memory_id: str, body: MemoryPatch, user=Depends(_verify_t
 async def forget_memory(memory_id: str, user=Depends(_verify_token)):
     """Forget (delete) a memory. Protected memories are still deletable by the user."""
     return await memory_service.delete_memory(user.get("uid"), memory_id)
+
+
+# ── Memory consolidation (P3) — propose → user approves → fold old memories ───
+
+@router.post("/memory/consolidate")
+async def memory_consolidate_propose(http_request: Request, user=Depends(_verify_token)):
+    """Propose folding an old, low-priority episodic cluster into one semantic
+    memory. Nothing changes until the user approves the proposal."""
+    return await consolidation_service.propose_consolidation(
+        user.get("uid"), request_headers=http_request.headers)
+
+
+@router.get("/memory/consolidations")
+async def memory_consolidations_list(status: str = None, user=Depends(_verify_token)):
+    items = await consolidation_service.list_consolidations(user.get("uid"), status=status)
+    return {"consolidations": items, "count": len(items)}
+
+
+@router.post("/memory/consolidations/{consolidation_id}")
+async def memory_consolidation_act(consolidation_id: str, body: ConsolidationAction,
+                                   user=Depends(_verify_token)):
+    """Approve (fold + archive sources) or reject a consolidation proposal."""
+    return await consolidation_service.act_on_consolidation(
+        user.get("uid"), consolidation_id, body.action)
 
 
 # ── V2: reflection / journal ─────────────────────────────────────────────────

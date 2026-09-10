@@ -127,7 +127,17 @@
       "unprotect": "Fjern beskyttelse",
       "forget": "Glem",
       "loading": "Henter minner…",
-      "empty": "Ingen minner ennå. Snakk med Andrés, eller lær ham noe ovenfor."
+      "empty": "Ingen minner ennå. Snakk med Andrés, eller lær ham noe ovenfor.",
+      "consolidate": {
+        "title": "Minnekonsolidering",
+        "hint": "Slå sammen en gammel klynge små minner til ett varig semantisk minne. Ingenting endres før du godkjenner.",
+        "propose": "Foreslå",
+        "working": "Jobber…",
+        "folds": "Slår sammen {{count}} gamle minner",
+        "offline": "frakoblet sammendrag",
+        "approve": "Godkjenn",
+        "reject": "Avslå"
+      }
     },
     "common": {
       "loading": "Laster…"

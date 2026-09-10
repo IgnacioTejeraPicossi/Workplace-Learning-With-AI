@@ -217,6 +217,15 @@ export async function updateAndresMemory(memoryId, patch) {
 export async function deleteAndresMemory(memoryId) {
   return apiCall(`/api/andres/memories/${memoryId}`, "DELETE");
 }
+export async function proposeAndresConsolidation() {
+  return apiCall("/api/andres/memory/consolidate", "POST", {});
+}
+export async function listAndresConsolidations(status = "pending") {
+  return apiCall(`/api/andres/memory/consolidations?status=${status}`, "GET");
+}
+export async function actAndresConsolidation(id, action) {
+  return apiCall(`/api/andres/memory/consolidations/${id}`, "POST", { action });
+}
 // Andrés V2 — reflection / curiosity / projects / evolution
 export async function andresReflect() {
   return apiCall("/api/andres/reflect", "POST", {});

@@ -131,6 +131,22 @@ def _keywords(text: str) -> set:
 # so an existing biography gradually gains vectors without one big upfront cost.
 _BACKFILL_PER_CALL = 5
 
+_indexes_ensured = False
+
+
+async def _ensure_indexes() -> None:
+    """Best-effort, once-per-process compound index on (user_id, created_at) so the
+    per-user memory scan stays fast as a biography grows. Idempotent; degrades to
+    a no-op when Mongo is unavailable (offline / tests)."""
+    global _indexes_ensured
+    if _indexes_ensured:
+        return
+    _indexes_ensured = True   # set first so a failure never retries on every call
+    try:
+        await andres_memories.create_index([("user_id", 1), ("created_at", -1)])
+    except Exception:
+        pass
+
 
 async def retrieve_relevant(user_id: str, query: str, limit: int = 5) -> list:
     """Rank memories by MEANING (embedding cosine) blended with keyword overlap +
@@ -142,11 +158,14 @@ async def retrieve_relevant(user_id: str, query: str, limit: int = 5) -> list:
     query embedding is None and this reduces EXACTLY to the previous keyword+
     importance+recency behaviour. Verified and unverified memories both compete.
     """
+    await _ensure_indexes()
     q_words = _keywords(query)
     q_vec = semantic_memory.embed_text(query)   # None offline → pure keyword path
     scored = []
     backfilled = 0
-    async for doc in andres_memories.find({"user_id": user_id}).limit(500):
+    # Exclude memories that were archived into a consolidation (their meaning now
+    # lives in the consolidated semantic memory), so recall stays uncluttered.
+    async for doc in andres_memories.find({"user_id": user_id, "archived": {"$ne": True}}).limit(500):
         overlap = len(q_words & _keywords(doc.get("content", "")))
         importance = float(doc.get("importance", 0.5))
         verified_bonus = 0.15 if doc.get("user_verified") else 0.0

@@ -5,6 +5,7 @@ import {
   getAndresProfile, andresChat,
   getAndresMemories, createAndresMemory, updateAndresMemory, deleteAndresMemory,
   getAndresResearchTiers, setAndresResearchTiers,
+  proposeAndresConsolidation, listAndresConsolidations, actAndresConsolidation,
 } from "./api";
 import { useSpeechCapture } from "./components/hologram/useSpeechCapture";
 import { useSpeechOutput } from "./components/hologram/useSpeechOutput";
@@ -192,6 +193,8 @@ export default function AndresRobot() {
   const [memFilter, setMemFilter] = useState("");
   const [memLoading, setMemLoading] = useState(false);
   const [newMem, setNewMem] = useState("");
+  const [consolidations, setConsolidations] = useState([]);
+  const [consoBusy, setConsoBusy] = useState(false);
 
   const loadProfile = useCallback(async () => {
     try { setProfile(await getAndresProfile()); } catch (e) { /* guest/offline */ }
@@ -206,6 +209,25 @@ export default function AndresRobot() {
     setMemLoading(false);
   }, [memFilter]);
 
+  const loadConsolidations = useCallback(async () => {
+    try { const r = await listAndresConsolidations("pending"); setConsolidations(r.consolidations || []); }
+    catch (e) { setConsolidations([]); }
+  }, []);
+  const handleProposeConsolidation = async () => {
+    setConsoBusy(true);
+    try { await proposeAndresConsolidation(); await loadConsolidations(); } catch (e) { /* offline */ }
+    setConsoBusy(false);
+  };
+  const handleActConsolidation = async (id, action) => {
+    setConsoBusy(true);
+    try {
+      await actAndresConsolidation(id, action);
+      await loadConsolidations();
+      if (action === "approve") { await loadMemories(); await loadProfile(); }
+    } catch (e) { /* offline */ }
+    setConsoBusy(false);
+  };
+
   const loadTiers = useCallback(async () => {
     try { const r = await getAndresResearchTiers(); setTiers(r.tiers); } catch (e) { /* offline */ }
   }, []);
@@ -217,7 +239,7 @@ export default function AndresRobot() {
   };
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
-  useEffect(() => { if (activeTab === "memory") loadMemories(); }, [activeTab, loadMemories]);
+  useEffect(() => { if (activeTab === "memory") { loadMemories(); loadConsolidations(); } }, [activeTab, loadMemories, loadConsolidations]);
   useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
   // When the mic finishes: DON'T auto-send (that shipped mutilated phrases when
@@ -695,6 +717,42 @@ export default function AndresRobot() {
           <p style={{ fontSize: 13, color: colors.textSecondary, margin: "6px 0 0" }}>
             {t("andresRobotModule.memory.intro")}
           </p>
+        </div>
+
+        {/* Memory consolidation — propose → user approves → fold old memories */}
+        <div style={{ ...card, borderLeft: `4px solid ${colors.primary}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <strong style={{ color: colors.text, fontSize: 14 }}>🧹 {t("andresRobotModule.memory.consolidate.title")}</strong>
+            <button
+              onClick={handleProposeConsolidation}
+              disabled={consoBusy}
+              style={{ marginLeft: "auto", background: colors.primary, color: "#fff", border: 0, borderRadius: 8, padding: "8px 14px", fontSize: 12.5, fontWeight: 600, cursor: consoBusy ? "not-allowed" : "pointer", opacity: consoBusy ? 0.6 : 1 }}
+            >
+              {consoBusy ? t("andresRobotModule.memory.consolidate.working") : t("andresRobotModule.memory.consolidate.propose")}
+            </button>
+          </div>
+          <p style={{ fontSize: 12.5, color: colors.textSecondary, margin: "6px 0 0" }}>
+            {t("andresRobotModule.memory.consolidate.hint")}
+          </p>
+          {consolidations.map((c) => (
+            <div key={c._id} style={{ marginTop: 10, padding: "10px 12px", borderRadius: 8, background: colors.background, border: `1px solid ${colors.border}` }}>
+              <div style={{ fontSize: 13, color: colors.text, lineHeight: 1.5 }}>{c.summary}</div>
+              <div style={{ fontSize: 11, color: colors.textSecondary, marginTop: 4 }}>
+                {t("andresRobotModule.memory.consolidate.folds", { count: c.count })}
+                {c.is_mock ? ` · ${t("andresRobotModule.memory.consolidate.offline")}` : ""}
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button onClick={() => handleActConsolidation(c._id, "approve")} disabled={consoBusy}
+                        style={{ background: "#16a34a", color: "#fff", border: 0, borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                  ✓ {t("andresRobotModule.memory.consolidate.approve")}
+                </button>
+                <button onClick={() => handleActConsolidation(c._id, "reject")} disabled={consoBusy}
+                        style={{ background: "transparent", color: colors.textSecondary, border: `1px solid ${colors.border}`, borderRadius: 7, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
+                  {t("andresRobotModule.memory.consolidate.reject")}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Add a memory by hand */}

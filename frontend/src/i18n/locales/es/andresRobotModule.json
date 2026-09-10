@@ -127,7 +127,17 @@
       "unprotect": "Desproteger",
       "forget": "Olvidar",
       "loading": "Recordando…",
-      "empty": "Aún no hay recuerdos. Habla con Andrés o enséñale algo arriba."
+      "empty": "Aún no hay recuerdos. Habla con Andrés o enséñale algo arriba.",
+      "consolidate": {
+        "title": "Consolidación de memoria",
+        "hint": "Funde un grupo antiguo de memorias pequeñas en una sola memoria semántica duradera. Nada cambia hasta que lo apruebes.",
+        "propose": "Proponer",
+        "working": "Trabajando…",
+        "folds": "Funde {{count}} memorias antiguas",
+        "offline": "resumen sin conexión",
+        "approve": "Aprobar",
+        "reject": "Rechazar"
+      }
     },
     "common": {
       "loading": "Cargando…"
