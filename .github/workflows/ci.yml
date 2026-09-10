@@ -74,7 +74,8 @@ jobs:
             backend/tests/test_andres_scholarly.py \
             backend/tests/test_andres_semantic_memory.py \
             backend/tests/test_andres_progress.py \
-            backend/tests/test_andres_consolidation.py
+            backend/tests/test_andres_consolidation.py \
+            backend/tests/test_andres_p5.py
 
   frontend:
     name: Frontend (install + build)

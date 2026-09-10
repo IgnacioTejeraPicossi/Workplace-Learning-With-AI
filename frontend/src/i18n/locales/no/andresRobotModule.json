@@ -39,6 +39,7 @@
       "emptyHint": "Si hei — Andrés begynner så vidt å utvikle seg, og denne samtalen er starten på biografien hans.",
       "offlineNote": "⚠️ Ingen AI-leverandør konfigurert — en ærlig begrensning, ikke en stemning.",
       "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen.",
+      "rateLimited": "Du sender meldinger veldig raskt — vent litt og prøv igjen.",
       "tooLong": "Den meldingen er for lang ({{count}} tegn). Hold den under {{max}} — lim inn et kortere utdrag eller oppsummer den først.",
       "web": {
         "toggle": "Web",

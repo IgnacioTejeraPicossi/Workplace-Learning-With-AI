@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.3] - 2026-09-10
+
+### Added — Andrés the Robot: chat rate limit + language-aware Wikipedia (audit P5)
+
+The last two audit quick-wins. Backend-only except a friendly rate-limit message.
+
+- **Per-user chat rate limit** — `backend/services/andres/rate_limit.py` `check_and_record(uid)`, an
+  in-memory sliding window called at the top of `POST /api/andres/chat`, so a shared demo can't run
+  up cost. Configurable: `ANDRES_CHAT_RATE_MAX` (default 30, `0` disables) and
+  `ANDRES_CHAT_RATE_WINDOW_SEC` (default 60); over the limit → HTTP 429 with `Retry-After`. The
+  Conversation UI shows a specific "you're sending messages very fast" note on 429
+  (`andresRobotModule.conversation.rateLimited`, EN/NO/ES) instead of the generic error.
+- **Language-aware Wikipedia** — `scholarly_research._wiki_lang(query)` picks the es / no / en
+  Wikipedia edition from the query's cues (diacritics + function words), so a Spanish humanities
+  question hits **es.wikipedia** (far better coverage) — the exact gap the Lorca example exposed.
+  Defaults to English.
+- **Tests** `backend/tests/test_andres_p5.py` (8 offline: rate-limit trips/per-user/disabled;
+  wiki-lang detection es/no/en; `_wikipedia` uses the detected edition). Added to the CI allow-list.
+
+Validated: backend compile; 74 offline tests (8 P5 + 12 scholarly + 54 contracts) + parity (390
+keys); production build. **The Andrés audit (P1–P5) is now fully implemented.** Still-open ideas
+noted for later: LLM-routed source selection and Andrés' finer citation taxonomy ([W]/[K]/[A]/[P]/[M]).
+
+New env vars (add to the Cloud Install env template if a shared deployment wants them):
+`ANDRES_CHAT_RATE_MAX`, `ANDRES_CHAT_RATE_WINDOW_SEC` (both optional, sane defaults).
+
+---
+
 ## [1.45.2] - 2026-09-10
 
 ### Added — Andrés the Robot: memory consolidation + user_id index (audit P3)

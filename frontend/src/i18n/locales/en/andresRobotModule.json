@@ -39,6 +39,7 @@
       "emptyHint": "Say hello — Andrés is just starting to develop, and this conversation is the beginning of his biography.",
       "offlineNote": "⚠️ No AI provider configured — this is an honest limitation, not a mood.",
       "errorNote": "Something went wrong reaching Andrés. Please try again.",
+      "rateLimited": "You are sending messages very fast — please wait a moment and try again.",
       "tooLong": "That message is too long ({{count}} characters). Please keep it under {{max}} — paste a shorter excerpt or summarise it first.",
       "web": {
         "toggle": "Web",

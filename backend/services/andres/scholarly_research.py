@@ -105,8 +105,24 @@ async def _semantic_scholar(client, query, limit):
     return out
 
 
+def _wiki_lang(query: str) -> str:
+    """Pick a Wikipedia language edition from the query's cues, so a Spanish
+    humanities question hits es.wikipedia (where coverage is far better) instead
+    of en. Defaults to English. Cheap heuristic: diacritics + a few function words."""
+    q = f" {(query or '').lower()} "
+    if any(ch in q for ch in "æøå") or any(w in q for w in (" jeg ", " hva ", " hvordan ", " ikke ", " også ")):
+        return "no"
+    if any(ch in q for ch in "ñ¿¡") or any(w in q for w in (" qué ", " cómo ", " por qué ", " cuál ", " para ", " está ", " años ")):
+        return "es"
+    # accented vowels alone lean Spanish (also present in Norwegian, handled above)
+    if any(ch in q for ch in "áéíóú"):
+        return "es"
+    return "en"
+
+
 async def _wikipedia(client, query, limit):
-    url = "https://en.wikipedia.org/w/api.php"
+    lang = _wiki_lang(query)
+    url = f"https://{lang}.wikipedia.org/w/api.php"
     params = {"action": "query", "format": "json", "list": "search",
               "srsearch": query, "srlimit": limit, "srprop": "snippet"}
     r = await client.get(url, params=params)
@@ -118,7 +134,7 @@ async def _wikipedia(client, query, limit):
         snippet = _clean(hit.get("snippet") or "")
         if title:
             page = title.replace(" ", "_")
-            out.append({"title": title, "url": f"https://en.wikipedia.org/wiki/{page}",
+            out.append({"title": title, "url": f"https://{lang}.wikipedia.org/wiki/{page}",
                         "snippet": snippet, "source": "Wikipedia"})
     return out
 

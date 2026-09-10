@@ -27,7 +27,7 @@ from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
     development_service, web_research, curriculum_service, research_service,
-    scholarly_research, progress_service, consolidation_service,
+    scholarly_research, progress_service, consolidation_service, rate_limit,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -249,6 +249,7 @@ async def research_suggest(body: ResearchSuggestRequest, http_request: Request,
 async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_token)):
     """One conversational turn with Andrés."""
     uid = user.get("uid")
+    rate_limit.check_and_record(uid)   # cheap per-user guard against runaway cost (429 if over)
     profile_doc = await get_or_create_profile(uid)
     tiers = research_service.get_tiers(profile_doc)
 

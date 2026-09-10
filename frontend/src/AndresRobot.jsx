@@ -360,12 +360,16 @@ export default function AndresRobot() {
       // A real request failure — NOT an offline model. Don't show the "no AI
       // provider" note (that would be a false culprit); show the length hint if
       // the server rejected the size, otherwise a plain retry note.
-      const tooLong = /HTTP 422/.test(e?.message || "");
+      const msg = e?.message || "";
+      const tooLong = /HTTP 422/.test(msg);
+      const rateLimited = /HTTP 429/.test(msg);
       setMessages((m) => [...m, {
         role: "andres", error: true,
-        text: tooLong
-          ? t("andresRobotModule.conversation.tooLong", { count: text.length.toLocaleString(), max: CHAT_MAX_CHARS.toLocaleString() })
-          : t("andresRobotModule.conversation.errorNote"),
+        text: rateLimited
+          ? t("andresRobotModule.conversation.rateLimited")
+          : tooLong
+            ? t("andresRobotModule.conversation.tooLong", { count: text.length.toLocaleString(), max: CHAT_MAX_CHARS.toLocaleString() })
+            : t("andresRobotModule.conversation.errorNote"),
       }]);
     }
     setSending(false);
