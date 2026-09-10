@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.4] - 2026-09-10
+
+### Docs — Andrés the Robot user guide refreshed with everything since the audit
+
+Brought `docs/andres-robot-help.{md,es,no}` (the in-app Help doc, English of Aug 2026) up to
+date so the owner can understand and recall what shipped. Trilingual parity kept (8 H2 sections
+each). Added/updated:
+- **Memory Garden** — recall is now by meaning (embeddings) not just keywords; the 🧹
+  consolidation flow (propose → approve; sources archived, not deleted).
+- New **Research & Knowledge Sources** section — the 🌐 grounding in Conversation (open research
+  APIs, topic routing, es/no Wikipedia, `[S1]` citations, no paywalls), the 📚 Knowledge Sources
+  directory, and "🧭 Ask Andrés where to research".
+- New **📈 Progress tab** section (age, memories-by-type, activity mini-chart, identity history).
+- **Multi-user** note (each account grows its own private Andrés) in Quick start.
+- **Web tier** row updated (now web + open research); FAQ entries for research sources,
+  per-user privacy, and the chat rate limit.
+
+Docs-only; no code touched.
+
+---
+
 ## [1.45.3] - 2026-09-10
 
 ### Added — Andrés the Robot: chat rate limit + language-aware Wikipedia (audit P5)

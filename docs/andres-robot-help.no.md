@@ -25,6 +25,10 @@ over tid — minner, en versjonert identitet, refleksjoner, små kreative verk o
 Du trenger en AI-leverandør konfigurert for ekte svar. Er ingen satt opp, sier Andrés det
 ærlig («ingen AI-leverandør konfigurert») i stedet for å late som.
 
+**Din egen Andrés.** Når du logger inn, er Andrés' biografi **privat for kontoen din** — hver
+person dyrker sin egen Andrés; minner og identitet deles aldri mellom brukere. (En delt Andrés
+er bare mulig hvis appen med vilje kjøres i mock-auth-modus, som er av i en ekte utrulling.)
+
 ---
 
 ## Samtale-fanen
@@ -69,6 +73,15 @@ Andrés husker på tvers av samtaler, men på **dine** premisser:
   gang.
 - Minner har typer (episodisk, semantisk, relasjonelt, kreativt osv.) og en viktighet. De
   relevante hentes automatisk fram for å gi svarene hans sammenheng.
+- **Gjenkalling skjer etter mening, ikke bare nøkkelord.** Med en AI-leverandør konfigurert
+  blir hvert minne vektorisert, og gjenkallingen rangerer etter semantisk likhet blandet med
+  viktighet og ferskhet — så et minne kan dukke opp selv uten felles ord med meldingen din.
+  Uten leverandør (frakoblet) faller den tilbake til nøkkelord-treff.
+- **🧹 Konsolidering.** Etter hvert som biografien vokser, kan du be Andrés **slå sammen en
+  gammel klynge små, lite brukte minner til ett varig semantisk minne**. Det er et *forslag du
+  godkjenner*: du ser nøyaktig hvilke minner det ville kombinere og sammendraget (skrevet kun
+  fra deres faktiske innhold). Ved godkjenning blir originalene **arkivert, ikke slettet** —
+  fullt reversibelt, ingenting skjult — og sammendraget holder gjenkallingen ryddig.
 
 Ingenting regnes som sant før du verifiserer det, og alt kan fjernes.
 
@@ -82,10 +95,55 @@ Andrés trekker bare på det du tillater. Tre nivåer, fra minst til mest ekspon
 |------|---------------|----------|
 | **Internt** | Hans egen biografi — lagrede minner og aktive prosjekter | På |
 | **Dokumenter** | Tekst (og bilder) du gir ham **denne runden** | På |
-| **Nett** | Et ferskt DuckDuckGo-søk, kun når du trykker 🌐 på en melding | Av |
+| **Nett** | Et ferskt DuckDuckGo-søk **og** åpne forskningskilder (se under), kun når du trykker 🌐 på en melding | Av |
 
 Slå av et nivå, så bruker han rett og slett ikke den kilden — og sier det ærlig i stedet for
 å søke i stillhet. Det mest eksponerte nivået (Nett) er av som standard.
+
+---
+
+## Forskning og kunnskapskilder
+
+Andrés kan hjelpe deg å finne *hvor* du bør lete, og — med din tillatelse — faktisk slå opp i
+åpne kilder og forankre svaret sitt i dem.
+
+### Forankrede svar med 🌐 (i Samtale)
+
+Når du trykker **🌐** på en melding (og Nett-nivået er på), slår Andrés opp, parallelt:
+
+- et generelt **DuckDuckGo**-søk, og
+- **åpne forsknings-API-er** — arXiv, Semantic Scholar, Wikipedia, PubMed, Project Gutenberg og
+  Internet Archive (også Europeana, hvis en nøkkel er satt opp). Kun *gratis, åpne* kilder —
+  ingenting bak betalingsmur eller innlogging.
+
+Han **ruter spørsmålet til kildene som passer** («den bibliografiske teften» hans): et
+realfagsspørsmål lener seg på arXiv + Semantic Scholar, et medisinsk på PubMed, et humanistisk
+på Wikipedia + Gutenberg + Internet Archive. Spanske spørsmål bruker **es.wikipedia** (og norske,
+no.wikipedia) for langt bedre dekning. Resultatene siteres som **[S1], [S2]…** (adskilt fra
+generelle nett-treff), og han blir bedt om å foretrekke dem for faktapåstander, være ærlig om
+hvilke kilder som svarte og hvilke som feilet, og at han bare har utdrag — ikke fullteksten. Er
+en kilde ratebegrenset eller utilgjengelig, fungerer runden fortsatt med de andre.
+
+### 📚 Knowledge Sources-fanen
+
+En kuratert katalog med ~55 anerkjente steder å finne informasjon på tvers av felt (akademisk
+søk, tidsskrifter, arkiver, kurs, medisin, politikk, næringsliv), hver med en ærlig
+**tilgangsmerkelapp** (stort sett gratis / delvis gratis / abonnement) og en lenke. To kjente
+«shadow libraries» er bevisst utelatt (de deler opphavsrettsbeskyttede bøker uten tillatelse);
+katalogen peker i stedet til lovlige, gratis alternativer.
+
+Øverst lar **«🧭 Spør Andrés hvor du bør undersøke»** deg beskrive et tema og få hans 3–5
+best egnede kilder fra katalogen, hver med en én-linjes begrunnelse.
+
+---
+
+## 📈 Fremgang-fanen
+
+Et skrivebeskyttet øyeblikksbilde av hvordan Andrés har vokst, så du kan **måle og dokumentere
+utviklingen hans over tid** (nyttig når du deler fremgangen hans med andre). Det viser
+utviklingsalder, identitetsversjon, antall minner (etter type), refleksjoner, ferdigheter og
+prosjekter, kreative verk og samtaler, et **14-dagers aktivitets-minidiagram**, og historikken
+over identitetsversjonene hans.
 
 ---
 
@@ -134,3 +192,16 @@ fritt ennå. Konfigurer en leverandør (f.eks. OpenAI) i appens API Config.
 Resonneringsmodellen trenger et øyeblikk, og hvis en lokal leverandør (LM Studio) er valgt,
 men uten modell lastet, faller appen tilbake til skyleverandøren. Å laste en modell eller
 velge skyleverandøren direkte gjør rundene raskere.
+
+**Hvordan finner han forskningskilder?**
+Bare når du trykker 🌐 på en melding. Da spør han åpne, gratis forsknings-API-er (arXiv,
+Semantic Scholar, Wikipedia, PubMed, Gutenberg, Internet Archive), velger de som passer temaet
+ditt, og siterer det han brukte som [S1], [S2]…. Han bruker aldri betalingskilder og omgår aldri
+en innlogging. 📚 Knowledge Sources-fanen er en egen katalog du kan bla i selv.
+
+**Deles min Andrés med andre?**
+Nei. Biografien hans er knyttet til kontoen din. Hver bruker får sin egen private Andrés.
+
+**Han sa at jeg sender meldinger for raskt — hvorfor?**
+Det er en mild ratebegrensning per bruker på chatten for å holde en delt demo rimelig. Vent et
+øyeblikk og fortsett; en administrator kan justere eller slå den av via miljøvariabler.

@@ -25,6 +25,11 @@ obras creativas y habilidades — todo sobre un modelo de lenguaje y todo bajo t
 Necesitas un proveedor de IA configurado para obtener respuestas reales. Si no hay ninguno,
 Andrés lo dirá con honestidad ("no hay proveedor de IA configurado") en vez de fingir.
 
+**Tu propio Andrés.** Al iniciar sesión, la biografía de Andrés es **privada de tu cuenta** —
+cada persona hace crecer su propio Andrés; las memorias y la identidad nunca se comparten
+entre usuarios. (Un Andrés compartido solo es posible si la app se ejecuta a propósito en modo
+mock-auth, que está apagado en un despliegue real.)
+
 ---
 
 ## La pestaña Conversación
@@ -71,6 +76,16 @@ Andrés recuerda entre conversaciones, pero en **tus** términos:
   fiables de inmediato.
 - Las memorias tienen tipos (episódica, semántica, relacional, creativa, etc.) e importancia.
   Las relevantes se recuperan automáticamente para dar continuidad a sus respuestas.
+- **La recuperación es por significado, no solo por palabras.** Con un proveedor de IA
+  configurado, cada memoria se representa como vector y la recuperación combina similitud
+  semántica con importancia y recencia — así una memoria puede aflorar aunque no comparta
+  ninguna palabra exacta con tu mensaje. Sin proveedor (offline), vuelve al emparejamiento por
+  palabras clave.
+- **🧹 Consolidación.** A medida que crece la biografía, puedes pedirle a Andrés que **funda un
+  grupo antiguo de memorias pequeñas y poco usadas en una sola memoria semántica duradera**. Es
+  una *propuesta que apruebas*: ves exactamente qué memorias combinaría y el resumen (escrito
+  solo a partir de su contenido real). Al aprobar, las originales se **archivan, no se borran**
+  — totalmente reversible, nada oculto — y el resumen mantiene la recuperación despejada.
 
 Nada se toma como cierto hasta que lo verificas, y todo puede eliminarse.
 
@@ -84,10 +99,55 @@ Andrés solo usa lo que le permites. Tres niveles, de menos a más expuesto:
 |-------|---------------|-------------|
 | **Interno** | Su propia biografía — memorias guardadas y proyectos activos | Activado |
 | **Documentos** | Texto (e imágenes) que le das **en este turno** | Activado |
-| **Web** | Una búsqueda fresca en DuckDuckGo, solo cuando pulsas 🌐 en un mensaje | Apagado |
+| **Web** | Una búsqueda fresca en DuckDuckGo **y** fuentes de investigación abiertas (ver abajo), solo cuando pulsas 🌐 en un mensaje | Apagado |
 
 Apaga cualquier nivel y sencillamente no usará esa fuente — y lo dirá con honestidad en vez
 de buscar en silencio. El nivel más expuesto (Web) está apagado por defecto.
+
+---
+
+## Investigación y Fuentes de conocimiento
+
+Andrés puede ayudarte a encontrar *dónde* buscar y — con tu permiso — consultar de verdad
+fuentes abiertas y fundamentar su respuesta en ellas.
+
+### Respuestas fundamentadas con 🌐 (en Conversación)
+
+Cuando pulsas **🌐** en un mensaje (y el nivel Web está activado), Andrés consulta, en paralelo:
+
+- una búsqueda general en **DuckDuckGo**, y
+- **APIs de investigación abiertas** — arXiv, Semantic Scholar, Wikipedia, PubMed, Project
+  Gutenberg e Internet Archive (también Europeana, si hay clave configurada). Solo fuentes
+  *libres y abiertas* — nada tras muro de pago o inicio de sesión.
+
+**Enruta la pregunta a las fuentes que encajan** (su "olfato bibliográfico"): una pregunta de
+ciencia se apoya en arXiv + Semantic Scholar, una médica en PubMed, una de humanidades en
+Wikipedia + Gutenberg + Internet Archive. Las preguntas en español usan **es.wikipedia** (y las
+noruegas, no.wikipedia) para mucha mejor cobertura. Los resultados se citan como **[S1], [S2]…**
+(distintos de los de la web general), y se le indica preferirlos para afirmaciones factuales,
+ser honesto sobre qué fuentes respondieron y cuáles fallaron, y que solo tiene fragmentos — no
+el texto completo. Si una fuente está limitada o inaccesible, el turno sigue con las demás.
+
+### La pestaña 📚 Knowledge Sources
+
+Un directorio curado de ~55 sitios de confianza para encontrar información en distintos campos
+(búsqueda académica, revistas, archivos, cursos, medicina, política, negocios), cada uno con una
+**etiqueta de acceso** honesta (casi todo gratis / algo gratis / suscripción) y un enlace. Se
+excluyen a propósito dos conocidas "shadow libraries" (comparten libros con copyright sin
+permiso); en su lugar el directorio apunta a alternativas legales y gratuitas.
+
+Arriba, **"🧭 Pregúntale a Andrés dónde investigar"** te deja describir un tema y obtener sus 3–5
+fuentes más adecuadas del directorio, cada una con una razón de una línea.
+
+---
+
+## La pestaña 📈 Avance
+
+Una instantánea de solo lectura de cómo ha crecido Andrés, para **medir y documentar su
+desarrollo con el tiempo** (útil al compartir su progreso con otros). Muestra su edad de
+desarrollo, versión de identidad, recuentos de memorias (por tipo), reflexiones, habilidades y
+proyectos, obras creativas y conversaciones, un **mini-gráfico de actividad de 14 días** y el
+historial de sus versiones de identidad.
 
 ---
 
@@ -137,3 +197,17 @@ con libertad. Configura un proveedor (p. ej. OpenAI) en la API Config de la app.
 El modelo de razonamiento necesita un momento, y si hay un proveedor local (LM Studio)
 seleccionado pero sin modelo cargado, la app recurre al proveedor en la nube. Cargar un
 modelo o elegir directamente el proveedor en la nube hace los turnos más ágiles.
+
+**¿Cómo encuentra fuentes de investigación?**
+Solo cuando pulsas 🌐 en un mensaje. Entonces consulta APIs de investigación abiertas y
+gratuitas (arXiv, Semantic Scholar, Wikipedia, PubMed, Gutenberg, Internet Archive), elige las
+que encajan con tu tema y cita lo que usó como [S1], [S2]…. Nunca usa fuentes de pago ni salta
+un inicio de sesión. La pestaña 📚 Knowledge Sources es un directorio aparte que puedes explorar.
+
+**¿Mi Andrés se comparte con otras personas?**
+No. Su biografía está ligada a tu cuenta. Cada usuario tiene su propio Andrés privado.
+
+**Dijo que estoy enviando mensajes demasiado rápido — ¿por qué?**
+Hay un suave límite de frecuencia por usuario en el chat para que un demo compartido sea
+asequible. Espera un momento y continúa; un administrador puede ajustarlo o desactivarlo con
+variables de entorno.

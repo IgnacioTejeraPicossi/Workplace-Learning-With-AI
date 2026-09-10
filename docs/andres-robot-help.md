@@ -25,6 +25,11 @@ of a language model, and all under your control.
 You need an AI provider configured for real replies. If none is set, Andrés will say so
 honestly ("no AI provider configured") instead of pretending.
 
+**Your own Andrés.** When you sign in, Andrés' biography is **private to your account** —
+each person grows their own Andrés; memories and identity are never shared between users.
+(A shared instance is only possible if the app is deliberately run in mock-auth mode, which
+is off in a real deployment.)
+
 ---
 
 ## The Conversation tab
@@ -70,6 +75,15 @@ Andrés remembers across conversations, but on **your** terms:
   **forget** it. You can also **add memories by hand** — those are trusted immediately.
 - Memories have types (episodic, semantic, relational, creative, and so on) and an
   importance. Relevant ones are recalled automatically to give his replies continuity.
+- **Recall is by meaning, not just keywords.** When an AI provider is configured, each
+  memory is embedded and recall ranks by semantic similarity blended with importance and
+  recency — so a memory can surface even when it shares no exact words with your message.
+  Offline (no provider) it falls back to keyword matching.
+- **🧹 Consolidation.** As the biography grows, you can ask Andrés to **fold an old cluster
+  of small, rarely-used memories into one durable semantic memory**. This is a *proposal you
+  approve*: you see exactly which memories it would combine and the summary (written only
+  from their real contents). On approval the originals are **archived, not deleted** — fully
+  reversible, nothing hidden — and the new summary keeps recall uncluttered.
 
 Nothing is treated as true until you verify it, and anything can be removed.
 
@@ -83,10 +97,55 @@ Andrés only draws on what you allow. Three tiers, from least to most exposed:
 |------|---------------|---------|
 | **Internal** | His own biography — stored memories and active projects | On |
 | **Documents** | Text (and images) you give him **this turn** | On |
-| **Web** | A fresh DuckDuckGo search, only when you press 🌐 on a message | Off |
+| **Web** | A fresh DuckDuckGo search **and** open research sources (see below), only when you press 🌐 on a message | Off |
 
 Turn any tier off and he simply won't use that source — and he'll say so honestly rather
 than searching silently. The most exposed tier (Web) is off by default.
+
+---
+
+## Research & Knowledge Sources
+
+Andrés can help you find *where* to look, and — with your permission — actually consult
+open sources and ground his answer in them.
+
+### Grounded answers with 🌐 (in Conversation)
+
+When you press **🌐** on a message (and the Web tier is on), Andrés consults, in parallel:
+
+- a general **DuckDuckGo** search, and
+- **open research APIs** — arXiv, Semantic Scholar, Wikipedia, PubMed, Project Gutenberg and
+  the Internet Archive (Europeana too, if a key is configured). These are the *free, open*
+  sources only — nothing behind a paywall or login.
+
+He **routes the question to the sources that fit it** (his "bibliographic nose"): a science
+question leans on arXiv + Semantic Scholar, a medical one on PubMed, a humanities one on
+Wikipedia + Gutenberg + the Internet Archive. Spanish questions use **es.wikipedia** (and
+Norwegian, no.wikipedia) for far better coverage. Results are cited inline as **[S1], [S2]…**
+(distinct from general web results), and he is told to prefer them for factual claims, to be
+honest about which sources answered and which failed, and that he only has snippets — not the
+full text. If a source is rate-limited or unreachable, the turn still works with the others.
+
+### The 📚 Knowledge Sources tab
+
+A curated directory of ~55 reputable places to find information across fields (academic
+search, journals, archives, courses, medicine, policy, business), each with an honest
+**access tag** (mostly free / some free / subscription) and a link. Two well-known "shadow
+libraries" are deliberately excluded (they share copyrighted books without permission); the
+tab points to legal free-book alternatives instead.
+
+At the top, **"🧭 Ask Andrés where to research"** lets you describe a topic and get his 3–5
+best-fit sources from the directory, each with a one-line reason.
+
+---
+
+## The 📈 Progress tab
+
+A read-only snapshot of how Andrés has grown, so you can **measure and document his
+development over time** (useful when sharing his progress with others). It shows his
+developmental age, identity version, counts of memories (by type), reflections, skills and
+projects, creative works and conversations, a **14-day activity mini-chart**, and the history
+of his identity versions.
 
 ---
 
@@ -134,3 +193,16 @@ Configure a provider (e.g. OpenAI) in the app's API Config.
 The reasoning model needs a moment, and if a local provider (LM Studio) is selected but
 has no model loaded, the app falls back to the cloud provider. Loading a model or selecting
 the cloud provider directly makes turns snappier.
+
+**How does he find research sources?**
+Only when you press 🌐 on a message. He then queries open, free research APIs (arXiv,
+Semantic Scholar, Wikipedia, PubMed, Gutenberg, Internet Archive), picks the ones that fit
+your topic, and cites what he used as [S1], [S2]…. He never uses paywalled sources and never
+bypasses a login. The 📚 Knowledge Sources tab is a separate directory you can browse yourself.
+
+**Is my Andrés shared with other people?**
+No. His biography is tied to your account. Different users each get their own private Andrés.
+
+**He said I'm sending messages too fast — why?**
+There's a gentle per-user rate limit on the chat to keep a shared demo affordable. Wait a
+moment and continue; an administrator can adjust or disable it via environment settings.
