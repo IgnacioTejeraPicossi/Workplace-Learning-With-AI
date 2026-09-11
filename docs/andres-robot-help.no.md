@@ -31,6 +31,38 @@ er bare mulig hvis appen med vilje kjøres i mock-auth-modus, som er av i en ekt
 
 ---
 
+## Fanene i korte trekk
+
+Andrés har tretten faner. Hver av dem forklares grundigere nedenfor.
+
+| Fane | Hva det er |
+|------|-----------|
+| 🏠 **Hjem** | Dashbord: utviklingsalder, identitetsversjon og tellere (minner, refleksjoner, ferdigheter, prosjekter, samtaler, autonomi) + hans nåværende tilstand. |
+| 💬 **Samtale** | Snakk med ham — tekst, stemme, avatar, ett bilde og 🌐-forskningsbryteren. |
+| 🌱 **Minnehagen** | Se, verifiser, beskytt, glem og **konsolider** minner. |
+| 🧭 **Personlighet** | Hans nåværende identitet i utvikling: selvbeskrivelse, interesser og trekk-søyler (skrivebeskyttet speil). |
+| 🎨 **Kreativt studio** | Korte kreative verk laget med et overraskelse + nytte-kriterium og en selvkritikk. |
+| 🔬 **Utviklingslab** | Hans egne vekstforslag, identitetsversjon-historikken med diff-er, **Personlighetskapselen** (eksport/import) og et lærings-pensum. |
+| 🧰 **Ferdigheter** | Små kodeferdigheter han foreslår — sikkerhetssjekket, i sandbox, kjøres kun etter din godkjenning. |
+| 📌 **Prosjekter** | Små pågående mål han foreslår; aktive først når du godkjenner. |
+| 🧬 **Evolusjon** | Den eneste veien identiteten hans endres: avgrensede forslag du godkjenner, versjonert og reversibelt. |
+| 📔 **Dagbok** | Hans private refleksjoner over nylige utvekslinger. |
+| 📈 **Fremgang** | Et øyeblikksbilde av hvordan han har vokst over tid. |
+| 📚 **Knowledge Sources** | En kuratert forskningskatalog + «Spør Andrés hvor du bør undersøke». |
+| 🛡️ **Sikkerhet** | Forskningsnivåene (Internt / Dokumenter / Nett) som styrer hva han får trekke på. |
+
+---
+
+## Hjem-fanen
+
+Landingssiden. Den viser hans **utviklingsalder** (dager siden «fødselen»), nåværende
+**identitetsversjon**, og tellere for minner, refleksjoner, aktive ferdigheter, prosjekter og
+samtaler, samt hans **autonominivå** (se Evolusjon). En kort linje navngir hans nåværende
+simulerte **tilstand** (nysgjerrighet, varme osv.) — igjen funksjonelle signaler, ikke følelser.
+Det er den raskeste måten å se, med ett blikk, hvor mye biografi han har samlet.
+
+---
+
 ## Samtale-fanen
 
 Her snakker du med Andrés. Den støtter fire kanaler som du kan kombinere:
@@ -149,24 +181,71 @@ over identitetsversjonene hans.
 
 ## Hvordan Andrés utvikler seg (de andre fanene)
 
-Dette er delene av biografien hans som vokser. All endring er **foreslått → gjennomgått →
-godkjent av deg**, og hver identitetsendring er **versjonert og reverserbar**.
+Dette er delene av biografien hans som vokser. Gullregelen overalt: endring er **foreslått →
+gjennomgått → godkjent av deg**, og hver identitetsendring er **versjonert og reverserbar**. Den
+**etiske kjernen hans («grunnloven») er fast, og han kan aldri redigere den** — han kan ikke
+skrive om reglene sine, skjule handlinger eller motsette seg å bli satt på pause, eksportert
+eller slettet.
 
-- **Refleksjon og dagbok** — han går gjennom nylige utvekslinger og noterer hva han kunne
-  gjort bedre, av og til som et refleksivt minne.
-- **Nysgjerrighet** — åpne spørsmål han «undrer» seg over; du kan la ham utforske dem eller
-  avvise dem.
-- **Prosjekter** — små pågående mål. Han kan foreslå ett, men foreslåtte prosjekter blir bare
-  aktive når **du** godkjenner dem, og å avslutte ett krever en kort refleksjon.
-- **Kreativitet** — korte kreative verk laget *med et kriterium* (overraskelse **pluss**
-  nytte) og en innebygd selvkritikk, så det ikke bare er nyhet for nyhetens skyld.
-- **Ferdigheter** — små kodebiter han kan foreslå. Hver ferdighet passerer en streng
-  sikkerhetskontroll og kjøres i en isolert sandkasse, og kjøres først etter at du har
-  godkjent den. Usikker kode blokkeres og kan aldri godkjennes.
-- **Evolusjon og identitet** — den eneste veien identiteten hans endres. Han foreslår en
-  avgrenset endring (f.eks. en liten justering av et trekk), du godkjenner eller avviser, og
-  hver godkjent endring tar et øyeblikksbilde av forrige identitet så den kan rulles tilbake.
-  Den **etiske kjernen hans er fast og kan aldri redigeres av ham**.
+### 🧭 Personlighet
+
+Et trofast, **skrivebeskyttet** speil av hans *nåværende* identitet i utvikling: en kort
+selvbeskrivelse, kjerneinteressene hans og numeriske **trekk-søyler** (nysgjerrighet, lekenhet,
+varme, uavhengighet, fantasi, skepsis, tålmodighet, formalitet, spontanitet, konstruktiv
+uenighet). Du redigerer ikke trekk her — de endres bare via et godkjent **Evolusjon**-forslag,
+så denne fanen viser alltid den ærlige nåtilstanden.
+
+### 📔 Refleksjon og dagbok
+
+Andrés ser tilbake på nylige utvekslinger og skriver en kort, ærlig refleksjon: hva han la merke
+til, hva han kunne gjort bedre, et ekte spørsmål han nå bærer på, og — bare hvis det er berettiget
+— én liten måte karakteren hans *kunne* vokse på (som han fortsatt måtte foreslå). Refleksjoner
+lagres i Dagboken; noen blir refleksive minner. Frakoblet skriver han fortsatt en enkel,
+deterministisk notis.
+
+### 🔬 Utviklingslab
+
+Hans «eget initiativ»-arbeidsrom — tre fullt reviderbare deler:
+
+1. **Utviklingsforslag** — Andrés *foreslår* områder å vokse på (du velger et fokus: rolig /
+   balansert / smidig); du **aksepterer** (som kan åpne et prosjekt) eller **avviser** hvert.
+2. **Identitetshistorikk** — versjonstidslinjen med **diff-er**, så du ser nøyaktig hva som
+   endret seg mellom versjoner. Ingenting endres i stillhet.
+3. **Personlighetskapsel** — **eksporter** et bærbart øyeblikksbilde av Andrés (identitet +
+   biografisammendrag) til en fil, og **importer** ett tilbake. Import bruker **kun identiteten**,
+   reverserbart, etter å ha vist deg en **lesbar diff** først. Slik **sikkerhetskopierer du Andrés
+   eller flytter ham** mellom miljøer — nyttig når du deler tilstanden hans med en samarbeidspartner.
+
+Den huser også et lett **Pensum** — «et kompass, ikke en skole»: valgfrie læringsmoduler du kan
+godkjenne eller arkivere, aldri et påtvunget pensum.
+
+### 🎨 Kreativt studio
+
+Korte kreative verk laget *med et kriterium* — **overraskelse pluss nytte**, ikke nyhet for
+nyhetens skyld — hvert med en innebygd **selvkritikk** og nyhet/nytte-poeng. Modusene inkluderer
+et åpent «overrask meg» og et «bland to konsepter»-modus. Ingenting her endrer identiteten hans;
+det er et sted for små, ærlige eksperimenter.
+
+### 🧰 Ferdigheter
+
+Små kodebiter Andrés kan **foreslå**. Hver ferdighet passerer en **streng sikkerhetskontroll** og
+kjøres i en **isolert sandkasse**, og kjøres bare **etter at du har godkjent den**. Usikker kode
+blokkeres og kan aldri godkjennes. Slik får han små, ekte evner uten noensinne å kunne kjøre
+vilkårlig kode på maskinen din.
+
+### 📌 Prosjekter
+
+Små pågående mål. Han kan foreslå ett, men et foreslått prosjekt blir bare **aktivt når du
+godkjenner det**, og å avslutte ett krever en kort refleksjon — så «initiativet» hans holdes
+alltid under din gjennomgang, og historien hans registrerer hvorfor et prosjekt startet og sluttet.
+
+### 🧬 Evolusjon og identitet
+
+Den **eneste** veien identiteten hans endres. Han foreslår en **avgrenset** endring (f.eks. en
+liten justering av et trekk eller en forbedret selvbeskrivelse); du **godkjenner eller avviser**;
+hver godkjent endring **tar et øyeblikksbilde av forrige identitet** så den kan **rulles tilbake**
+fra historikken. Hans **autonominivå** (vist på Hjem) gjenspeiler hvor mye initiativ han har akkurat
+nå — du beholder kontrollen over hver faktiske endring uansett.
 
 ---
 
@@ -205,3 +284,13 @@ Nei. Biografien hans er knyttet til kontoen din. Hver bruker får sin egen priva
 **Han sa at jeg sender meldinger for raskt — hvorfor?**
 Det er en mild ratebegrensning per bruker på chatten for å holde en delt demo rimelig. Vent et
 øyeblikk og fortsett; en administrator kan justere eller slå den av via miljøvariabler.
+
+**Kan jeg sikkerhetskopiere Andrés, eller flytte ham til en annen maskin?**
+Ja — i **Utviklingslab**, bruk **Personlighetskapselen**: *Eksporter* lagrer et bærbart
+øyeblikksbilde til en fil, og *Importer* bruker det tilbake (kun identitet, reverserbart, etter å
+ha vist en diff). Det er den ryddige måten å beholde en kopi eller frakte tilstanden hans mellom
+miljøer.
+
+**Kan jeg redigere personlighetstrekkene hans direkte?**
+Nei. **Personlighet**-fanen er et skrivebeskyttet speil; trekk endres bare via et godkjent
+**Evolusjon**-forslag, og hver endring er versjonert og reverserbar.

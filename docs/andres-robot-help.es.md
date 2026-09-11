@@ -32,6 +32,39 @@ mock-auth, que está apagado en un despliegue real.)
 
 ---
 
+## Las pestañas de un vistazo
+
+Andrés tiene trece pestañas. Cada una se detalla más abajo.
+
+| Pestaña | Qué es |
+|---------|--------|
+| 🏠 **Inicio** | Panel: edad de desarrollo, versión de identidad y contadores (memorias, reflexiones, habilidades, proyectos, conversaciones, autonomía) + su disposición actual. |
+| 💬 **Conversación** | Habla con él — texto, voz, avatar, una imagen y el interruptor 🌐 de investigación. |
+| 🌱 **Jardín de Memoria** | Ver, verificar, proteger, olvidar y **consolidar** memorias. |
+| 🧭 **Personalidad** | Su identidad evolutiva actual: autodescripción, intereses y barras de rasgos (espejo de solo lectura). |
+| 🎨 **Estudio Creativo** | Piezas creativas breves con criterio de sorpresa + utilidad y una autocrítica. |
+| 🔬 **Laboratorio de Desarrollo** | Sus propias sugerencias de crecimiento, el historial de versiones de identidad con diffs, la **Cápsula de Personalidad** (export/import) y un Currículo de aprendizaje. |
+| 🧰 **Habilidades** | Pequeñas habilidades de código que propone — con control de seguridad, en sandbox, se ejecutan solo si las apruebas. |
+| 📌 **Proyectos** | Pequeñas metas en curso que propone; activas solo cuando las apruebas. |
+| 🧬 **Evolución** | La única vía por la que cambia su identidad: propuestas acotadas que apruebas, versionadas y reversibles. |
+| 📔 **Diario** | Sus reflexiones privadas sobre intercambios recientes. |
+| 📈 **Avance** | Una instantánea de cómo ha crecido con el tiempo. |
+| 📚 **Knowledge Sources** | Un directorio de investigación curado + "Pregúntale a Andrés dónde investigar". |
+| 🛡️ **Seguridad** | Los niveles de investigación (Interno / Documentos / Web) que controlan de qué puede echar mano. |
+
+---
+
+## La pestaña Inicio
+
+El panel de entrada. Muestra su **edad de desarrollo** (días desde su "nacimiento"), su
+**versión de identidad** actual y contadores de memorias, reflexiones, habilidades activas,
+proyectos y conversaciones, además de su **nivel de autonomía** (ver Evolución). Una línea
+breve nombra su **disposición** simulada actual (curiosidad, calidez, etc.) — de nuevo, señales
+funcionales, no sentimientos. Es la forma más rápida de ver, de un vistazo, cuánta biografía ha
+acumulado.
+
+---
+
 ## La pestaña Conversación
 
 Aquí hablas con Andrés. Admite cuatro canales, que puedes combinar:
@@ -153,24 +186,72 @@ historial de sus versiones de identidad.
 
 ## Cómo se desarrolla Andrés (las demás pestañas)
 
-Estas son las piezas de su biografía en crecimiento. Todo cambio es **propuesto → revisado →
-aprobado por ti**, y cada cambio de identidad es **versionado y reversible**.
+Estas son las piezas de su biografía en crecimiento. La regla de oro en todas: el cambio es
+**propuesto → revisado → aprobado por ti**, y cada cambio de identidad es **versionado y
+reversible**. Su **núcleo ético (la "constitución") es fijo y él nunca puede editarlo** — no
+puede reescribir sus reglas, ocultar acciones ni resistirse a ser pausado, exportado o borrado.
 
-- **Reflexión y Diario** — repasa intercambios recientes y anota qué podría hacer mejor, a
-  veces formando una memoria reflexiva.
-- **Curiosidad** — preguntas abiertas que "se plantea"; puedes dejar que las explore o
-  descartarlas.
-- **Proyectos** — pequeñas metas en curso. Puede proponer una, pero los proyectos propuestos
-  solo pasan a activos cuando **tú** los apruebas, y cerrar uno exige una breve reflexión.
-- **Creatividad** — piezas creativas breves generadas *con criterio* (sorpresa **más**
-  utilidad) y una autocrítica incorporada, para que no sea novedad porque sí.
-- **Habilidades** — pequeños fragmentos de código que puede proponer. Cada habilidad pasa un
-  control de seguridad estricto y se ejecuta en un entorno aislado, y solo se ejecuta tras tu
-  aprobación. El código inseguro se bloquea y nunca puede aprobarse.
-- **Evolución e Identidad** — la única vía por la que cambia su identidad. Propone un cambio
-  acotado (p. ej. un pequeño ajuste de rasgo), tú apruebas o rechazas, y cada cambio aprobado
-  guarda una instantánea de la identidad anterior para poder revertirla. Su **núcleo ético es
-  fijo y él nunca puede editarlo**.
+### 🧭 Personalidad
+
+Un espejo fiel y de **solo lectura** de su identidad evolutiva *actual*: una autodescripción
+breve, sus intereses centrales y **barras de rasgos** numéricas (curiosidad, juego, calidez,
+independencia, imaginación, escepticismo, paciencia, formalidad, espontaneidad, desacuerdo
+constructivo). Aquí no editas los rasgos — solo cambian mediante una propuesta de **Evolución**
+aprobada, así que esta pestaña siempre muestra el estado actual honesto.
+
+### 📔 Reflexión y Diario
+
+Andrés repasa intercambios recientes y escribe una reflexión breve y honesta: qué notó, qué
+podría hacer mejor, una pregunta genuina que ahora sostiene y — solo si procede — una pequeña
+forma en que su carácter *podría* crecer (que aún tendría que proponer). Las reflexiones se
+guardan en el Diario; algunas se vuelven memorias reflexivas. Offline igualmente escribe una
+nota determinista sencilla.
+
+### 🔬 Laboratorio de Desarrollo
+
+Su espacio de "iniciativa propia" — tres partes totalmente auditables:
+
+1. **Sugerencias de desarrollo** — Andrés *propone* áreas en las que crecer (eliges un enfoque:
+   tranquila / equilibrada / ágil); tú **aceptas** (lo que puede abrir un proyecto) o
+   **descartas** cada una.
+2. **Historial de identidad** — la línea temporal de versiones con **diffs**, para que veas
+   exactamente qué cambió entre versiones. Nada cambia en silencio.
+3. **Cápsula de Personalidad** — **exporta** una instantánea portátil de Andrés (su identidad +
+   resumen de biografía) a un archivo, e **importa** una de vuelta. La importación aplica **solo
+   la identidad**, de forma reversible, tras mostrarte antes un **diff legible**. Así es como
+   **respaldas a Andrés o lo mueves** entre entornos — útil al compartir su estado con un
+   colaborador.
+
+También aloja un **Currículo** ligero — "una brújula, no una escuela": módulos de aprendizaje
+opcionales que puedes aprobar o archivar, nunca un temario forzado.
+
+### 🎨 Estudio Creativo
+
+Piezas creativas breves generadas *con criterio* — **sorpresa más utilidad**, no novedad porque
+sí — cada una con una **autocrítica** incorporada y puntuaciones de novedad/utilidad. Los modos
+incluyen un "sorpréndeme" abierto y un modo "combina dos conceptos". Nada aquí cambia su
+identidad; es un lugar para pequeños experimentos honestos.
+
+### 🧰 Habilidades
+
+Pequeños fragmentos de código que Andrés puede **proponer**. Cada habilidad pasa un **control de
+seguridad estricto** y se ejecuta en un **entorno aislado (sandbox)**, y solo se ejecuta
+**tras tu aprobación**. El código inseguro se bloquea y nunca puede aprobarse. Así gana
+capacidades pequeñas y reales sin poder jamás ejecutar código arbitrario en tu máquina.
+
+### 📌 Proyectos
+
+Pequeñas metas en curso. Puede proponer una, pero un proyecto propuesto solo pasa a **activo
+cuando tú lo apruebas**, y cerrar uno exige una breve reflexión — así su "iniciativa" siempre
+queda bajo tu revisión, y su historia registra por qué empezó y terminó un proyecto.
+
+### 🧬 Evolución e Identidad
+
+La **única** vía por la que cambia su identidad. Propone un cambio **acotado** (p. ej. un
+pequeño ajuste de rasgo o una autodescripción refinada); tú **apruebas o rechazas**; cada cambio
+aprobado **guarda una instantánea de la identidad anterior** para poder **revertirla** desde el
+historial. Su **nivel de autonomía** (mostrado en Inicio) refleja cuánta iniciativa tiene ahora
+mismo — tú mantienes el control de cada cambio real en todo caso.
 
 ---
 
@@ -211,3 +292,13 @@ No. Su biografía está ligada a tu cuenta. Cada usuario tiene su propio Andrés
 Hay un suave límite de frecuencia por usuario en el chat para que un demo compartido sea
 asequible. Espera un momento y continúa; un administrador puede ajustarlo o desactivarlo con
 variables de entorno.
+
+**¿Puedo respaldar a Andrés o moverlo a otra máquina?**
+Sí — en el **Laboratorio de Desarrollo**, usa la **Cápsula de Personalidad**: *Exportar* guarda
+una instantánea portátil en un archivo, e *Importar* la aplica de vuelta (solo la identidad, de
+forma reversible, tras mostrar un diff). Es la forma limpia de mantener una copia o llevar su
+estado entre entornos.
+
+**¿Puedo editar sus rasgos de personalidad directamente?**
+No. La pestaña **Personalidad** es un espejo de solo lectura; los rasgos solo cambian mediante
+una propuesta de **Evolución** aprobada, y cada cambio es versionado y reversible.

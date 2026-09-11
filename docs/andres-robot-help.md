@@ -32,6 +32,38 @@ is off in a real deployment.)
 
 ---
 
+## The tabs at a glance
+
+Andrés has thirteen tabs. Each is covered in more depth below.
+
+| Tab | What it is |
+|-----|-----------|
+| 🏠 **Home** | Dashboard: developmental age, identity version, and counters (memories, reflections, skills, projects, conversations, autonomy) + his current disposition. |
+| 💬 **Conversation** | Talk with him — text, voice, avatar, one image, and the 🌐 research toggle. |
+| 🌱 **Memory Garden** | See, verify, protect, forget and **consolidate** memories. |
+| 🧭 **Personality** | His current evolving identity: self-description, interests and trait bars (read-only mirror). |
+| 🎨 **Creative Studio** | Short creative pieces made with a surprise + usefulness criterion and a self-critique. |
+| 🔬 **Development Lab** | His own growth suggestions, the identity-version history with diffs, the **Personality Capsule** (export/import), and a learning Curriculum. |
+| 🧰 **Skills** | Small code skills he proposes — safety-checked, sandboxed, run only after you approve. |
+| 📌 **Projects** | Small ongoing goals he proposes; active only once you approve. |
+| 🧬 **Evolution** | The only path his identity changes: bounded proposals you approve, versioned and reversible. |
+| 📔 **Journal** | His private reflections on recent exchanges. |
+| 📈 **Progress** | A snapshot of how he has grown over time. |
+| 📚 **Knowledge Sources** | A curated research directory + "Ask Andrés where to research". |
+| 🛡️ **Safety** | The research tiers (Internal / Documents / Web) that control what he may draw on. |
+
+---
+
+## The Home tab
+
+The landing dashboard. It shows his **developmental age** (days since his "birth"), his current
+**identity version**, and counters for memories, reflections, active skills, projects and
+conversations, plus his **autonomy level** (see Evolution). A short line names his current
+simulated **disposition** (curiosity, warmth, etc.) — again, functional signals, not feelings.
+It's the quickest way to see, at a glance, how much of a biography he has accumulated.
+
+---
+
 ## The Conversation tab
 
 This is where you talk with Andrés. It supports four channels, which you can mix:
@@ -151,23 +183,69 @@ of his identity versions.
 
 ## How Andrés develops (the other tabs)
 
-These are the pieces of his growing biography. All change is **proposed → reviewed →
-approved by you**, and every identity change is **versioned and reversible**.
+These are the pieces of his growing biography. The golden rule everywhere: change is
+**proposed → reviewed → approved by you**, and every identity change is **versioned and
+reversible**. His **ethical core (the "constitution") is fixed and he can never edit it** —
+he can't rewrite his own rules, hide actions, or resist being paused, exported or deleted.
 
-- **Reflection & Journal** — he reviews recent exchanges and notes what he could do
-  better, sometimes forming a reflective memory.
-- **Curiosity** — open questions he "wonders" about; you can let him explore or dismiss them.
-- **Projects** — small ongoing goals. He can propose one, but proposed projects only
-  become active when **you** approve them, and closing one requires a short reflection.
-- **Creativity** — short creative pieces generated *with a criterion* (surprise **plus**
-  usefulness) and a built-in self-critique, so it isn't just novelty for its own sake.
-- **Skills** — small pieces of code he can propose. Every skill passes a strict safety
-  check and runs in an isolated sandbox, and only runs after you approve it. Unsafe code
-  is blocked and can never be approved.
-- **Evolution & Identity** — the only path his identity changes. He proposes a bounded
-  change (e.g. a small trait nudge), you approve or reject, and each approved change
-  snapshots the previous identity so it can be rolled back. His **ethical core is fixed
-  and can never be edited by him**.
+### 🧭 Personality
+
+A faithful, **read-only** mirror of his *current* evolving identity: a short self-description,
+his core interests, and numeric **trait bars** (curiosity, playfulness, warmth, independence,
+imagination, skepticism, patience, formality, spontaneity, constructive-disagreement). You
+don't edit traits here — they only ever change through an approved **Evolution** proposal, so
+this tab always shows the honest current state.
+
+### 📔 Reflection & Journal
+
+Andrés looks back over recent exchanges and writes a short, honest reflection: what he noticed,
+what he might do better, a genuine question he now holds, and — only if warranted — one small
+way his character *might* grow (which he would still have to propose). Reflections are stored in
+the Journal; some become reflective memories. Offline he still writes a plain deterministic note.
+
+### 🔬 Development Lab
+
+His "own initiative" workspace — three fully auditable parts:
+
+1. **Developmental suggestions** — Andrés *proposes* areas to grow (you pick a focus:
+   calm / balanced / agile); you **accept** (which may open a project) or **dismiss** each.
+2. **Identity history** — the version timeline with **diffs**, so you can see exactly what
+   changed between versions. Nothing changes silently.
+3. **Personality Capsule** — **export** a portable snapshot of Andrés (his identity + biography
+   summary) to a file, and **import** one back. Import applies the **identity only**, reversibly,
+   after showing you a **legible diff** first. This is how you **back up Andrés or move him**
+   between environments — useful when sharing his state with a collaborator.
+
+It also hosts a lightweight **Curriculum** — "a compass, not a school": optional learning
+modules you can approve or archive, never a forced syllabus.
+
+### 🎨 Creative Studio
+
+Short creative pieces generated *with a criterion* — **surprise plus usefulness**, not novelty
+for its own sake — each with a built-in **self-critique** and novelty/usefulness scores. Modes
+include an open "surprise me" and a "blend two concepts" mode. Nothing here changes his identity;
+it's a place for small, honest experiments.
+
+### 🧰 Skills
+
+Small pieces of code Andrés can **propose**. Every skill passes a **strict safety check** and
+runs in an **isolated sandbox**, and only ever runs **after you approve it**. Unsafe code is
+blocked and can never be approved. This lets him gain small, real capabilities without ever
+being able to run arbitrary code on your machine.
+
+### 📌 Projects
+
+Small ongoing goals. He can propose one, but a proposed project only becomes **active when you
+approve it**, and closing one requires a short reflection — so his "initiative" always stays
+under your review, and his history records why a project started and ended.
+
+### 🧬 Evolution & Identity
+
+The **only** path by which his identity changes. He proposes a **bounded** change (e.g. a small
+trait nudge or a refined self-description); you **approve or reject**; each approved change
+**snapshots the previous identity** so it can be **rolled back** from the history. His
+**autonomy level** (shown on Home) reflects how much initiative he currently has — you stay in
+control of every actual change regardless.
 
 ---
 
@@ -206,3 +284,12 @@ No. His biography is tied to your account. Different users each get their own pr
 **He said I'm sending messages too fast — why?**
 There's a gentle per-user rate limit on the chat to keep a shared demo affordable. Wait a
 moment and continue; an administrator can adjust or disable it via environment settings.
+
+**Can I back up Andrés, or move him to another machine?**
+Yes — in the **Development Lab**, use the **Personality Capsule**: *Export* saves a portable
+snapshot to a file, and *Import* applies it back (identity only, reversibly, after showing a
+diff). It's the clean way to keep a backup or carry his state between environments.
+
+**Can I edit his personality traits directly?**
+No. The **Personality** tab is a read-only mirror; traits only change through an approved
+**Evolution** proposal, and every change is versioned and reversible.

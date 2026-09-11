@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.5] - 2026-09-10
+
+### Docs — Andrés user guide deepened after a coverage audit (all 13 tabs)
+
+A coverage audit of the help doc against the real feature surface (13 tabs, 51 endpoints) found
+it was concept-organised and shallow: it never documented the **Home**, **Personality** or
+**Development Lab** tabs as such, and completely omitted the **Personality Capsule** (export/import
+— how you back up or move Andrés), the **Curriculum**, the **autonomy level**, and the identity
+history with diffs; six growth features were bundled into terse bullets. Deepened `docs/
+andres-robot-help.{md,es,no}` (trilingual parity: 10 H2 + 10 H3 each, ~50% longer):
+- New **"The tabs at a glance"** table mapping all 13 tabs.
+- New **Home** and **Personality** sections; the "How Andrés develops" bullets expanded into real
+  `###` subsections (Personality, Reflection & Journal, Development Lab, Creative Studio, Skills,
+  Projects, Evolution & Identity), each describing the actual flow.
+- **Development Lab** now documented in full: developmental suggestions, identity history + diffs,
+  the **Personality Capsule** (export/import, identity-only, reversible), and the Curriculum.
+- **Autonomy level** explained; FAQ adds "back up / move Andrés" and "edit traits directly?".
+
+Docs-only; no code touched. (`Curriculum.jsx` exists but is embedded in Development Lab, not a
+standalone tab — documented accordingly.)
+
+---
+
 ## [1.45.4] - 2026-09-10
 
 ### Docs — Andrés the Robot user guide refreshed with everything since the audit
