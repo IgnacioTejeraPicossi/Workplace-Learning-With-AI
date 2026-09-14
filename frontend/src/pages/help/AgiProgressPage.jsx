@@ -6,6 +6,7 @@ import BenefitsOfAGI from './agi/BenefitsOfAGI';
 import HomoSapiensVsAI from './agi/HomoSapiensVsAI';
 import VoicesOnAGI from './agi/VoicesOnAGI';
 import ReflectionsFromAI from './agi/ReflectionsFromAI';
+import AgiSafetySignals from './agi/AgiSafetySignals';
 import FreshInsights from '../../FreshInsights';
 
 export default function AgiProgressPage({ onNavigate }) {
@@ -21,6 +22,7 @@ export default function AgiProgressPage({ onNavigate }) {
     { id: 'benefits', labelKey: 'help.agiTabs.benefits', fallback: 'The Benefits of AGI', icon: '✨' },
     { id: 'voices', labelKey: 'help.agiTabs.voices', fallback: 'Voices on AGI', icon: '🎙️' },
     { id: 'reflections', labelKey: 'help.agiTabs.reflections', fallback: 'Reflections from the AI/AGI', icon: '🪞' },
+    { id: 'safety', labelKey: 'help.agiTabs.safety', fallback: 'Safety & Governance', icon: '🛡️' },
     { id: 'liveSignals', labelKey: 'help.agiTabs.liveSignals', fallback: 'Live Signals', icon: '🛰️' },
   ];
 
@@ -38,6 +40,8 @@ export default function AgiProgressPage({ onNavigate }) {
         return <VoicesOnAGI />;
       case 'reflections':
         return <ReflectionsFromAI />;
+      case 'safety':
+        return <AgiSafetySignals />;
       case 'liveSignals':
         return (
           <FreshInsights
