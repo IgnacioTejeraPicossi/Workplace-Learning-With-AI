@@ -10,7 +10,10 @@ still present but rejected.
 
 **Before using Jira again** (e.g. the EA Second Brain / Compliance agent creating
 real issues):
-  1. Create a new token at https://id.atlassian.com/manage-profile/security/api-tokens
+  1. Create a new token at:
+       https://id.atlassian.com/manage-profile/security/api-tokens
+     Security note: open that URL yourself (type/navigate to it) rather than clicking
+     a link from any "your token is expiring" email — even a legitimate-looking one.
   2. Set JIRA_API_TOKEN (and JIRA_BASE_URL / JIRA_EMAIL) in the repo-root `.env`
      — never in code, never committed. Restart the backend.
   3. If the Compliance agent's "Send → n8n/OutSystems" path is used, also update the
