@@ -86,6 +86,19 @@ async def create_issue(payload: dict) -> str:
             headers=HEADERS,
             timeout=30.0
         )
+        # Auth failure (401/403) most likely means the Jira API token expired.
+        # The "AI learning Jira integration" token was left to expire ~2026-10-10.
+        # Surface an actionable message (reaches the run's errors via ea_execute).
+        if r.status_code in (401, 403):
+            raise RuntimeError(
+                "Jira auth failed (HTTP %d): the API token was probably expired or "
+                "revoked. The 'AI learning Jira integration' token was set to expire "
+                "~2026-10-10. Create a new token at "
+                "https://id.atlassian.com/manage-profile/security/api-tokens, update "
+                "JIRA_API_TOKEN in the repo-root .env (and the n8n/OutSystems Jira "
+                "credential if that path is used), then restart the backend."
+                % r.status_code
+            )
         r.raise_for_status()
         data = r.json()
         return data.get("key", data.get("id", "JIRA-UNKNOWN"))
