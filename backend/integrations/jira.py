@@ -1,5 +1,21 @@
 """
-Jira integration for EA Second Brain Agent
+Jira integration for EA Second Brain Agent.
+
+⚠️ TOKEN ROTATION NOTE (2026-09-14)
+The "AI learning Jira integration" Atlassian API token was deliberately left to
+EXPIRE (~2026-10-10) because Jira issue creation is not in active use right now.
+So this integration is currently DORMANT — `create_issue` returns a mock when the
+env vars are unset, and returns a clear "token expired" error if the old token is
+still present but rejected.
+
+**Before using Jira again** (e.g. the EA Second Brain / Compliance agent creating
+real issues):
+  1. Create a new token at https://id.atlassian.com/manage-profile/security/api-tokens
+  2. Set JIRA_API_TOKEN (and JIRA_BASE_URL / JIRA_EMAIL) in the repo-root `.env`
+     — never in code, never committed. Restart the backend.
+  3. If the Compliance agent's "Send → n8n/OutSystems" path is used, also update the
+     Jira credential stored in n8n / OutSystems (a separate place).
+  4. Revoke the old token.
 """
 
 import base64
