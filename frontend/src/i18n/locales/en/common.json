@@ -665,6 +665,19 @@
           "personal": "physicsgirl.com",
           "review": "arXiv 2111.11392 (review)"
         }
+      },
+      "featuredDeutsch": {
+        "name": "David Deutsch",
+        "badge": "Featured Researcher",
+        "role": "Visiting Professor of Physics, Centre for Quantum Computation, Clarendon Laboratory, University of Oxford · FRS",
+        "bio": "A pioneer of quantum computation — he described the first universal quantum computer and one of the first quantum algorithms — and the originator of constructor theory. That foundational work is mainstream, well-established physics. He is also the best-known advocate of the view featured in the two rows above: that quantum interference is literally the action of parallel universes (Everett's Many-Worlds), argued in The Fabric of Reality (1997) and The Beginning of Infinity (2011).",
+        "relationToOph": "Why he's here: Deutsch takes the realist reading of quantum theory to its limit — every branch is an equally real world, and no observer is needed to make facts. That is the sharpest foil to OPH, which makes overlap between observers the very source of public reality. Note the epistemic split we keep: his quantum-computing work is established; his multiverse and time-travel claims are tagged speculative.",
+        "links": {
+          "oxford": "Oxford profile",
+          "personal": "Personal site",
+          "book": "The Fabric of Reality",
+          "paper": "1991 CTC paper"
+        }
       }
     },
     "aiAsObserver": {

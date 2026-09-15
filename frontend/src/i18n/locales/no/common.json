@@ -956,6 +956,19 @@
           "personal": "physicsgirl.com",
           "review": "arXiv 2111.11392 (oversikt)"
         }
+      },
+      "featuredDeutsch": {
+        "name": "David Deutsch",
+        "badge": "Utvalgt forsker",
+        "role": "Gjesteprofessor i fysikk, Centre for Quantum Computation, Clarendon Laboratory, University of Oxford · FRS",
+        "bio": "En pioner innen kvanteberegning — han beskrev den første universelle kvantedatamaskinen og en av de første kvantealgoritmene — og opphavsmann til konstruktørteori. Det grunnleggende arbeidet er etablert, dominerende fysikk. Han er også den mest kjente forkjemperen for synet i de to radene over: at kvanteinterferens bokstavelig talt er virkningen av parallelle universer (Everetts mangeverdener), argumentert i The Fabric of Reality (1997) og The Beginning of Infinity (2011).",
+        "relationToOph": "Hvorfor han er her: Deutsch tar den realistiske lesningen av kvanteteori til sitt ytterste — hver gren er en like virkelig verden, og ingen observatør trengs for å gjøre fakta. Det er den skarpeste kontrasten til OPH, som gjør overlapp mellom observatører til selve kilden til offentlig virkelighet. Merk det epistemiske skillet vi holder: kvanteberegningsarbeidet hans er etablert; påstandene om multivers og tidsreise er merket som spekulative.",
+        "links": {
+          "oxford": "Oxford-profil",
+          "personal": "Personlig nettsted",
+          "book": "The Fabric of Reality",
+          "paper": "D-CTC-artikkel (1991)"
+        }
       }
     },
     "aiAsObserver": {

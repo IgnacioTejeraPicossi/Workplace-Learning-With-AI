@@ -1633,6 +1633,19 @@
           "personal": "physicsgirl.com",
           "review": "arXiv 2111.11392 (revisión)"
         }
+      },
+      "featuredDeutsch": {
+        "name": "David Deutsch",
+        "badge": "Investigador destacado",
+        "role": "Profesor visitante de Física, Centre for Quantum Computation, Clarendon Laboratory, Universidad de Oxford · FRS",
+        "bio": "Pionero de la computación cuántica — describió el primer ordenador cuántico universal y uno de los primeros algoritmos cuánticos — y creador de la teoría de constructores. Ese trabajo fundacional es física dominante y bien establecida. Es además el defensor más conocido de la idea de las dos filas de arriba: que la interferencia cuántica es literalmente la acción de universos paralelos (los muchos mundos de Everett), argumentada en La estructura de la realidad (1997) y El comienzo del infinito (2011).",
+        "relationToOph": "Por qué está aquí: Deutsch lleva la lectura realista de la teoría cuántica al límite — cada rama es un mundo igual de real, y no hace falta ningún observador para fijar los hechos. Ese es el contraste más nítido con OPH, que hace del solapamiento entre observadores la fuente misma de la realidad pública. Nota el desglose epistémico que mantenemos: su trabajo en computación cuántica está establecido; sus afirmaciones sobre el multiverso y el viaje en el tiempo se etiquetan como especulativas.",
+        "links": {
+          "oxford": "Perfil en Oxford",
+          "personal": "Web personal",
+          "book": "La estructura de la realidad",
+          "paper": "Artículo D-CTC (1991)"
+        }
       }
     },
     "aiAsObserver": {
