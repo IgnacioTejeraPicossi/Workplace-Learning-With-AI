@@ -61,6 +61,18 @@ const SIGNALS = [
       { label: 'SCMP', url: 'https://www.scmp.com/tech/policy/article/3367448/china-rejects-calls-pacing-ai-development-fearing-it-would-entrench-us-tech-lead' },
     ],
   },
+  {
+    id: 'dissenters',
+    badge: 'governance',
+    contested: true,
+    sources: [
+      { label: 'CNN', url: 'https://www.cnn.com/2026/08/10/tech/meta-glimmer-mark-zuckerberg-future-of-ai' },
+      { label: 'Tech Startups', url: 'https://techstartups.com/2026/09/14/china-michael-burry-and-yann-lecun-reject-openai-and-anthropic-calls-to-slow-ai-development-lecun-calls-warnings-fake/' },
+      { label: 'The Tribune (Hassabis)', url: 'https://www.tribuneindia.com/news/advanced-ai-development/direction-is-correct-google-deepmind-co-founder-demis-hassabis-backs-anthropic-boss-dario-amodeis-calls-for-ai-slowdown' },
+      { label: 'Asia Times', url: 'https://asiatimes.com/2026/09/big-ai-slowdown-a-safety-pause-or-strategic-retreat/' },
+      { label: 'LinkedIn (GenAI Works)', url: 'https://www.linkedin.com/pulse/people-building-ai-want-slow-down-except-one-genai-works-v9qcf/' },
+    ],
+  },
 ];
 
 function Badge({ kind, t }) {
