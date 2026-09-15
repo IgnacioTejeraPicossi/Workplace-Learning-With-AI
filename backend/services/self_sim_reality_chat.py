@@ -350,6 +350,53 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
         "tags": ["grinberg", "syntergic", "transferred potential", "neuronal field", "lattice",
                  "constructed reality", "consciousness", "epr"],
     },
+    # ── Deutsch's Many-Worlds multiverse (2026-09-14, from a documentary the
+    # owner brought in on the double-slit experiment). Speculative: the
+    # interference is established, but "the other branches are real" is a
+    # contested interpretation. The time-travel chunk also carries the honest
+    # answer to the owner's "which-multiverse?" probability question.
+    {
+        "id": "deutsch-many-worlds",
+        "title": "Many-Worlds & the double-slit argument (Deutsch)",
+        "level": "speculative",
+        "text": ("David Deutsch (The Fabric of Reality, 1997) argues that single-particle "
+                 "double-slit interference is direct evidence for parallel universes: the "
+                 "pattern depends on paths the visible particle never took, so 'shadow' "
+                 "particles from neighbouring universes must interfere with ours. He reads "
+                 "this as proof of Everett's Many-Worlds — a constantly branching multiverse "
+                 "with a copy of you in each branch. Honest layering: the interference is "
+                 "ESTABLISHED; Many-Worlds is a serious mainstream INTERPRETATION; but 'the "
+                 "other branches are physically real, and interference proves it' is a "
+                 "contested claim, empirically tied with Copenhagen, Bohmian pilot-wave and "
+                 "objective-collapse rivals — hence speculative."),
+        "sources": ["Deutsch, The Fabric of Reality (1997)", "Everett (1957)"],
+        "tags": ["deutsch", "many worlds", "everett", "multiverse", "double slit",
+                 "interference", "shadow photons", "parallel universes", "interpretation"],
+    },
+    {
+        "id": "deutsch-time-travel-branches",
+        "title": "Time travel to a parallel branch, and which-multiverse (Deutsch, D-CTCs)",
+        "level": "speculative",
+        "text": ("Deutsch's 1991 model of quantum mechanics near closed timelike curves "
+                 "(D-CTCs) argues that if backward time travel were possible, the grandfather "
+                 "paradox dissolves: the traveller arrives in a parallel branch, changes that "
+                 "branch's future, not the one they left, so two copies can coexist with no "
+                 "contradiction. On the probability of landing where 'you' exist, the honest "
+                 "answer depends on WHICH multiverse: in Everett/Deutsch branching (Tegmark "
+                 "Level III) all branches share the same physics and a common past, so a past "
+                 "branch is essentially our own history and 'you', Earth and life almost "
+                 "certainly exist there (why Deutsch says there would be two copies). The "
+                 "'so different that life couldn't exist' worry, plus the placement problem "
+                 "(same planet/galaxy/cluster), describes a different multiverse — Tegmark "
+                 "Level II bubble universes with different constants, mostly lifeless. All of "
+                 "it rests on speculative premises."),
+        "sources": ["Deutsch, 'Quantum mechanics near closed timelike lines', Phys. Rev. D 44 (1991)",
+                    "Tegmark, 'Parallel Universes' (2003)",
+                    "Scientific American, 'Time Travel Simulation Resolves Grandfather Paradox' (2014)"],
+        "tags": ["deutsch", "time travel", "closed timelike curves", "d-ctc", "grandfather paradox",
+                 "branch", "probability", "tegmark", "level ii", "level iii", "constants",
+                 "parallel universe", "multiverse"],
+    },
     {
         "id": "qec-holography",
         "title": "Quantum error correction & holography (AdS/CFT as a code)",

@@ -20,6 +20,11 @@ const ROWS = [
   { id: 'pribramHolonomic' },
   { id: 'bohmImplicate' },
   { id: 'grinbergSyntergic' },
+  // Deutsch's Many-Worlds multiverse — brought in from a documentary on the
+  // double-slit experiment. The time-travel row also answers the owner's own
+  // "which-multiverse?" probability question (see its Link note).
+  { id: 'deutschMultiverse' },
+  { id: 'deutschTimeTravel' },
 ];
 
 const PASTERSKI_LINKS = [
