@@ -50,6 +50,17 @@ const SIGNALS = [
       { label: 'Congress.gov (CRS)', url: 'https://www.congress.gov/crs-product/IF13217' },
     ],
   },
+  {
+    id: 'standoff',
+    badge: 'governance',
+    contested: true,
+    sources: [
+      { label: 'Washington Post', url: 'https://www.washingtonpost.com/technology/2026/09/14/china-pushes-back-calls-an-ai-slowdown-trump-xi-meeting-looms/' },
+      { label: 'Semafor', url: 'https://www.semafor.com/article/09/14/2026/beijing-issues-ai-warnings-but-rejects-us-calls-to-slow-development' },
+      { label: 'NBC News', url: 'https://www.nbcnews.com/world/china/china-ai-slowdown-trump-amodei-altman-threat-cold-war-rcna597631' },
+      { label: 'SCMP', url: 'https://www.scmp.com/tech/policy/article/3367448/china-rejects-calls-pacing-ai-development-fearing-it-would-entrench-us-tech-lead' },
+    ],
+  },
 ];
 
 function Badge({ kind, t }) {
