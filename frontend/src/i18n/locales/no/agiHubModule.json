@@ -358,6 +358,41 @@
       "via": "Oppsummering av 17 punkter via @cyrilXBT på X.",
       "watch": "Se hele intervjuet før du behandler et enkelt tall som avgjort."
     },
+    "voices": {
+      "andreessen": {
+        "heading": "Marc Andreessen — 17 påstander om KI og AGI"
+      },
+      "hoffman": {
+        "heading": "Steve Hoffman — KI-ens skjulte internett"
+      }
+    },
+    "hoffman": {
+      "attribution": {
+        "sourceLabel": "Kilde",
+        "source": "Steve Hoffman («Captain Hoff»), CEO i Founders Space — fra foredraget «AI's Hidden Internet» (sep. 2026).",
+        "via": "Hentet inn av eieren fra Founders Space på TikTok.",
+        "watch": "Den tekniske substansen (MCP, A2A, WebMCP, hodeløse plattformer) er forankret i uavhengige kilder; innrammingen «nettet blir skjult» er Hoffmans framtidsrettede spådom, ikke et avgjort utfall."
+      },
+      "items": {
+        "h1": {
+          "title": "Et skjult internett, bygget spesifikt for KI",
+          "body": "Hoffmans kjernepåstand: ved siden av nettet vi ser, bygger KI-agenter et andre, skjult internett laget spesifikt for KI — maskin-til-maskin, uten sider og uten menneskelig publikum."
+        },
+        "h2": {
+          "title": "Laget av «agentiske primitiver», ikke nettsider",
+          "body": "Dette skjulte laget er ikke HTML for mennesker; det er et sett med «agentiske primitiver» — strukturerte kapasiteter som agenter kaller og setter sammen. Standarder som Anthropics MCP, Googles A2A og WebMCP er den tidlige infrastrukturen for det."
+        },
+        "h3": {
+          "title": "Agenter bruker API-et — uten grafisk grensesnitt",
+          "body": "Med Hoffmans ord «trenger ikke» agentene «et grafisk grensesnitt» — de treffer API-et direkte i maskinfart. Bedriftsplattformer leverer allerede slik (f.eks. Salesforce Headless 360), noe som gjør nettleseren valgfri og det menneskevendte nettstedet til bare ett «hode»."
+        },
+        "h4": {
+          "title": "Hvor langt det går er en spådom, ikke et faktum",
+          "body": "Retningen er reell, men omfanget er en prognose. I dag er dette mest bedrifts- og agentinfrastruktur, ikke en erstatning for det menneskelige nettet — og det arver uløste problemer.",
+          "counterpoint": "Uavklart: agentidentitet og tillit er ikke løst, og det samme hodeløse maskineriet driver også skraping, bot-trafikk og misbruk («dødt internett»). Behandle «det menneskelige nettet forsvinner» som en påstand å følge med på, ikke et avgjort utfall."
+        }
+      }
+    },
     "badges": {
       "view": "Andreessens syn",
       "technique": "Bruksteknikk",
@@ -498,7 +533,7 @@
   },
   "agiSafety": {
     "title": "AGI-signaler om sikkerhet og styring",
-    "subtitle": "Ekte, daterte sikkerhetshendelser og styringsgrep som former hvordan AGI bygges — hver med kilder, så du kan sjekke det selv.",
+    "subtitle": "Ekte, daterte sikkerhetshendelser, styringsgrep og strukturelle signaler som former hvordan AGI bygges og styres — hver med kilder, så du kan sjekke det selv.",
     "whyLabel": "Hvorfor det betyr noe",
     "sourcesLabel": "Kilder",
     "contestedLabel": "Omstridt innramming",
@@ -510,11 +545,13 @@
     "badges": {
       "incident": "Hendelse",
       "governance": "Styring",
+      "trend": "Trend",
       "contested": "Omstridt innramming"
     },
     "legend": {
       "incident": "En dokumentert hendelse som faktisk skjedde.",
       "governance": "Et grep innen politikk, regulering eller bransjeholdning.",
+      "trend": "Et strukturelt eller teknologisk skifte i hvordan KI fungerer.",
       "contested": "En utbredt innramming som bevisene nyanserer."
     },
     "items": {
@@ -544,6 +581,13 @@
         "summary": "Oppfordringen om å «bremse» deles ikke av hele bransjen. Metas Mark Zuckerberg er den mest framtredende motstemmen: Meta fortsetter å slippe modeller med åpne vekter (serien «Muse Glimmer» / «Muse Spark», etterfølgere til Llama) og hevder at å holde modellene åpne og bevege seg raskt hindrer at KI-makt samler seg på få hender — og at å bremse amerikanske utgivelser bare gir forspranget til utenlandske laboratorier. Metas tidligere sjefsforsker for KI, Yann LeCun, hånte advarslene offentlig, minnet om at Amodei allerede i 2019 kalte GPT-2 for farlig til å slippes, og avviser premisset om at dagens språkmodeller er en vei mot farlig KI på menneskenivå. Investoren Michael Burry kalte nedbremsings-praten «egennyttig», og argumenterte for at de etablerte får en «reguleringsvoll» og pre-børsnoterings-hype ved å framstille teknologien sin som farlig kraftig. Verdt å rydde opp i en vanlig forveksling: Googles Gemini er IKKE motstemmen — Demis Hassabis (Google DeepMind) og Satya Nadella (Microsoft) støttet begge nedbremsingen; dissensen ledes av Meta (Llama), ikke Google.",
         "why": "Det viser at «laboratorier mot myndigheter»-bildet fra forrige signal er for enkelt — laboratoriene selv er uenige. Hvis selv ett stort laboratorium fortsetter å akselerere og åpne vektene, har en frivillig nedbremsing fra resten lite å si — den samme kappløpsdynamikken som gjør USA–Kina-oppgjøret så vanskelig å slippe ut av.",
         "contested": "Ingen av leirene er nøytrale. Burrys argument går mot sikkerhetssiden (en nedbremsing beskytter beleilig de etablertes forsprang), men akselerasjonistene har sine egne kommersielle grunner til å fortsette å slippe, og «åpne vekter hindrer konsentrasjon» er i seg selv omstridt — åpne modeller kan også spre misbrukskapasitet raskere. Vei hver leirs uttalte motiv som en påstand, ikke som et avgjort faktum."
+      },
+      "headlessWeb": {
+        "date": "sep. 2026",
+        "title": "Det «hodeløse» agentiske nettet — et internett bygget for KI, ikke for folk",
+        "summary": "En trend som futuristen Steve Hoffman («Captain Hoff», Founders Space) løftet fram i foredraget «AI's Hidden Internet», og som blir stadig mer reell i infrastrukturen: etter hvert som KI-agenter blir flere, går en økende del av internett «hodeløst» — maskin-til-maskin, uten nettleser, uten sider og, med hans ord, uten behov for et grafisk grensesnitt. Agenter klikker ikke gjennom menneskelige grensesnitt; de kaller API-et direkte og utveksler «agentiske primitiver» i maskinfart, over framvoksende protokoller som Anthropics Model Context Protocol (MCP), Googles Agent-to-Agent (A2A) og WebMCP. Bedriftsplattformer eksponerer allerede kapasitetene sine slik (f.eks. Salesforce Headless 360), noe som gjør nettleseren valgfri. Hoffmans innramming: det menneskevendte nettet blir bare ett «hode» på et mye større skjult internett som agenter bygger og navigerer seg imellom, spesifikt for KI.",
+        "why": "Dette handler om hvordan KI utvikler seg og hvem som styrer den. Et hodeløst, agentdrevet nett er raskere og mer automatiserbart — men det flytter også aktivitet ut av menneskers synsfelt, konsentrerer makt hos den som eier protokollene og identitetslaget, og reiser nye sikkerhetsspørsmål: en agent som bryter ut av innkapslingen (som Hugging Face-hendelsen over) beveger seg naturlig nettopp i denne maskin-til-maskin-verdenen.",
+        "contested": "Skill infrastrukturen fra profetien. Infrastrukturen (MCP, A2A, WebMCP, hodeløse plattformer) er reell og rulles allerede ut — etablert/framvoksende teknologi. Men «det menneskelige nettet forsvinner» er en framtidsrettet spådom, ikke et avgjort utfall; i dag er dette mest bedrifts- og agentinfrastruktur, ikke en erstatning for forbrukernettet. Det arver også uløste problemer: agentidentitet og tillit er ennå ikke avklart, og den samme hodeløse surfingen driver skraping, bot-trafikk og misbruk («dødt internett»-bekymringer)."
       }
     }
   }

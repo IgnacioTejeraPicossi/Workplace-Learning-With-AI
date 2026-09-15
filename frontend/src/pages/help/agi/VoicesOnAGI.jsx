@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * Voices on AGI — a curated, epistemically-honest feed of notable claims and
- * anecdotes about the state of AGI. The first entry is Marc Andreessen's
- * appearance on The Joe Rogan Experience (17 points), summarized by @cyrilXBT.
+ * anecdotes about the state of AGI. It now hosts MORE THAN ONE voice:
+ *   1. Marc Andreessen on The Joe Rogan Experience (17 points, via @cyrilXBT).
+ *   2. Steve Hoffman ("Captain Hoff", Founders Space) — "AI's Hidden Internet",
+ *      the headless / agentic web (brought in by the owner from TikTok).
  *
- * Design intent (same posture as the "Code of Reality" case study): PRESENT,
- * don't evangelize. Every point carries an epistemic badge and the source's
- * own caveats are shown up front, including the published counter-evidence for
- * the strongest health claim. Points are paraphrased, not reproduced verbatim.
- *
- * This tab is also the natural home for the "constantly updating" curated feed
- * — new voices/signals can be appended over time.
+ * Design intent (unchanged): PRESENT, don't evangelize. Every point carries an
+ * epistemic badge and the source's own caveats are shown up front, including
+ * published counter-evidence where a strong claim has it. Points are paraphrased,
+ * not reproduced verbatim. New voices are appended over time — the component is
+ * data-driven over a VOICES list so adding one is just data + i18n.
  */
 
 // Epistemic taxonomy — honest about what each point actually is.
@@ -23,8 +23,8 @@ const BADGES = {
   contested: { color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' }, // counter-evidence exists
 };
 
-// Point id + its epistemic category. Titles/bodies come from i18n (agiVoices.items.*).
-// `counterpoint: true` renders the published counter-evidence note (point 2).
+// Point id + its epistemic category. Titles/bodies come from i18n.
+// `counterpoint: true` renders the published counter-evidence note.
 const ANDREESSEN_POINTS = [
   { id: 'p1',  badge: 'view' },
   { id: 'p2',  badge: 'contested', counterpoint: true },
@@ -45,6 +45,37 @@ const ANDREESSEN_POINTS = [
   { id: 'p17', badge: 'view' },
 ];
 
+// Second voice — Steve Hoffman, "AI's Hidden Internet" (the headless/agentic
+// web). His claims are paraphrased from the talk; the technical substance is
+// grounded in the sources named in this voice's attribution.
+const HOFFMAN_POINTS = [
+  { id: 'h1', badge: 'view' },
+  { id: 'h2', badge: 'view' },
+  { id: 'h3', badge: 'view' },
+  { id: 'h4', badge: 'contested', counterpoint: true },
+];
+
+// A voice = a heading + an attribution block + its points, each keyed to its own
+// i18n base so existing Andreessen keys never move.
+const VOICES = [
+  {
+    id: 'andreessen',
+    icon: '🎙️',
+    headingKey: 'agiVoices.voices.andreessen.heading',
+    itemsBase: 'agiVoices.items',
+    attribBase: 'agiVoices.attribution',
+    points: ANDREESSEN_POINTS,
+  },
+  {
+    id: 'hoffman',
+    icon: '🛰️',
+    headingKey: 'agiVoices.voices.hoffman.heading',
+    itemsBase: 'agiVoices.hoffman.items',
+    attribBase: 'agiVoices.hoffman.attribution',
+    points: HOFFMAN_POINTS,
+  },
+];
+
 function EpistemicBadge({ kind, t }) {
   const c = BADGES[kind] || BADGES.view;
   return (
@@ -58,9 +89,9 @@ function EpistemicBadge({ kind, t }) {
   );
 }
 
-function PointCard({ point, index, t }) {
+function PointCard({ point, index, itemsBase, t }) {
   const counterpoint = point.counterpoint
-    ? t('agiVoices.items.p2.counterpoint', { defaultValue: '' })
+    ? t(`${itemsBase}.${point.id}.counterpoint`, { defaultValue: '' })
     : '';
   return (
     <div style={{
@@ -84,13 +115,13 @@ function PointCard({ point, index, t }) {
           fontSize: 12, fontWeight: 700,
         }}>{index + 1}</span>
         <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem', flex: 1 }}>
-          {t(`agiVoices.items.${point.id}.title`)}
+          {t(`${itemsBase}.${point.id}.title`)}
         </div>
         <EpistemicBadge kind={point.badge} t={t} />
       </div>
       <div style={{ padding: '0.9rem 1rem', flex: 1 }}>
         <p style={{ margin: 0, color: '#374151', fontSize: '0.875rem', lineHeight: 1.6 }}>
-          {t(`agiVoices.items.${point.id}.body`)}
+          {t(`${itemsBase}.${point.id}.body`)}
         </p>
         {counterpoint && (
           <div style={{
@@ -111,6 +142,47 @@ function PointCard({ point, index, t }) {
   );
 }
 
+// One voice: heading + attribution + its (filtered) points grid.
+function VoiceBlock({ voice, filter, t }) {
+  const points = filter === 'all'
+    ? voice.points
+    : voice.points.filter(p => p.badge === filter);
+  if (!points.length) return null;
+
+  return (
+    <div style={{ display: 'grid', gap: 14 }}>
+      {/* Voice heading */}
+      <h3 style={{ margin: '0.5rem 0 0', fontSize: 17, fontWeight: 700, color: '#0f172a' }}>
+        {voice.icon} {t(voice.headingKey)}
+      </h3>
+
+      {/* Source / attribution */}
+      <div style={{
+        backgroundColor: '#f1f5f9', borderRadius: '0.75rem', border: '1px solid #e2e8f0',
+        padding: '0.9rem 1.2rem', fontSize: '0.85rem', color: '#475569', lineHeight: 1.6,
+      }}>
+        <strong style={{ color: '#334155' }}>
+          {t(`${voice.attribBase}.sourceLabel`, { defaultValue: 'Source' })}:
+        </strong>{' '}
+        {t(`${voice.attribBase}.source`)}{' '}
+        {t(`${voice.attribBase}.via`)}{' '}
+        <em>{t(`${voice.attribBase}.watch`)}</em>
+      </div>
+
+      {/* Point cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+        gap: 16,
+      }}>
+        {points.map((p) => (
+          <PointCard key={p.id} point={p} index={voice.points.indexOf(p)} itemsBase={voice.itemsBase} t={t} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function VoicesOnAGI() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
@@ -123,10 +195,9 @@ export default function VoicesOnAGI() {
     { id: 'contested', labelKey: 'agiVoices.badges.contested' },
   ];
 
-  const points = useMemo(
-    () => (filter === 'all'
-      ? ANDREESSEN_POINTS
-      : ANDREESSEN_POINTS.filter(p => p.badge === filter)),
+  // Voices that still have at least one point under the active filter.
+  const visibleVoices = useMemo(
+    () => VOICES.filter(v => filter === 'all' || v.points.some(p => p.badge === filter)),
     [filter]
   );
 
@@ -142,7 +213,7 @@ export default function VoicesOnAGI() {
         </div>
       </div>
 
-      {/* Caution banner — surface the source's own caveats up front */}
+      {/* Caution banner — surface the sources' own caveats up front */}
       <div style={{
         backgroundColor: '#fffbeb', borderRadius: '0.75rem', border: '1px solid #fde68a',
         padding: '1.1rem 1.4rem', display: 'flex', gap: '1rem', alignItems: 'flex-start',
@@ -153,25 +224,12 @@ export default function VoicesOnAGI() {
             {t('agiVoices.banner.title', { defaultValue: 'Read these as claims, not settled facts' })}
           </div>
           <div style={{ color: '#78350f', fontSize: '0.875rem', lineHeight: 1.6 }}>
-            {t('agiVoices.banner.text', { defaultValue: 'Several of these are Marc Andreessen’s stated views and second-hand anecdotes, not independently verified facts. Where strong claims have published counter-evidence, it is shown alongside. Treat the numbers as starting points to verify, not conclusions.' })}
+            {t('agiVoices.banner.text', { defaultValue: 'These are stated views and second-hand anecdotes, not independently verified facts. Where strong claims have published counter-evidence, it is shown alongside. Treat the numbers as starting points to verify, not conclusions.' })}
           </div>
         </div>
       </div>
 
-      {/* Source / attribution */}
-      <div style={{
-        backgroundColor: '#f1f5f9', borderRadius: '0.75rem', border: '1px solid #e2e8f0',
-        padding: '0.9rem 1.2rem', fontSize: '0.85rem', color: '#475569', lineHeight: 1.6,
-      }}>
-        <strong style={{ color: '#334155' }}>
-          {t('agiVoices.attribution.sourceLabel', { defaultValue: 'Source' })}:
-        </strong>{' '}
-        {t('agiVoices.attribution.source', { defaultValue: 'Marc Andreessen on The Joe Rogan Experience (3+ hour interview).' })}{' '}
-        {t('agiVoices.attribution.via', { defaultValue: 'Summary of 17 points via @cyrilXBT on X.' })}{' '}
-        <em>{t('agiVoices.attribution.watch', { defaultValue: 'Watch the full interview before treating any single number as settled.' })}</em>
-      </div>
-
-      {/* Filter chips */}
+      {/* Filter chips (apply across all voices) */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {filters.map(f => (
           <button
@@ -190,16 +248,10 @@ export default function VoicesOnAGI() {
         ))}
       </div>
 
-      {/* Point cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-        gap: 16,
-      }}>
-        {points.map((p) => (
-          <PointCard key={p.id} point={p} index={ANDREESSEN_POINTS.indexOf(p)} t={t} />
-        ))}
-      </div>
+      {/* Voices */}
+      {visibleVoices.map(v => (
+        <VoiceBlock key={v.id} voice={v} filter={filter} t={t} />
+      ))}
 
       {/* Legend */}
       <div style={{

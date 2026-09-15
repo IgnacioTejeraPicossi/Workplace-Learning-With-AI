@@ -24,6 +24,7 @@ const BADGES = {
   incident:   { color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' }, // a documented event
   governance: { color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' }, // a policy / posture move
   contested:  { color: '#b45309', bg: '#fffbeb', border: '#fde68a' }, // a shaky popular framing
+  trend:      { color: '#0f766e', bg: '#f0fdfa', border: '#99f6e4' }, // a structural / tech shift
 };
 
 // URLs are not translated (they are proper resources). Titles/summaries/why
@@ -71,6 +72,18 @@ const SIGNALS = [
       { label: 'The Tribune (Hassabis)', url: 'https://www.tribuneindia.com/news/advanced-ai-development/direction-is-correct-google-deepmind-co-founder-demis-hassabis-backs-anthropic-boss-dario-amodeis-calls-for-ai-slowdown' },
       { label: 'Asia Times', url: 'https://asiatimes.com/2026/09/big-ai-slowdown-a-safety-pause-or-strategic-retreat/' },
       { label: 'LinkedIn (GenAI Works)', url: 'https://www.linkedin.com/pulse/people-building-ai-want-slow-down-except-one-genai-works-v9qcf/' },
+    ],
+  },
+  {
+    id: 'headlessWeb',
+    badge: 'trend',
+    contested: true,
+    sources: [
+      { label: 'Founders Space (Hoffman)', url: 'https://www.tiktok.com/@founders.space/video/7681827864043375886' },
+      { label: 'Infoblox', url: 'https://www.infoblox.com/blog/security/headless-what-is-it-and-do-i-need-to-go-there/' },
+      { label: 'MuleSoft', url: 'https://blogs.mulesoft.com/agentic-perspectives/the-agentic-enterprise-why-aiforce-needs-a-headless-foundation-and-an-agent-control-plane/' },
+      { label: 'Digiday', url: 'https://digiday.com/media/wtf-is-headless-browsing-and-how-are-ai-agents-fueling-it/' },
+      { label: 'Salesforce', url: 'https://www.salesforce.com/headless/' },
     ],
   },
 ];
@@ -230,7 +243,7 @@ export default function AgiSafetySignals() {
           {t('agiSafety.legendTitle', { defaultValue: 'What the tags mean' })}
         </div>
         <div style={{ display: 'grid', gap: 8 }}>
-          {['incident', 'governance', 'contested'].map(k => (
+          {['incident', 'governance', 'trend', 'contested'].map(k => (
             <div key={k} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <Badge kind={k} t={t} />
               <span style={{ color: '#475569', fontSize: '0.83rem' }}>

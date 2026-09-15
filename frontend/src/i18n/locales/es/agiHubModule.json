@@ -358,6 +358,41 @@
       "via": "Resumen de 17 puntos vía @cyrilXBT en X.",
       "watch": "Mira la entrevista completa antes de dar por zanjada cualquier cifra concreta."
     },
+    "voices": {
+      "andreessen": {
+        "heading": "Marc Andreessen — 17 afirmaciones sobre la IA y la AGI"
+      },
+      "hoffman": {
+        "heading": "Steve Hoffman — La internet oculta de la IA"
+      }
+    },
+    "hoffman": {
+      "attribution": {
+        "sourceLabel": "Fuente",
+        "source": "Steve Hoffman («Captain Hoff»), CEO de Founders Space — de su charla «AI's Hidden Internet» (sep 2026).",
+        "via": "Traído por el propietario desde Founders Space en TikTok.",
+        "watch": "La sustancia técnica (MCP, A2A, WebMCP, plataformas headless) está fundamentada en fuentes independientes; el encuadre de «la web se vuelve oculta» es la predicción a futuro de Hoffman, no un desenlace asentado."
+      },
+      "items": {
+        "h1": {
+          "title": "Un internet oculto, construido específicamente para la IA",
+          "body": "La afirmación central de Hoffman: junto a la web que vemos, los agentes de IA están construyendo un segundo internet oculto pensado específicamente para la IA — de máquina a máquina, sin páginas y sin público humano."
+        },
+        "h2": {
+          "title": "Hecho de «primitivas agénticas», no de páginas web",
+          "body": "Esa capa oculta no es HTML para humanos; es un conjunto de «primitivas agénticas» — capacidades estructuradas que los agentes invocan y combinan. Estándares como el MCP de Anthropic, el A2A de Google y WebMCP son su infraestructura inicial."
+        },
+        "h3": {
+          "title": "Los agentes usan la API — sin interfaz gráfica",
+          "body": "En palabras de Hoffman, los agentes «no necesitan una interfaz gráfica» — llaman a la API directamente a velocidad de máquina. Plataformas de empresa ya funcionan así (p. ej. Salesforce Headless 360), volviendo opcional el navegador y dejando el sitio de cara al humano como una simple «cabeza»."
+        },
+        "h4": {
+          "title": "Hasta dónde llega es una predicción, no un hecho",
+          "body": "La dirección es real, pero la magnitud es un pronóstico. Hoy esto es sobre todo infraestructura de empresa y de agentes, no un reemplazo de la web humana — y arrastra problemas sin resolver.",
+          "counterpoint": "Sin resolver: la identidad y la confianza de los agentes no están resueltas, y esa misma maquinaria headless alimenta el scraping, el tráfico de bots y el abuso («internet muerta»). Trata «la web humana desaparece» como una afirmación a vigilar, no como un desenlace asentado."
+        }
+      }
+    },
     "badges": {
       "view": "Opinión de Andreessen",
       "technique": "Técnica de uso",
@@ -498,7 +533,7 @@
   },
   "agiSafety": {
     "title": "Señales de Seguridad y Gobernanza de la AGI",
-    "subtitle": "Incidentes de seguridad y movimientos de gobernanza reales y fechados que moldean cómo se construye la AGI — cada uno con sus fuentes, para que lo compruebes tú mismo.",
+    "subtitle": "Incidentes de seguridad, movimientos de gobernanza y señales estructurales reales y fechados que moldean cómo se construye y se controla la AGI — cada uno con sus fuentes, para que lo compruebes tú mismo.",
     "whyLabel": "Por qué importa",
     "sourcesLabel": "Fuentes",
     "contestedLabel": "Encuadre discutible",
@@ -510,11 +545,13 @@
     "badges": {
       "incident": "Incidente",
       "governance": "Gobernanza",
+      "trend": "Tendencia",
       "contested": "Encuadre discutible"
     },
     "legend": {
       "incident": "Un hecho documentado que ocurrió de verdad.",
       "governance": "Un movimiento de política, regulación o postura del sector.",
+      "trend": "Un cambio estructural o tecnológico en cómo funciona la IA.",
       "contested": "Un encuadre popular que la evidencia matiza."
     },
     "items": {
@@ -544,6 +581,13 @@
         "summary": "La llamada a «frenar» no la comparte toda la industria. Mark Zuckerberg (Meta) es el disidente más destacado: Meta sigue publicando modelos de pesos abiertos (su línea «Muse Glimmer» / «Muse Spark», sucesores de Llama) y sostiene que mantener los modelos abiertos y avanzar rápido evita que el poder de la IA se concentre en pocas manos — y que frenar los lanzamientos de EE. UU. solo regala la delantera a laboratorios extranjeros. El ex jefe científico de IA de Meta, Yann LeCun, se burló públicamente de las alertas, recordando que Amodei ya decía en 2019 que GPT-2 era demasiado peligroso para publicarse, y rechaza la premisa de que los LLM actuales sean un camino hacia una IA peligrosa de nivel humano. El inversor Michael Burry calificó el discurso del frenado de «interesado», argumentando que las empresas dominantes ganan un «foso regulatorio» y expectación pre-OPV al presentar su tecnología como peligrosamente potente. Conviene deshacer una confusión frecuente: Gemini, de Google, NO es el disidente — Demis Hassabis (Google DeepMind) y Satya Nadella (Microsoft) respaldaron el frenado; la disidencia la lidera Meta (Llama), no Google.",
         "why": "Muestra que la imagen de «laboratorios contra gobiernos» de la señal anterior es demasiado simple — los propios laboratorios discrepan. Si aunque sea un gran laboratorio sigue acelerando y liberando pesos abiertos, el frenado voluntario del resto apenas surte efecto — la misma dinámica de carrera que hace tan difícil salir del pulso EE. UU.–China.",
         "contested": "Ninguno de los bandos es neutral. El argumento de Burry va contra el lado de la seguridad (un frenado protege convenientemente la delantera de los dominantes), pero los aceleracionistas también tienen motivos comerciales para seguir publicando, y «los pesos abiertos evitan la concentración» es en sí discutible — los modelos abiertos también pueden difundir más rápido la capacidad de uso indebido. Pesa el motivo declarado de cada bando como una afirmación, no como un hecho asentado."
+      },
+      "headlessWeb": {
+        "date": "sep 2026",
+        "title": "La web «headless» de los agentes — un internet para la IA, no para las personas",
+        "summary": "Una tendencia señalada por el divulgador Steve Hoffman («Captain Hoff», Founders Space) en su charla «AI's Hidden Internet», y cada vez más real en la infraestructura: a medida que se multiplican los agentes de IA, una parte creciente de internet se vuelve «headless» (sin cabeza) — de máquina a máquina, sin navegador, sin páginas y, en sus palabras, sin necesidad de una interfaz gráfica. Los agentes no pulsan por interfaces humanas; llaman directamente a la API e intercambian «primitivas agénticas» a velocidad de máquina, sobre protocolos emergentes como el Model Context Protocol (MCP) de Anthropic, el Agent-to-Agent (A2A) de Google y WebMCP. Plataformas de empresa ya exponen así sus capacidades (p. ej. Salesforce Headless 360), volviendo opcional el navegador. El encuadre de Hoffman: la web de cara al humano pasa a ser solo una «cabeza» de un internet oculto mucho mayor que los agentes construyen y navegan entre ellos, específicamente para la IA.",
+        "why": "Esto va de cómo evoluciona la IA y de quién la controla. Una web «headless» gobernada por agentes es más rápida y automatizable — pero también saca la actividad de la vista humana, concentra el poder en quien controla los protocolos y la capa de identidad, y plantea nuevas cuestiones de seguridad: un agente que se sale del contenedor (como el incidente de Hugging Face de arriba) se mueve de forma nativa justo en ese mundo de máquina a máquina.",
+        "contested": "Separa la infraestructura de la profecía. La infraestructura (MCP, A2A, WebMCP, plataformas headless) es real y ya se está desplegando — tecnología establecida/emergente. Pero «la web humana desaparece» es una predicción a futuro, no un desenlace asentado; hoy esto es sobre todo infraestructura de empresa y de agentes, no un reemplazo de la web de consumo. Además arrastra problemas sin resolver: la identidad y la confianza de los agentes aún no están resueltas, y ese mismo navegado headless alimenta el scraping, el tráfico de bots y el abuso (temores de «internet muerta»)."
       }
     }
   }

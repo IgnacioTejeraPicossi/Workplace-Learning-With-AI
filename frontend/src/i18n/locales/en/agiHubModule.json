@@ -358,6 +358,41 @@
       "via": "Summary of 17 points via @cyrilXBT on X.",
       "watch": "Watch the full interview before treating any single number as settled."
     },
+    "voices": {
+      "andreessen": {
+        "heading": "Marc Andreessen — 17 claims on AI & AGI"
+      },
+      "hoffman": {
+        "heading": "Steve Hoffman — AI's Hidden Internet"
+      }
+    },
+    "hoffman": {
+      "attribution": {
+        "sourceLabel": "Source",
+        "source": "Steve Hoffman ('Captain Hoff'), CEO of Founders Space — from his talk 'AI's Hidden Internet' (Sep 2026).",
+        "via": "Brought in by the owner from Founders Space on TikTok.",
+        "watch": "The technical substance (MCP, A2A, WebMCP, headless platforms) is grounded in independent sources; the 'the web goes hidden' framing is Hoffman's forward-looking prediction, not a settled outcome."
+      },
+      "items": {
+        "h1": {
+          "title": "A hidden internet, built specifically for AI",
+          "body": "Hoffman's core claim: alongside the web we see, AI agents are building a second, hidden internet meant specifically for AI — machine-to-machine, with no pages and no human audience."
+        },
+        "h2": {
+          "title": "Made of 'agentic primitives', not web pages",
+          "body": "This hidden layer isn't HTML for humans; it's a set of 'agentic primitives' — structured capabilities that agents call and compose. Standards like Anthropic's MCP, Google's A2A and WebMCP are the early plumbing for it."
+        },
+        "h3": {
+          "title": "Agents use the API — no graphical interface",
+          "body": "In Hoffman's words, agents 'don't need a graphical interface' — they hit the API directly at machine speed. Enterprise platforms already ship this way (e.g. Salesforce Headless 360), making the browser optional and the human-facing site just one 'head'."
+        },
+        "h4": {
+          "title": "How far it goes is a prediction, not a fact",
+          "body": "The direction is real, but the scale is a forecast. Today this is mostly enterprise and agent infrastructure, not a replacement for the human web — and it inherits unsolved problems.",
+          "counterpoint": "Unsettled: agent identity and trust aren't solved, and the same headless machinery also powers scraping, bot traffic and abuse ('dead internet'). Treat 'the human web disappears' as a claim to watch, not a settled outcome."
+        }
+      }
+    },
     "badges": {
       "view": "Andreessen’s view",
       "technique": "Usage technique",
@@ -498,7 +533,7 @@
   },
   "agiSafety": {
     "title": "AGI Safety & Governance Signals",
-    "subtitle": "Real, dated safety incidents and governance moves shaping how AGI is built — each with sources, so you can check it yourself.",
+    "subtitle": "Real, dated safety incidents, governance moves and structural signals shaping how AGI is built and controlled — each with sources, so you can check it yourself.",
     "whyLabel": "Why it matters",
     "sourcesLabel": "Sources",
     "contestedLabel": "Contested framing",
@@ -510,11 +545,13 @@
     "badges": {
       "incident": "Incident",
       "governance": "Governance",
+      "trend": "Trend",
       "contested": "Contested framing"
     },
     "legend": {
       "incident": "A documented event that actually happened.",
       "governance": "A policy, regulatory or industry-posture move.",
+      "trend": "A structural or technological shift in how AI works.",
       "contested": "A popular framing the evidence complicates."
     },
     "items": {
@@ -544,6 +581,13 @@
         "summary": "The 'slow down' call is not shared across the industry. Meta's Mark Zuckerberg is the most prominent holdout: Meta keeps shipping open-weight models (its 'Muse Glimmer' / 'Muse Spark' line, successors to Llama) and argues that keeping models open and moving fast stops AI power concentrating in a few hands — and that slowing US releases just hands the lead to foreign labs. Meta's former chief AI scientist Yann LeCun publicly mocked the warnings, recalling that Amodei called GPT-2 too dangerous to release back in 2019, and rejects the premise that today's LLMs are a path to dangerous human-level AI. Investor Michael Burry called the slowdown talk 'self-serving,' arguing incumbents gain a regulatory moat and pre-IPO hype by framing their tech as dangerously powerful. One common mix-up worth fixing: Google's Gemini is NOT the holdout — Google DeepMind's Demis Hassabis and Microsoft's Satya Nadella both backed the slowdown; the dissent is led by Meta (Llama), not Google.",
         "why": "It shows the 'labs vs governments' picture from the previous signal is too simple — the labs themselves disagree. If even one major lab keeps accelerating and open-sourcing, a voluntary slowdown by the rest has little bite — the same race dynamic that makes the US–China standoff so hard to escape.",
         "contested": "Neither camp is neutral. Burry's argument cuts against the safety side (a slowdown conveniently protects incumbents' lead), but the accelerationists have their own commercial reasons to keep shipping, and 'open weights prevent concentration' is itself contested — open models can also spread misuse capability faster. Weigh each side's stated motive as a claim, not a settled fact."
+      },
+      "headlessWeb": {
+        "date": "Sep 2026",
+        "title": "The 'headless' agentic web — an internet built for AI, not people",
+        "summary": "A trend flagged by futurist Steve Hoffman ('Captain Hoff', Founders Space) in his 'AI's Hidden Internet' talk, and increasingly real in the plumbing: as AI agents multiply, a growing slice of the internet is going 'headless' — machine-to-machine, with no browser, no pages and, in his words, no need for a graphical interface. Agents don't click through human UIs; they call the API directly and exchange 'agentic primitives' at machine speed, over emerging protocols like Anthropic's Model Context Protocol (MCP), Google's Agent-to-Agent (A2A) and WebMCP. Enterprise platforms already expose their capabilities this way (e.g. Salesforce Headless 360), making the browser optional. Hoffman's framing: the human-facing web becomes just one 'head' on a much larger hidden internet that agents build and navigate among themselves, specifically for AI.",
+        "why": "This is about how AI evolves and who controls it. A headless, agent-run web is faster and more automatable — but it also moves activity out of human view, concentrates leverage in whoever owns the protocols and the identity layer, and raises fresh safety questions: an agent that breaks containment (like the Hugging Face incident above) moves natively in exactly this machine-to-machine world.",
+        "contested": "Separate the plumbing from the prophecy. The infrastructure (MCP, A2A, WebMCP, headless platforms) is real and shipping — established/emerging tech. But 'the human web disappears' is a forward-looking prediction, not a settled outcome; today this is mostly enterprise and agent infrastructure, not a replacement for the consumer web. It also inherits unsolved problems: agent identity and trust are not yet settled, and the same headless browsing powers scraping, bot traffic and abuse ('dead internet' worries)."
       }
     }
   }
