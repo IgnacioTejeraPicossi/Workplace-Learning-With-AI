@@ -363,7 +363,7 @@
         "heading": "Marc Andreessen — 17 påstander om KI og AGI"
       },
       "hoffman": {
-        "heading": "Steve Hoffman — KI-ens skjulte internett"
+        "heading": "Steve Hoffman — om KI-kappløpet og dets skjulte internett"
       }
     },
     "hoffman": {
@@ -390,6 +390,11 @@
           "title": "Hvor langt det går er en spådom, ikke et faktum",
           "body": "Retningen er reell, men omfanget er en prognose. I dag er dette mest bedrifts- og agentinfrastruktur, ikke en erstatning for det menneskelige nettet — og det arver uløste problemer.",
           "counterpoint": "Uavklart: agentidentitet og tillit er ikke løst, og det samme hodeløse maskineriet driver også skraping, bot-trafikk og misbruk («dødt internett»). Behandle «det menneskelige nettet forsvinner» som en påstand å følge med på, ikke et avgjort utfall."
+        },
+        "h5": {
+          "title": "Hvorfor vi ikke kan stanse KI-kappløpet: konkurranse",
+          "body": "Hoffmans svar på «hvorfor kan vi ikke stanse det dødelige KI-kappløpet?» er ett ord: konkurranse — drevet av en «vinneren tar alt»-logikk: den som når superintelligens først, forventes å dominere markedet. Med en global KI-investering som ventes å overstige tusen milliarder dollar i 2026 og hyperskalerere låst i et kappløp bare én eller to kan vinne, vil ingen bedrift eller nasjon bremse ensidig og gi rivalene den gevinsten — så samlet stanser ingen, selv midt i sikkerhetsadvarslene.",
+          "counterpoint": "To påstander her, ingen lover. «Ustoppelig»: konkurransekappløp har blitt bremset før når verifikasjon og felles interesse falt på plass — atomvåpenkontroll (prøvestansavtalen av 1963, NPT) og Montreal-protokollen av 1987 om KFK (KI er vanskeligere — spredte aktører, svak verifikasjon, dobbel bruk — men vanskelig er ikke umulig). Og «vinneren tar alt»: at ett laboratorium dominerer for alltid er i seg selv omstridt — modeller blir raskt handelsvare, åpne vekter uthuler vollgravene, og ingen hyperskalerer har ennå vist positiv avkastning på KI i stor skala."
         }
       }
     },
@@ -588,6 +593,13 @@
         "summary": "En trend som futuristen Steve Hoffman («Captain Hoff», Founders Space) løftet fram i foredraget «AI's Hidden Internet», og som blir stadig mer reell i infrastrukturen: etter hvert som KI-agenter blir flere, går en økende del av internett «hodeløst» — maskin-til-maskin, uten nettleser, uten sider og, med hans ord, uten behov for et grafisk grensesnitt. Agenter klikker ikke gjennom menneskelige grensesnitt; de kaller API-et direkte og utveksler «agentiske primitiver» i maskinfart, over framvoksende protokoller som Anthropics Model Context Protocol (MCP), Googles Agent-to-Agent (A2A) og WebMCP. Bedriftsplattformer eksponerer allerede kapasitetene sine slik (f.eks. Salesforce Headless 360), noe som gjør nettleseren valgfri. Hoffmans innramming: det menneskevendte nettet blir bare ett «hode» på et mye større skjult internett som agenter bygger og navigerer seg imellom, spesifikt for KI.",
         "why": "Dette handler om hvordan KI utvikler seg og hvem som styrer den. Et hodeløst, agentdrevet nett er raskere og mer automatiserbart — men det flytter også aktivitet ut av menneskers synsfelt, konsentrerer makt hos den som eier protokollene og identitetslaget, og reiser nye sikkerhetsspørsmål: en agent som bryter ut av innkapslingen (som Hugging Face-hendelsen over) beveger seg naturlig nettopp i denne maskin-til-maskin-verdenen.",
         "contested": "Skill infrastrukturen fra profetien. Infrastrukturen (MCP, A2A, WebMCP, hodeløse plattformer) er reell og rulles allerede ut — etablert/framvoksende teknologi. Men «det menneskelige nettet forsvinner» er en framtidsrettet spådom, ikke et avgjort utfall; i dag er dette mest bedrifts- og agentinfrastruktur, ikke en erstatning for forbrukernettet. Det arver også uløste problemer: agentidentitet og tillit er ennå ikke avklart, og den samme hodeløse surfingen driver skraping, bot-trafikk og misbruk («dødt internett»-bekymringer)."
+      },
+      "race": {
+        "date": "sep. 2026",
+        "title": "Hvorfor kappløpet ikke kan stanses — «konkurranse»",
+        "summary": "Futuristen Steve Hoffman («Captain Hoff», Founders Space) oppsummerer i ett ord hvorfor det «dødelige KI-kappløpet» ikke kan stanses: konkurranse — med en «vinneren tar alt»-logikk under: den som når superintelligens først, ventes å dominere markedet. Global KI-investering ventes å overstige tusen milliarder dollar i 2026, der de store hyperskalererne alene øser anslagsvis 775–800 milliarder inn i KI-infrastruktur og er låst i et kappløp bare én eller to til slutt kan vinne. I den settingen vil ingen bedrift eller nasjon bremse ensidig og gi fra seg den gevinsten — akkurat mønsteret som går gjennom hele denne fanen (laboratorier foreslår nedbremsing → USA og Kina avviser det → Meta fortsetter å akselerere).",
+        "why": "Det navngir motoren bak alle de andre signalene her. Hvis den som når superintelligens først tar hele markedet, er hver aktørs individuelt rasjonelle trekk å fortsette å løpe — så samlet stanser ingen selv når mange sier de vil. En lærebok-felle for kollektiv handling, og grunnen til at frivillige nedbremsinger stadig mislykkes.",
+        "contested": "To påstander bor inni dette, ingen av dem en naturlov. «Ustoppelig»: konkurransekappløp HAR blitt bremset når verifikasjon og felles interesse falt på plass — atomvåpenkontroll (prøvestansavtalen av 1963, NPT) og Montreal-protokollen av 1987 om KFK (KI er vanskeligere — spredte aktører, svak verifikasjon, dobbel bruk — men vanskelig er ikke umulig). Og «vinneren tar alt»: at ett laboratorium dominerer for alltid er i seg selv omstridt — modeller blir raskt handelsvare, åpne vekter uthuler vollgravene, og ingen hyperskalerer har ennå vist positiv avkastning på KI i stor skala."
       }
     }
   }
