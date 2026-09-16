@@ -127,6 +127,28 @@ DEFAULT_DATA: List[AGIItem] = [
         total=73,
         notes="SpaceXAI (xAI), 12 Aug 2026. Frontier reasoning + agentic coding and long-running tasks; 500K context; text+image input (text-only output). Artificial Analysis Intelligence Index 61 (up from Grok 4.5's 56) — third overall, matching GPT-5.6 Sol and overtaking Kimi K3. CursorBench v3.2 69.9%, DeepSWE 65.9%, APEX-Agents 57.5%, Terminal-Bench 26%. Available in Cursor (acquired by SpaceXAI), Grok Build, API, OpenRouter and Vercel. Native audio (A) still trails the fully-multimodal leaders, so its CHC-breadth score sits just below Opus 5 / GPT-5.6 Sol despite matching them on the intelligence index.",
     ),
+    # ── Refresh through September 2026 (added 2026-09-16, web-sourced). An unusually
+    # active month: five frontier launches in ten days. Scores remain CHC-breadth
+    # approximations (multimodal-weighted), NOT a task-benchmark ranking — which is
+    # why a reasoning/math leader can tie a fully-multimodal peer here.
+    AGIItem(
+        model="Claude Fable 5.1", year=2026, month=9,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":10,"MS":0,"MR":8,"V":9,"A":9,"S":6},
+        total=82,
+        notes="Anthropic, 1 Sep 2026. Highest score ever on Artificial Analysis's Intelligence Index (66 at max effort), ahead of Claude Opus 5 (63), Claude Fable 5 (62) and GPT-5.6 Sol / Grok 4.6 (61). An incremental but real bump over Fable 5 (juni-2026): fully multimodal (vision + audio), which keeps its CHC-breadth total at the very top, tied with GPT-6 Astra. Fable tier still requires usage credits (not a default/free model). MS (persistent long-term memory) remains unsolved across this generation.",
+    ),
+    AGIItem(
+        model="Gemini 3.8 Flash", year=2026, month=9,
+        scores={"K":9,"RW":9,"M":9,"R":8,"WM":6,"MS":0,"MR":5,"V":8,"A":7,"S":8},
+        total=69,
+        notes="Google DeepMind, 2 Sep 2026. Latest fast, low-cost 'workhorse' Flash model (the Gemini Pro flagship line was last updated Feb 2026). Improves on 3.6 Flash in reasoning, coding and multimodal, with Google's characteristic high Speed (S) and strong native vision/audio. A cost/latency-optimized model rather than a frontier flagship, so its breadth total sits below the top-tier launches.",
+    ),
+    AGIItem(
+        model="GPT-6 Astra", year=2026, month=9,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":10,"MS":0,"MR":9,"V":9,"A":7,"S":7},
+        total=82,
+        notes="OpenAI, 3 Sep 2026 — billed as its 'most intelligent and aligned' model and the standout September launch. Saturates the hardest reasoning/math/cyber benchmarks: ARC-AGI-3 99.9% (abstract reasoning), FrontierMath Tier 4 97.6%, ExploitBench 100% (vs 78.5% for GPT-5.6 Sol), OSWorld 2.0 72.6% computer-use at ~47% less time per task. 1.05M-token context, knowledge cutoff Apr 2026. Its CHC-breadth total ties Claude Fable 5.1 here because the model card lists text+image input (native audio is not its headline), so audio (A) — weighted equally in this metric — is the one domain where it doesn't top the field despite leading reasoning, math and cyber. On a reasoning-only view it is the clear frontier leader.",
+    ),
 ]
 
 

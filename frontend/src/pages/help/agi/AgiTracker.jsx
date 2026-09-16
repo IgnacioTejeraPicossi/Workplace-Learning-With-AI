@@ -59,7 +59,7 @@ export default function AgiTracker() {
       <div>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{t('help.agiProgress.title', { defaultValue: 'AGI Progress Tracker' })}</h2>
         <div style={{ color: '#64748b', fontSize: 14 }}>
-          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through august-2026 with Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro, Claude Fable 5, plus Kimi K2.6 & K3 (Moonshot AI), GPT-5.6 Sol, Claude Opus 5, Gemini 3.6 Flash and Grok 4.5/4.6.' })}
+          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through september-2026 with Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro, Claude Fable 5, plus Kimi K2.6 & K3 (Moonshot AI), GPT-5.6 Sol, Claude Opus 5, Gemini 3.6 Flash, Grok 4.5/4.6 and the September launches Claude Fable 5.1, GPT-6 Astra & Gemini 3.8 Flash.' })}
           {' ['}
           <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">{t('help.agiProgress.paper', { defaultValue: 'paper' })}</a>
           {']'}
