@@ -363,7 +363,7 @@
         "heading": "Marc Andreessen — 17 claims on AI & AGI"
       },
       "hoffman": {
-        "heading": "Steve Hoffman — AI's Hidden Internet"
+        "heading": "Steve Hoffman — on the AI race & its hidden internet"
       }
     },
     "hoffman": {
@@ -390,6 +390,11 @@
           "title": "How far it goes is a prediction, not a fact",
           "body": "The direction is real, but the scale is a forecast. Today this is mostly enterprise and agent infrastructure, not a replacement for the human web — and it inherits unsolved problems.",
           "counterpoint": "Unsettled: agent identity and trust aren't solved, and the same headless machinery also powers scraping, bot traffic and abuse ('dead internet'). Treat 'the human web disappears' as a claim to watch, not a settled outcome."
+        },
+        "h5": {
+          "title": "Why we can't stop the AI race: competition",
+          "body": "Hoffman's answer to 'why can't we stop the deadly AI race?' is one word: competition — driven by a winner-take-all belief that whoever reaches superintelligence first will dominate the market. With global AI investment forecast to top $1 trillion in 2026 and hyperscalers locked in an arms race only one or two can win, no company or country will unilaterally slow down and hand rivals that prize — so collectively no one stops, even amid safety warnings.",
+          "counterpoint": "Two claims here, not laws. 'Unstoppable': competitive races have been slowed before when verification and shared interest aligned — nuclear arms control (the 1963 Partial Test Ban Treaty, the NPT) and the 1987 Montreal Protocol on CFCs (AI is harder — diffuse actors, weak verification, dual-use — but that's difficult, not impossible). And 'winner-take-all': the premise that one lab dominates forever is itself contested — models commoditise fast, open weights erode moats, and no hyperscaler has yet shown positive ROI at scale."
         }
       }
     },
@@ -588,6 +593,13 @@
         "summary": "A trend flagged by futurist Steve Hoffman ('Captain Hoff', Founders Space) in his 'AI's Hidden Internet' talk, and increasingly real in the plumbing: as AI agents multiply, a growing slice of the internet is going 'headless' — machine-to-machine, with no browser, no pages and, in his words, no need for a graphical interface. Agents don't click through human UIs; they call the API directly and exchange 'agentic primitives' at machine speed, over emerging protocols like Anthropic's Model Context Protocol (MCP), Google's Agent-to-Agent (A2A) and WebMCP. Enterprise platforms already expose their capabilities this way (e.g. Salesforce Headless 360), making the browser optional. Hoffman's framing: the human-facing web becomes just one 'head' on a much larger hidden internet that agents build and navigate among themselves, specifically for AI.",
         "why": "This is about how AI evolves and who controls it. A headless, agent-run web is faster and more automatable — but it also moves activity out of human view, concentrates leverage in whoever owns the protocols and the identity layer, and raises fresh safety questions: an agent that breaks containment (like the Hugging Face incident above) moves natively in exactly this machine-to-machine world.",
         "contested": "Separate the plumbing from the prophecy. The infrastructure (MCP, A2A, WebMCP, headless platforms) is real and shipping — established/emerging tech. But 'the human web disappears' is a forward-looking prediction, not a settled outcome; today this is mostly enterprise and agent infrastructure, not a replacement for the consumer web. It also inherits unsolved problems: agent identity and trust are not yet settled, and the same headless browsing powers scraping, bot traffic and abuse ('dead internet' worries)."
+      },
+      "race": {
+        "date": "Sep 2026",
+        "title": "Why the race can't be stopped — 'competition'",
+        "summary": "Futurist Steve Hoffman ('Captain Hoff', Founders Space) sums up why the 'deadly AI race' can't be halted in one word: competition — with a winner-take-all logic underneath it: whoever reaches superintelligence first is expected to dominate the market. Global AI investment is forecast to top $1 trillion in 2026, with the big hyperscalers alone pouring an estimated $775–800 billion into AI infrastructure and locked in an arms race only one or two can ultimately win. In that setting no company or country will unilaterally slow down and cede that prize — exactly the pattern running through this whole tab (labs propose a slowdown → the US and China reject it → Meta keeps accelerating).",
+        "why": "It names the engine behind every other signal here. If the first to superintelligence takes the whole market, each actor's individually rational move is to keep racing — so collectively no one stops even when many say they want to. A textbook collective-action trap, and the reason voluntary slowdowns keep failing.",
+        "contested": "Two claims sit inside this, neither a law of nature. 'Unstoppable': competitive arms races HAVE been slowed when verification and shared interest lined up — nuclear arms control (the 1963 Partial Test Ban Treaty, the NPT) and the 1987 Montreal Protocol on CFCs (AI is harder — diffuse actors, weak verification, dual-use — but difficult is not impossible). And 'winner-take-all': that one lab dominates forever is itself contested — models commoditise fast, open weights erode moats, and no hyperscaler has yet shown positive ROI on AI at scale."
       }
     }
   }

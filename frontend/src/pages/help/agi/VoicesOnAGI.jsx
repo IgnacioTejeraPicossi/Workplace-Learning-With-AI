@@ -53,6 +53,7 @@ const HOFFMAN_POINTS = [
   { id: 'h2', badge: 'view' },
   { id: 'h3', badge: 'view' },
   { id: 'h4', badge: 'contested', counterpoint: true },
+  { id: 'h5', badge: 'contested', counterpoint: true },
 ];
 
 // A voice = a heading + an attribution block + its points, each keyed to its own

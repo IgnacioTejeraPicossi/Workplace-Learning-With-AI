@@ -363,7 +363,7 @@
         "heading": "Marc Andreessen — 17 afirmaciones sobre la IA y la AGI"
       },
       "hoffman": {
-        "heading": "Steve Hoffman — La internet oculta de la IA"
+        "heading": "Steve Hoffman — sobre la carrera de la IA y su internet oculta"
       }
     },
     "hoffman": {
@@ -390,6 +390,11 @@
           "title": "Hasta dónde llega es una predicción, no un hecho",
           "body": "La dirección es real, pero la magnitud es un pronóstico. Hoy esto es sobre todo infraestructura de empresa y de agentes, no un reemplazo de la web humana — y arrastra problemas sin resolver.",
           "counterpoint": "Sin resolver: la identidad y la confianza de los agentes no están resueltas, y esa misma maquinaria headless alimenta el scraping, el tráfico de bots y el abuso («internet muerta»). Trata «la web humana desaparece» como una afirmación a vigilar, no como un desenlace asentado."
+        },
+        "h5": {
+          "title": "Por qué no podemos frenar la carrera de la IA: competición",
+          "body": "La respuesta de Hoffman a «¿por qué no podemos frenar la mortal carrera de la IA?» es una palabra: competición. Con una inversión global en IA que se prevé supere el billón de dólares en 2026 y unos hyperscalers metidos en una carrera armamentística que solo uno o dos pueden ganar, ninguna empresa ni país frenará de forma unilateral para regalar la delantera a sus rivales — así que colectivamente nadie se detiene, ni siquiera entre las alertas de seguridad.",
+          "counterpoint": "«Imparable» es una afirmación, no una ley. Otras carreras competitivas se han frenado cuando la verificación y el interés compartido se alinearon — el control de armas nucleares (el Tratado de Prohibición Parcial de Ensayos de 1963, el TNP) y el Protocolo de Montreal de 1987 sobre los CFC. La IA es más difícil de coordinar (actores dispersos, verificación débil, doble uso), pero la historia dice que es difícil, no imposible."
         }
       }
     },
@@ -588,6 +593,13 @@
         "summary": "Una tendencia señalada por el divulgador Steve Hoffman («Captain Hoff», Founders Space) en su charla «AI's Hidden Internet», y cada vez más real en la infraestructura: a medida que se multiplican los agentes de IA, una parte creciente de internet se vuelve «headless» (sin cabeza) — de máquina a máquina, sin navegador, sin páginas y, en sus palabras, sin necesidad de una interfaz gráfica. Los agentes no pulsan por interfaces humanas; llaman directamente a la API e intercambian «primitivas agénticas» a velocidad de máquina, sobre protocolos emergentes como el Model Context Protocol (MCP) de Anthropic, el Agent-to-Agent (A2A) de Google y WebMCP. Plataformas de empresa ya exponen así sus capacidades (p. ej. Salesforce Headless 360), volviendo opcional el navegador. El encuadre de Hoffman: la web de cara al humano pasa a ser solo una «cabeza» de un internet oculto mucho mayor que los agentes construyen y navegan entre ellos, específicamente para la IA.",
         "why": "Esto va de cómo evoluciona la IA y de quién la controla. Una web «headless» gobernada por agentes es más rápida y automatizable — pero también saca la actividad de la vista humana, concentra el poder en quien controla los protocolos y la capa de identidad, y plantea nuevas cuestiones de seguridad: un agente que se sale del contenedor (como el incidente de Hugging Face de arriba) se mueve de forma nativa justo en ese mundo de máquina a máquina.",
         "contested": "Separa la infraestructura de la profecía. La infraestructura (MCP, A2A, WebMCP, plataformas headless) es real y ya se está desplegando — tecnología establecida/emergente. Pero «la web humana desaparece» es una predicción a futuro, no un desenlace asentado; hoy esto es sobre todo infraestructura de empresa y de agentes, no un reemplazo de la web de consumo. Además arrastra problemas sin resolver: la identidad y la confianza de los agentes aún no están resueltas, y ese mismo navegado headless alimenta el scraping, el tráfico de bots y el abuso (temores de «internet muerta»)."
+      },
+      "race": {
+        "date": "sep 2026",
+        "title": "Por qué no se puede frenar la carrera — «competición»",
+        "summary": "El divulgador Steve Hoffman («Captain Hoff», Founders Space) resume en una palabra por qué no se puede detener la «mortal carrera de la IA»: competición. Se prevé que la inversión global en IA supere el billón de dólares en 2026, con los grandes hyperscalers volcando ellos solos unos 775–800 mil millones en infraestructura de IA y metidos en una carrera armamentística que solo uno o dos pueden ganar. En ese contexto ninguna empresa ni país frenará de forma unilateral para ceder la delantera — justo el patrón que recorre toda esta pestaña (los laboratorios proponen frenar → EE. UU. y China lo rechazan → Meta sigue acelerando).",
+        "why": "Nombra el motor detrás de todas las demás señales de aquí. La jugada individualmente racional de cada actor es seguir corriendo, así que colectivamente nadie se detiene aunque muchos digan que quieren — un caso de manual de trampa de acción colectiva, y la razón por la que los frenados voluntarios siguen fracasando.",
+        "contested": "«Imparable» es un diagnóstico, no una ley de la naturaleza. Otras carreras armamentísticas SÍ se han frenado cuando la verificación y el interés compartido se alinearon — el control de armas nucleares (el Tratado de Prohibición Parcial de Ensayos de 1963, el TNP) y el Protocolo de Montreal de 1987 sobre los CFC. La IA es más difícil de coordinar (actores dispersos, verificación débil, doble uso, enorme incentivo comercial), así que trata «la competición nos impide parar» como la trayectoria por defecto a combatir, no como un destino asentado."
       }
     }
   }

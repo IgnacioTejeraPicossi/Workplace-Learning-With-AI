@@ -86,6 +86,16 @@ const SIGNALS = [
       { label: 'Salesforce', url: 'https://www.salesforce.com/headless/' },
     ],
   },
+  {
+    id: 'race',
+    badge: 'contested',
+    contested: true,
+    sources: [
+      { label: 'Founders Space (Hoffman)', url: 'https://www.tiktok.com/@founders.space' },
+      { label: 'Goldman Sachs', url: 'https://www.goldmansachs.com/insights/articles/global-investment-is-forecast-to-exceed-1-trillion-in-2026' },
+      { label: 'Futurum', url: 'https://futurumgroup.com/insights/ai-capex-2026-the-690b-infrastructure-sprint/' },
+    ],
+  },
 ];
 
 function Badge({ kind, t }) {
