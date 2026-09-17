@@ -146,6 +146,47 @@ const benefits = [
     bgColor: '#f0fdf4',
     borderColor: '#86efac',
   },
+  // ─── Added 2026-09-17: Food/Agriculture, Energy/Fusion, Cyber Defense, Justice ─
+  {
+    id: 'food',
+    icon: '🌾',
+    titleKey: 'agiBenefits.items.food.title',
+    descKey: 'agiBenefits.items.food.desc',
+    examplesKey: 'agiBenefits.items.food.examples',
+    color: '#65a30d',
+    bgColor: '#f7fee7',
+    borderColor: '#d9f99d',
+  },
+  {
+    id: 'energy',
+    icon: '⚡',
+    titleKey: 'agiBenefits.items.energy.title',
+    descKey: 'agiBenefits.items.energy.desc',
+    examplesKey: 'agiBenefits.items.energy.examples',
+    color: '#ca8a04',
+    bgColor: '#fefce8',
+    borderColor: '#fde047',
+  },
+  {
+    id: 'cyberDefense',
+    icon: '🛡️',
+    titleKey: 'agiBenefits.items.cyberDefense.title',
+    descKey: 'agiBenefits.items.cyberDefense.desc',
+    examplesKey: 'agiBenefits.items.cyberDefense.examples',
+    color: '#1d4ed8',
+    bgColor: '#eff6ff',
+    borderColor: '#bfdbfe',
+  },
+  {
+    id: 'justice',
+    icon: '⚖️',
+    titleKey: 'agiBenefits.items.justice.title',
+    descKey: 'agiBenefits.items.justice.desc',
+    examplesKey: 'agiBenefits.items.justice.examples',
+    color: '#57534e',
+    bgColor: '#fafaf9',
+    borderColor: '#e7e5e4',
+  },
 ];
 
 function BenefitCard({ benefit, t, extraExamples = [] }) {

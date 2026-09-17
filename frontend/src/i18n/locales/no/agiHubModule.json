@@ -342,6 +342,94 @@
           "Det globale markedet for KI-programvare innen viltforvaltning passerte 2,2 milliarder dollar i 2025 — akustiske sensorer, droner og GPS-telemetri knyttet til synsmodeller",
           "Havovervåking: deteksjon av ulovlig fiske og korallbleking fra satellittbilder"
         ]
+      },
+      "food": {
+        "title": "Mat og landbruk",
+        "desc": "KI-drevet presisjonsjordbruk øker avlingene samtidig som det kutter sløsing med vann, gjødsel og plantevernmidler — en direkte spak på matsikkerheten for en voksende befolkning.",
+        "examples": [
+          {
+            "text": "Presisjonsjordbruk (GPS + droner + IoT + synsmodeller) har vist avlingsøkninger på 20–40% og vannbrukskutt på ~30%, samtidig som innsatssløsing reduseres 40–60%.",
+            "url": "https://www.csis.org/analysis/ai-global-food-security-focus-precision-agriculture",
+            "source": "CSIS"
+          },
+          {
+            "text": "Autonome droner med hyperspektrale kameraer skanner hele jorder på minutter og fanger sykdom, skadedyr og næringsmangel tidlig nok til å handle.",
+            "url": "https://farmonaut.com/precision-farming/ai-in-agriculture-new-food-innovations-for-2026",
+            "source": "Farmonaut"
+          },
+          {
+            "text": "Agtech hentet rundt 7 milliarder dollar i investeringer i 2025, der presisjonsjordbruk-avtaler gikk forbi tradisjonelle innsatsvarer.",
+            "url": "https://intellias.com/artificial-intelligence-in-agriculture/",
+            "source": "Intellias"
+          },
+          "Generative «KI-agronom»-assistenter og biometrisk husdyrovervåking gir ekspertråd til småbønder som aldri hadde tilgang til det"
+        ]
+      },
+      "energy": {
+        "title": "Ren energi og fusjon",
+        "desc": "KI akselererer de vanskeligste energiproblemene — stabilisering av fusjonsplasma, oppdagelse av reaktormaterialer og å presse mer ut av strømnettet — og bringer rikelig lavkarbonkraft nærmere.",
+        "examples": [
+          {
+            "text": "Kinas EAST-reaktor satte verdensrekord i januar 2026: plasma på 120 millioner °C opprettholdt i 1056 sekunder (~18 minutter) sammenhengende drift.",
+            "url": "https://earth911.com/eco-tech/the-state-of-fusion-energy-in-2026-real-reactors-real-grids-real-caveats/",
+            "source": "Earth911"
+          },
+          {
+            "text": "Commonwealth Fusions ARC-anlegg søkte PJM om nettilkobling i april 2026 — den første slike forespørselen fra en fusjonsutvikler til en stor amerikansk nettoperatør.",
+            "url": "https://www.cnn.com/2026/04/30/climate/nuclear-fusion-real-world-electricity-grid",
+            "source": "CNN"
+          },
+          {
+            "text": "KI hjelper nå med å kjøre fusjonseksperimenter (DeepMind–EPFL tokamak-plasmakontroll, Helions datadrevne pulsjustering) og å finne materialer som overlever inne i en reaktor.",
+            "url": "https://www.lanl.gov/media/publications/1663/1224-nuclear-fusion-power-by-2030",
+            "source": "LANL"
+          },
+          "Utover fusjon: ML-prognoser balanserer fornybart på nettet og optimaliserer batterikjemi og bygningers energibruk"
+        ]
+      },
+      "cyberDefense": {
+        "title": "Cyberforsvar",
+        "desc": "De samme evnene som gjør KI til en trussel, gjør den også til et kraftig forsvar — den oppdager inntrengninger i sanntid og retter sårbarheter raskere enn menneskelige team kunne alene.",
+        "examples": [
+          {
+            "text": "WEFs Global Cybersecurity Outlook 2026 finner at 94% av lederne venter at KI blir den største driveren for endring i cyber — mye av det defensivt: automatisert deteksjon og trusselprioritering på tvers av endepunkter, nettverk og identiteter.",
+            "url": "https://www.weforum.org/publications/global-cybersecurity-outlook-2026/digest/",
+            "source": "WEF"
+          },
+          {
+            "text": "Forsvarere bruker KI til å løfte fram avvik nesten i sanntid og korrelere signaler på tvers av systemer, og finner de få reelle truslene blant millioner av varsler.",
+            "url": "https://www.weforum.org/publications/global-cybersecurity-outlook-2026/in-full/3-the-trends-reshaping-cybersecurity/",
+            "source": "WEF"
+          },
+          "KI-kodegjennomgang og automatisert sårbarhetsoppdagelse kan finne og tette feil før angripere når dem",
+          {
+            "text": "Dobbel bruk, ærlig talt: den samme teknologien driver raskere angrep — 87% av lederne pekte på KI-relaterte sårbarheter som den raskest voksende cyberrisikoen (se Hugging Face-hendelsen i «Safety & Governance»-fanen i denne hubben).",
+            "url": "https://www.bcg.com/publications/2026/cybersecurity-spending-ai-threat-trends",
+            "source": "BCG"
+          }
+        ]
+      },
+      "justice": {
+        "title": "Tilgang til rettferdighet",
+        "desc": "KI kan bidra til å lukke «rettferdighetsgapet» — og gjøre grunnleggende juridisk hjelp tilgjengelig for de millionene som ikke har råd til advokat.",
+        "examples": [
+          {
+            "text": "I en bransjeundersøkelse for jussfeltet i 2026 sa 79% av fagfolkene at teknologi har bedret tilgangen til rettferdighet det siste tiåret, og 76% venter at KI vil snevre inn gapet ytterligere.",
+            "url": "https://www.americanbar.org/groups/centers_commissions/center-for-innovation/artificial-intelligence/access-to-justice/",
+            "source": "ABA"
+          },
+          {
+            "text": "Ved å håndtere dokumentgjennomgang, utfylling av skjemaer og saksmottak kutter KI kostnaden ved rettshjelp kraftig — og frigjør knapp pro bono-kapasitet til de vanskeligste sakene.",
+            "url": "https://www.probonoinst.org/2026/02/06/ai-and-technology-help-bridge-access-to-justice/",
+            "source": "Pro Bono Institute"
+          },
+          {
+            "text": "Stanfords Justice Innovation-lab kartlegger, bygger og tester KI-rettshjelpverktøy for selvprosederende parter.",
+            "url": "https://justiceinnovation.law.stanford.edu/category/current-projects/ai-a2j/",
+            "source": "Stanford"
+          },
+          "Forklaringer i klarspråk gjør tette lover og rettsskjemaer om til noe en ikke-jurist faktisk kan handle ut fra"
+        ]
       }
     }
   },

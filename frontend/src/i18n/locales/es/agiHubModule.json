@@ -342,6 +342,94 @@
           "El mercado global de IA para conservación supera los 2 200 M$ en software en 2025 — sensores acústicos, drones y telemetría GPS conectados con modelos de visión",
           "Monitoreo marino: detección de pesca ilegal y blanqueo de corales por satélite"
         ]
+      },
+      "food": {
+        "title": "Alimentación y Agricultura",
+        "desc": "La agricultura de precisión con IA aumenta los rendimientos a la vez que reduce el desperdicio de agua, fertilizantes y pesticidas — una palanca directa sobre la seguridad alimentaria de una población creciente.",
+        "examples": [
+          {
+            "text": "La agricultura de precisión (GPS + drones + IoT + modelos de visión) ha mostrado subidas de rendimiento del 20–40% y recortes de uso de agua de ~30%, reduciendo el desperdicio de insumos un 40–60%.",
+            "url": "https://www.csis.org/analysis/ai-global-food-security-focus-precision-agriculture",
+            "source": "CSIS"
+          },
+          {
+            "text": "Drones autónomos con cámaras hiperespectrales escanean campos enteros en minutos, detectando enfermedades, plagas y deficiencias de nutrientes a tiempo para actuar.",
+            "url": "https://farmonaut.com/precision-farming/ai-in-agriculture-new-food-innovations-for-2026",
+            "source": "Farmonaut"
+          },
+          {
+            "text": "La agtech captó unos 7000 millones de dólares de inversión en 2025, con las operaciones de agricultura de precisión superando a los insumos agrícolas tradicionales.",
+            "url": "https://intellias.com/artificial-intelligence-in-agriculture/",
+            "source": "Intellias"
+          },
+          "Asistentes «agrónomo IA» generativos y monitoreo biométrico del ganado llevan asesoramiento experto a pequeños agricultores que nunca lo tuvieron"
+        ]
+      },
+      "energy": {
+        "title": "Energía Limpia y Fusión",
+        "desc": "La IA está acelerando los problemas energéticos más difíciles — estabilizar plasmas de fusión, descubrir materiales para reactores y exprimir más la red — acercando una energía baja en carbono y abundante.",
+        "examples": [
+          {
+            "text": "El reactor chino EAST batió un récord mundial en enero de 2026: plasma a 120 millones de °C sostenido durante 1056 segundos (~18 minutos) de operación continua.",
+            "url": "https://earth911.com/eco-tech/the-state-of-fusion-energy-in-2026-real-reactors-real-grids-real-caveats/",
+            "source": "Earth911"
+          },
+          {
+            "text": "La planta ARC de Commonwealth Fusion solicitó en abril de 2026 la conexión a la red a PJM — la primera petición así de un desarrollador de fusión a un gran operador de red de EE. UU.",
+            "url": "https://www.cnn.com/2026/04/30/climate/nuclear-fusion-real-world-electricity-grid",
+            "source": "CNN"
+          },
+          {
+            "text": "La IA ya ayuda a ejecutar experimentos de fusión (control de plasma en tokamak de DeepMind–EPFL, ajuste de pulsos por datos de Helion) y a encontrar materiales que sobrevivan dentro de un reactor.",
+            "url": "https://www.lanl.gov/media/publications/1663/1224-nuclear-fusion-power-by-2030",
+            "source": "LANL"
+          },
+          "Más allá de la fusión: la predicción por ML equilibra las renovables en la red y optimiza la química de las baterías y el consumo de los edificios"
+        ]
+      },
+      "cyberDefense": {
+        "title": "Ciberdefensa",
+        "desc": "Las mismas capacidades que hacen de la IA una amenaza la hacen también un defensor potente — detectando intrusiones en tiempo real y corrigiendo vulnerabilidades más rápido de lo que podrían los equipos humanos solos.",
+        "examples": [
+          {
+            "text": "El Global Cybersecurity Outlook 2026 del WEF halla que el 94% de los líderes espera que la IA sea el mayor motor de cambio en ciberseguridad — buena parte defensivo: detección automatizada y priorización de amenazas en endpoints, redes e identidades.",
+            "url": "https://www.weforum.org/publications/global-cybersecurity-outlook-2026/digest/",
+            "source": "WEF"
+          },
+          {
+            "text": "Los defensores usan IA para aflorar anomalías casi en tiempo real y correlacionar señales entre sistemas, encontrando las pocas amenazas reales entre millones de alertas.",
+            "url": "https://www.weforum.org/publications/global-cybersecurity-outlook-2026/in-full/3-the-trends-reshaping-cybersecurity/",
+            "source": "WEF"
+          },
+          "La revisión de código con IA y el descubrimiento automatizado de vulnerabilidades pueden encontrar y parchear fallos antes de que los atacantes lleguen a ellos",
+          {
+            "text": "Doble uso, con honestidad: la misma tecnología potencia ataques más rápidos — el 87% de los líderes señaló las vulnerabilidades ligadas a la IA como el ciberriesgo de más rápido crecimiento (ver el incidente de Hugging Face en la pestaña «Safety & Governance» de este hub).",
+            "url": "https://www.bcg.com/publications/2026/cybersecurity-spending-ai-threat-trends",
+            "source": "BCG"
+          }
+        ]
+      },
+      "justice": {
+        "title": "Acceso a la Justicia",
+        "desc": "La IA puede ayudar a cerrar la «brecha de justicia» — poniendo ayuda legal básica al alcance de los millones que no pueden pagar un abogado.",
+        "examples": [
+          {
+            "text": "En una encuesta al sector legal de 2026, el 79% de los profesionales dijo que la tecnología ha mejorado el acceso a la justicia en la última década, y el 76% espera que la IA estreche más la brecha.",
+            "url": "https://www.americanbar.org/groups/centers_commissions/center-for-innovation/artificial-intelligence/access-to-justice/",
+            "source": "ABA"
+          },
+          {
+            "text": "Al encargarse de la revisión de documentos, el rellenado de formularios y la admisión de casos, la IA reduce mucho el coste de la asistencia jurídica — liberando la escasa capacidad pro bono para los casos más difíciles.",
+            "url": "https://www.probonoinst.org/2026/02/06/ai-and-technology-help-bridge-access-to-justice/",
+            "source": "Pro Bono Institute"
+          },
+          {
+            "text": "El laboratorio Justice Innovation de Stanford está diseñando, construyendo y probando herramientas de ayuda legal con IA para litigantes sin abogado.",
+            "url": "https://justiceinnovation.law.stanford.edu/category/current-projects/ai-a2j/",
+            "source": "Stanford"
+          },
+          "Explicaciones en lenguaje claro convierten leyes y formularios judiciales densos en algo con lo que una persona sin formación jurídica puede actuar de verdad"
+        ]
       }
     }
   },
