@@ -430,6 +430,28 @@
           },
           "Explicaciones en lenguaje claro convierten leyes y formularios judiciales densos en algo con lo que una persona sin formación jurídica puede actuar de verdad"
         ]
+      },
+      "abundance": {
+        "title": "Abundancia Económica",
+        "desc": "Al hacer casi gratis copiar experiencia, software y servicios, la IA está generando un excedente del consumidor grande y medible — y podría elevar el crecimiento global si las ganancias se reparten.",
+        "examples": [
+          {
+            "text": "El AI Index 2026 de Stanford HAI estima que el excedente del consumidor por herramientas de IA en EE. UU. alcanzó unos 172 000 millones de dólares al año a principios de 2026 (desde ~112 000 millones), triplicándose el valor mediano por usuario — mientras la mayoría de herramientas siguen gratis o casi.",
+            "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy",
+            "source": "Stanford HAI"
+          },
+          {
+            "text": "El FMI sostiene que la IA puede elevar el crecimiento global — no solo en las economías ricas — si se acompaña de la inversión y las políticas adecuadas.",
+            "url": "https://www.imf.org/en/publications/fandd/issues/2026/03/point-of-view-ai-can-lift-global-growth-marcello-estevao",
+            "source": "FMI"
+          },
+          "Cae el «coste de la cognición»: tareas que antes exigían un especialista — redactar, traducir, analizar, programar — están cada vez más a una consulta barata de distancia, ampliando lo que pueden hacer personas y pymes",
+          {
+            "text": "Matiz honesto: las ganancias se reparten de forma desigual y el despliegue es caro — cientos de miles de millones en capex, presión sobre el empleo e incluso inflación — así que la «abundancia» depende de decisiones de distribución, no solo de la capacidad.",
+            "url": "https://www.cnbc.com/2026/08/12/ais-costly-buildout-complicates-the-feds-inflation-fight.html",
+            "source": "CNBC"
+          }
+        ]
       }
     }
   },

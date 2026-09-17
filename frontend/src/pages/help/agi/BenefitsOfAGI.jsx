@@ -187,6 +187,16 @@ const benefits = [
     bgColor: '#fafaf9',
     borderColor: '#e7e5e4',
   },
+  {
+    id: 'abundance',
+    icon: '💰',
+    titleKey: 'agiBenefits.items.abundance.title',
+    descKey: 'agiBenefits.items.abundance.desc',
+    examplesKey: 'agiBenefits.items.abundance.examples',
+    color: '#059669',
+    bgColor: '#ecfdf5',
+    borderColor: '#6ee7b7',
+  },
 ];
 
 function BenefitCard({ benefit, t, extraExamples = [] }) {

@@ -430,6 +430,28 @@
           },
           "Plain-language explainers turn dense statutes and court forms into something a non-lawyer can actually act on"
         ]
+      },
+      "abundance": {
+        "title": "Economic Abundance",
+        "desc": "By making expertise, software and services nearly free to copy, AI is generating large, measurable consumer surplus — and could lift global growth if the gains are shared.",
+        "examples": [
+          {
+            "text": "Stanford HAI's 2026 AI Index estimates US consumer surplus from AI tools reached about $172B a year by early 2026 (up from ~$112B), with the median value per user tripling — while most tools stay free or near-free.",
+            "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy",
+            "source": "Stanford HAI"
+          },
+          {
+            "text": "The IMF argues AI can raise global growth — not only in rich economies — if paired with the right investment and policies.",
+            "url": "https://www.imf.org/en/publications/fandd/issues/2026/03/point-of-view-ai-can-lift-global-growth-marcello-estevao",
+            "source": "IMF"
+          },
+          "Falling 'cost of cognition': tasks that once needed a specialist — drafting, translating, analysing, coding — are increasingly a cheap query away, expanding what individuals and small businesses can do",
+          {
+            "text": "Honest caveat: the gains are unevenly distributed and the build-out is costly — hundreds of billions in capex, pressure on jobs and even inflation — so 'abundance' depends on distribution choices, not just capability.",
+            "url": "https://www.cnbc.com/2026/08/12/ais-costly-buildout-complicates-the-feds-inflation-fight.html",
+            "source": "CNBC"
+          }
+        ]
       }
     }
   },

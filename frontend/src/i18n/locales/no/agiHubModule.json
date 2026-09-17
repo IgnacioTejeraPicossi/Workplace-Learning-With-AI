@@ -430,6 +430,28 @@
           },
           "Forklaringer i klarspråk gjør tette lover og rettsskjemaer om til noe en ikke-jurist faktisk kan handle ut fra"
         ]
+      },
+      "abundance": {
+        "title": "Økonomisk overflod",
+        "desc": "Ved å gjøre ekspertise, programvare og tjenester nesten gratis å kopiere skaper KI et stort, målbart konsumentoverskudd — og kan løfte global vekst hvis gevinstene deles.",
+        "examples": [
+          {
+            "text": "Stanford HAIs AI Index 2026 anslår at konsumentoverskuddet fra KI-verktøy i USA nådde rundt 172 milliarder dollar i året tidlig i 2026 (opp fra ~112 milliarder), med en tredobling av medianverdien per bruker — mens de fleste verktøy fortsatt er gratis eller nesten gratis.",
+            "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy",
+            "source": "Stanford HAI"
+          },
+          {
+            "text": "IMF argumenterer for at KI kan øke global vekst — ikke bare i rike økonomier — hvis den kombineres med riktige investeringer og retningslinjer.",
+            "url": "https://www.imf.org/en/publications/fandd/issues/2026/03/point-of-view-ai-can-lift-global-growth-marcello-estevao",
+            "source": "IMF"
+          },
+          "Fallende «kognisjonskostnad»: oppgaver som før krevde en spesialist — skriving, oversetting, analyse, koding — er stadig oftere bare et billig søk unna, og utvider hva enkeltpersoner og småbedrifter kan få til",
+          {
+            "text": "Ærlig forbehold: gevinstene er ujevnt fordelt og utbyggingen er kostbar — hundrevis av milliarder i capex, press på jobber og til og med inflasjon — så «overflod» avhenger av fordelingsvalg, ikke bare av kapasitet.",
+            "url": "https://www.cnbc.com/2026/08/12/ais-costly-buildout-complicates-the-feds-inflation-fight.html",
+            "source": "CNBC"
+          }
+        ]
       }
     }
   },
