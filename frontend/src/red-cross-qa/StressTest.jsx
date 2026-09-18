@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
+import { EnonicPatternBadge, DeltaPct, CrossToolRefs } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -261,6 +262,7 @@ const StressTest = ({ environment, executionMode }) => {
                 {t('redCrossWebQaModule.resilience.score')}: {score}/100
               </div>
             )}
+            <DeltaPct delta={r.delta_pct} higherIsBetter={true} />
           </div>
           <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 12px' }}>
             {t('redCrossWebQaModule.resilience.subheader')}
@@ -319,11 +321,16 @@ const StressTest = ({ environment, executionMode }) => {
                     fontSize: 12, color: '#581c87',
                   }}>
                     <strong>{f.title || f.category || '—'}</strong>{f.message ? ` — ${f.message}` : ''}
+                    {f.enonic_xp_pattern && (
+                      <div style={{ marginTop: 5 }}><EnonicPatternBadge pattern={f.enonic_xp_pattern} /></div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {resilience?.status === 'ok' && <CrossToolRefs refs={r.cross_tool_refs} />}
 
           {resilience?.status === 'error' && <div style={errorBox}>{resilience.message}</div>}
         </div>

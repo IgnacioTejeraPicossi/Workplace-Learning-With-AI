@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import { EnonicPatternBadge, DeltaPct, CrossToolRefs } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -80,6 +81,9 @@ const Designsystemet = ({ environment }) => {
               {score === null ? '—' : score}
             </p>
             <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>/ 100</p>
+            <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center' }}>
+              <DeltaPct delta={report?.delta_pct} higherIsBetter={true} />
+            </div>
           </div>
 
           <div style={panel}>
@@ -147,6 +151,9 @@ const Designsystemet = ({ environment }) => {
                       💡 {d.fix_hint}
                     </p>
                   )}
+                  {d.enonic_xp_pattern && (
+                    <div style={{ marginTop: 6 }}><EnonicPatternBadge pattern={d.enonic_xp_pattern} /></div>
+                  )}
                 </div>
               ))}
             </div>
@@ -173,11 +180,16 @@ const Designsystemet = ({ environment }) => {
                     <strong style={{ fontSize: 13, color: '#1e293b' }}>{r.title}</strong>
                   </div>
                   {r.description && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#475569' }}>{r.description}</p>}
+                  {r.enonic_xp_pattern && (
+                    <div style={{ marginTop: 6 }}><EnonicPatternBadge pattern={r.enonic_xp_pattern} /></div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        {report && report.status !== 'error' && <CrossToolRefs refs={report?.cross_tool_refs} />}
 
         {report?.status === 'error' && <div style={errorBox}>{report.message}</div>}
       </div>

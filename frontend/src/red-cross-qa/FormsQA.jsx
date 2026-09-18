@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
+import { EnonicPatternBadge } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -157,6 +158,9 @@ const FormsQA = ({ environment }) => {
                     <p style={{ margin: '6px 0 0', fontSize: 12, color: '#0f766e', fontStyle: 'italic' }}>
                       💡 {f.fix_hint}
                     </p>
+                  )}
+                  {f.enonic_xp_pattern && (
+                    <div style={{ marginTop: 6 }}><EnonicPatternBadge pattern={f.enonic_xp_pattern} /></div>
                   )}
                 </div>
               ))}

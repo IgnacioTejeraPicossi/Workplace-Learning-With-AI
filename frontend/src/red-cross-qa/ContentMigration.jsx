@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
+import { EnonicPatternBadge } from './_EnonicSignals';
 
 const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
@@ -275,6 +276,9 @@ const ContentMigration = ({ environment }) => {
                             backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5',
                             fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
                           }}>{p.issue}</span>
+                          {p.enonic_xp_pattern && (
+                            <div style={{ marginTop: 5 }}><EnonicPatternBadge pattern={p.enonic_xp_pattern} /></div>
+                          )}
                         </td>
                       </tr>
                     );
