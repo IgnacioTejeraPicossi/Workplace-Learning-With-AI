@@ -23,7 +23,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 CheckStatus = Literal["pass", "warn", "fail", "pending"]
@@ -62,8 +62,7 @@ class SecurityCheck(BaseModel):
     source: str = Field("mock", description="Where the check ran (runtime_scan / static / manual).")
     last_run_at: Optional[str] = Field(default=None, alias="lastRunAt")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -112,8 +111,7 @@ class Finding(BaseModel):
     created_at: str = Field(default_factory=_now_iso, alias="createdAt")
     updated_at: str = Field(default_factory=_now_iso, alias="updatedAt")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -137,8 +135,7 @@ class FindingSnapshotEntry(BaseModel):
     severity: Severity = "info"
     status: FindingStatus = "open"
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class ScanRun(BaseModel):
@@ -161,8 +158,7 @@ class ScanRun(BaseModel):
         default=None, alias="findingsSnapshot",
     )
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -188,8 +184,7 @@ class DpiaForm(BaseModel):
     updated_at: str = Field(default_factory=_now_iso, alias="updatedAt")
     updated_by: str = Field("anonymous", alias="updatedBy")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -209,8 +204,7 @@ class StatusSnapshot(BaseModel):
     overall_status: CheckStatus = Field("pending", alias="overallStatus")
     dpia_present: bool = Field(False, alias="dpiaPresent")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class ScanRequest(BaseModel):
