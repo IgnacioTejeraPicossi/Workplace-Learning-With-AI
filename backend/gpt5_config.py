@@ -23,12 +23,44 @@ import os
 #   OPENAI_HIGH_MODEL=gpt-5.5
 #   OPENAI_MEDIUM_MODEL=gpt-5.4-mini
 #   OPENAI_LOW_MODEL=gpt-5.4-nano
+#
+# GPT-6 Astra (OpenAI, available in the API since 2026-09-03) — OpenAI's most
+# intelligent/aligned model; state-of-the-art on computer use, software
+# engineering and cybersecurity; 1.05M-token context, 128K max output. It is a
+# reasoning model (llm.py already routes gpt-6* through max_completion_tokens +
+# the empty-content retry). To adopt it as the HIGH tier for every agent, set:
+#   OPENAI_HIGH_MODEL=gpt-6-astra
+# COST NOTE: premium pricing — ~$10 / 1M input and ~$50 / 1M output tokens
+# (roughly 5x the current gpt-5.5 high tier; prompts >272K tokens bill at 2x
+# input / 1.5x output). Only `complexity="high"` calls use the HIGH tier;
+# medium/low tasks stay on the cheaper models below.
 OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-5.5"
 OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-5.4-mini"
 OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-5.4-nano"
+# Optional "frontier" tier — the most capable (and most expensive) model, used
+# ONLY when a caller explicitly asks for complexity="frontier" (never the
+# standard default). Wired 2026-09-21 so modules with a model picker (e.g.
+# J-messages Analyzer) can opt into GPT-6 Astra for specific, high-value cases
+# while everything else stays on the cheaper high/medium/low tiers.
+OPENAI_FRONTIER_MODEL = os.getenv("OPENAI_FRONTIER_MODEL", "").strip() or "gpt-6-astra"
 
 # GPT-5 Model Variants
 GPT5_MODELS = {
+    "gpt-6": {
+        # Frontier tier (override via OPENAI_FRONTIER_MODEL). Default: gpt-6-astra.
+        # Opt-in only (complexity="frontier"); premium pricing (~$10/$50 per 1M
+        # in/out tokens). A reasoning model — llm.py routes gpt-6* through
+        # max_completion_tokens + the empty-content retry.
+        "name": OPENAI_FRONTIER_MODEL,
+        "description": "Most intelligent/aligned model (GPT-6 Astra). Opt-in, premium cost — reserved for the hardest multistep reasoning, code and agentic tasks.",
+        "use_cases": [
+            "Hardest multistep reasoning",
+            "Complex software engineering / agentic workflows",
+            "High-stakes analysis where quality outweighs cost",
+        ],
+        "max_tokens": 4096,
+        "temperature": 0.7
+    },
     "gpt-5": {
         # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-5.5
         "name": OPENAI_HIGH_MODEL,
@@ -85,6 +117,11 @@ def get_optimal_model(task_type: str, complexity: str = "medium") -> str:
         Model name to use
     """
     
+    # Frontier tier — explicit opt-in ONLY (never a default). Most capable +
+    # most expensive (GPT-6 Astra). Checked first so it wins over task_type.
+    if complexity == "frontier":
+        return "gpt-6"
+
     # High complexity tasks - use full GPT-5
     if complexity == "high" or task_type in ["repository_analysis", "advanced_coaching", "team_analytics"]:
         return "gpt-5"

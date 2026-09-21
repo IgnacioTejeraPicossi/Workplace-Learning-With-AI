@@ -597,7 +597,7 @@ def analyze_text_content(
     # Extract metadata using LLM if available
     if ask_ai_unified_sync:
         try:
-            complexity_level = complexity if complexity in ("low", "medium", "high") else "low"
+            complexity_level = complexity if complexity in ("low", "medium", "high", "frontier") else "low"
             temperature_value = temperature if temperature is None or (isinstance(temperature, (int, float)) and 0.0 <= float(temperature) <= 2.0) else None
             prompt = build_metadata_prompt(header_text, body_text)
             response = ask_ai_unified_sync(
@@ -699,7 +699,7 @@ Returner ren tekst, uten markers eller Markdown.
 Tekst:
 \"\"\"{body_text[:12000]}\"\"\"
 """
-                        complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+                        complexity_level = complexity if complexity in ["low", "medium", "high", "frontier"] else "low"
                         temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
                         summary_text = ask_ai_unified_sync(
                             prompt=sum_prompt, task_type="summarization", complexity=complexity_level,
@@ -796,7 +796,7 @@ Tekst:
                 print(f"[J-MESSAGES]    → Available headers: {list(request_headers_dict.keys())}")
             
             # Validate and use complexity from query parameter
-            complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            complexity_level = complexity if complexity in ["low", "medium", "high", "frontier"] else "low"
             # Validate temperature (optional)
             temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
@@ -1348,7 +1348,7 @@ async def analyze_j_note(
         if ask_ai_unified_sync:
             prompt = build_note_prompt(full_text)
             # Validate and use complexity from query parameter
-            complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            complexity_level = complexity if complexity in ["low", "medium", "high", "frontier"] else "low"
             temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
             resp = ask_ai_unified_sync(
@@ -1775,7 +1775,7 @@ async def pre_analyze_j_message(
             if not ask_ai_unified_sync:
                 raise HTTPException(status_code=500, detail="LLM service not available")
             
-            complexity_level = complexity if complexity in ["low", "medium", "high"] else "medium"
+            complexity_level = complexity if complexity in ["low", "medium", "high", "frontier"] else "medium"
             temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
             request_headers_dict = dict(request.headers) if request else {}

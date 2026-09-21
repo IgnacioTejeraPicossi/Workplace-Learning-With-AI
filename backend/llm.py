@@ -100,9 +100,12 @@ def _normalize_params_for_model(params: dict, model_name: str) -> dict:
     """
     params = params.copy()  # Don't modify the original
 
-    # Check if this is a GPT-5 / o-series reasoning model
+    # Check if this is a GPT-5.x / GPT-6.x / o-series reasoning model.
+    # GPT-6 (e.g. gpt-6-astra, avail. 2026-09) shares the same API restrictions
+    # as GPT-5.x: max_completion_tokens instead of max_tokens, default temperature only.
     is_gpt5_model = model_name and (
         model_name.startswith("gpt-5") or
+        model_name.startswith("gpt-6") or
         model_name.startswith("o1") or
         model_name.startswith("o3")
     )
@@ -596,7 +599,8 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         # reasoning_tokens=900, content_len=0. Retry once with a much larger
         # budget so there is room for the actual answer after reasoning.
         _is_reasoning = bool(model_to_use) and (
-            model_to_use.startswith("gpt-5") or model_to_use.startswith("o1") or model_to_use.startswith("o3")
+            model_to_use.startswith("gpt-5") or model_to_use.startswith("gpt-6") or
+            model_to_use.startswith("o1") or model_to_use.startswith("o3")
         )
         if not content and finish == "length" and _is_reasoning:
             current = params.get("max_completion_tokens") or params.get("max_tokens") or 900

@@ -411,9 +411,10 @@ export default function JMessagesAnalyzer() {
                     cursor: 'pointer'
                   }}
                 >
-                  <option value="low">{t('jMessages.analyzer.aiLevelLow')} (GPT-3.5)</option>
-                  <option value="medium">{t('jMessages.analyzer.aiLevelMedium')} (GPT-4o-mini)</option>
-                  <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (GPT-4o / GPT-5 if available)</option>
+                  <option value="low">{t('jMessages.analyzer.aiLevelLow')} (gpt-5.4-nano)</option>
+                  <option value="medium">{t('jMessages.analyzer.aiLevelMedium')} (gpt-5.4-mini)</option>
+                  <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (gpt-5.5)</option>
+                  <option value="frontier">{t('jMessages.analyzer.aiLevelFrontier', { defaultValue: 'Frontier' })} (GPT-6 Astra 💎)</option>
                 </select>
               </label>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
