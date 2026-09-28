@@ -371,7 +371,7 @@
       "btnRunBoth": "Kjør begge (Lighthouse + Enonic)",
       "presetsTitle": "URL-snarveier",
       "preset_rodekorsProd": "rodekors.no (produksjon)",
-      "preset_lunixHello": "test.lunix.cloud (Toms forhåndsvisning)",
+      "preset_lunixHello": "next.lunix.cloud (Toms forhåndsvisning)",
       "preset_localDev": "localhost:3000 (lokal utvikling)",
       "header": "Ytelsespilot",
       "subheader": "Core Web Vitals, Lighthouse, bundle‑analyse, GraphQL‑tider",

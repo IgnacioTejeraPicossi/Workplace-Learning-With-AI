@@ -47,8 +47,8 @@ const PRIORITY_COLOR = { high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
 // URL presets — quick targets for the rodekors.no rebuild stack.
 // `lunixHello` is Tom's NextJS + Enonic XP + GraphQL "hello world" preview
-// shared 2026-05-08 (test.lunix.cloud) — perfect smoke for the Enonic-specific
-// performance suite (Guillotine waterfall / N+1 / overfetch).
+// (moved 2026-09-28 from test.lunix.cloud → next.lunix.cloud) — perfect smoke
+// for the Enonic-specific performance suite (Guillotine waterfall / N+1 / overfetch).
 const URL_PRESETS = [
   {
     key: 'rodekorsProd',
@@ -58,7 +58,7 @@ const URL_PRESETS = [
   },
   {
     key: 'lunixHello',
-    url: 'https://test.lunix.cloud/',
+    url: 'https://next.lunix.cloud/',
     icon: '🧪',
     color: '#7c3aed',
     badge: 'Tom · NextJS + XP + GraphQL',
@@ -112,7 +112,7 @@ const Performance = ({ environment }) => {
 
   // Run both Lighthouse + Enonic-specific against the current URL (or an
   // optional override). Used by the URL-preset chips so a single click on
-  // "Tom · test.lunix.cloud" gives a complete picture of the NextJS + XP
+  // "Tom · next.lunix.cloud" gives a complete picture of the NextJS + XP
   // + Guillotine GraphQL stack.
   const handleRunBoth = async (override) => {
     const target = override || url;
