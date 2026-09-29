@@ -149,6 +149,27 @@ DEFAULT_DATA: List[AGIItem] = [
         total=82,
         notes="OpenAI, 3 Sep 2026 — billed as its 'most intelligent and aligned' model and the standout September launch. Saturates the hardest reasoning/math/cyber benchmarks: ARC-AGI-3 99.9% (abstract reasoning), FrontierMath Tier 4 97.6%, ExploitBench 100% (vs 78.5% for GPT-5.6 Sol), OSWorld 2.0 72.6% computer-use at ~47% less time per task. 1.05M-token context, knowledge cutoff Apr 2026. Its CHC-breadth total ties Claude Fable 5.1 here because the model card lists text+image input (native audio is not its headline), so audio (A) — weighted equally in this metric — is the one domain where it doesn't top the field despite leading reasoning, math and cyber. On a reasoning-only view it is the clear frontier leader.",
     ),
+    # ── Late-September 2026 wave (added 2026-09-29, web-sourced). Opus 5.5 is the
+    # acknowledged new frontier leader; Grok 4.7 keeps the xAI line current;
+    # DeepSeek V4.1-Flash is the standout Chinese open-weight (cyber + usage share).
+    AGIItem(
+        model="Claude Opus 5.5", year=2026, month=9,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":10,"MS":0,"MR":9,"V":9,"A":9,"S":6},
+        total=83,
+        notes="Anthropic, 22 Sep 2026 — the new frontier leader: widest lead at the top of Artificial Analysis's Intelligence Index in months (~58) and +304 Elo over GPT-6 Astra on GDPval-AA. SWE-bench Multilingual 93.9%, Global-MMLU 94.3%, Terminal-Bench 4.0 66.4%. Fully multimodal (vision + audio), which puts its CHC-breadth total at the very top (83), just above the GPT-6 Astra / Fable 5.1 tie. Honest caveat: indices disagree at the very top — BenchLM's index still puts GPT-5.6 Sol marginally ahead on raw intelligence, and GPT-6 Astra still leads pure reasoning/math saturation. MS (persistent long-term memory) remains 0 for all LLMs this generation.",
+    ),
+    AGIItem(
+        model="Grok 4.7", year=2026, month=9,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":8,"MS":0,"MR":7,"V":7,"A":5,"S":7},
+        total=74,
+        notes="SpaceXAI (xAI), 21 Sep 2026 — incremental over Grok 4.6 with better agentic coding and roughly a third of Opus 5.5's price ($2/$6). CursorBench 4.0 46.3%, Terminal-Bench 4.0 38.0%, Senior SWE-Bench pass@3 40.0%. Text+image (native audio still trails the fully-multimodal leaders), so its CHC-breadth total sits below the top tier despite strong coding/agentic work.",
+    ),
+    AGIItem(
+        model="DeepSeek V4.1-Flash", year=2026, month=9,
+        scores={"K":9,"RW":9,"M":10,"R":9,"WM":6,"MS":0,"MR":5,"V":3,"A":2,"S":8},
+        total=61,
+        notes="DeepSeek (China), Sep 2026 — an open-weight 'Flash' (fast/cheap) model that jumped from 7th to 1st on the CyberGym vulnerability-discovery test within ten days of release, and led global usage by request share the week of 14 Sep. Elite on cyber/coding and very fast, but text-centric — limited native vision/audio keeps its CHC-breadth total below the multimodal frontier (same honest divergence noted for Kimi). Domain scores here are directional; less public breadth data than the proprietary leaders.",
+    ),
 ]
 
 
