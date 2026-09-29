@@ -437,6 +437,7 @@ export default function ReadmeViewer() {
           <option value="README.md">README.md</option>
           <option value="docs/andres-robot-help.md">docs/andres-robot-help.md</option>
           <option value="docs/self-sim-reality-help.md">docs/self-sim-reality-help.md</option>
+          <option value="docs/red-cross-qa-help.md">docs/red-cross-qa-help.md</option>
           <option value="docs/ai-study-buddy.md">docs/ai-study-buddy.md</option>
           <option value="docs/architecture.md">docs/architecture.md</option>
           <option value="docs/deployment.md">docs/deployment.md</option>
