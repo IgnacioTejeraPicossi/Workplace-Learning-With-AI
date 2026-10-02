@@ -22,7 +22,14 @@ import os
 # Examples:
 #   OPENAI_HIGH_MODEL=gpt-5.5
 #   OPENAI_MEDIUM_MODEL=gpt-5.4-mini
-#   OPENAI_LOW_MODEL=gpt-5.4-nano
+#   OPENAI_LOW_MODEL=gpt-6-luna
+#
+# Deprecation notice (OpenAI, received 2026-10-02): gpt-5.4-nano, gpt-5.1 and
+# gpt-5.3-codex are shut off on 2027-04-01. Only gpt-5.4-nano affected us (it was
+# the LOW default) → replaced with its recommended successor gpt-6-luna (fast /
+# low-cost, ~$0.10/$0.60 per 1M in/out, ~1M context; gpt-6* is handled as a
+# reasoning model by llm.py). gpt-5.1 / gpt-5.3-codex were unused (their
+# recommended successor is gpt-6-sol).
 #
 # GPT-6 Astra (OpenAI, available in the API since 2026-09-03) — OpenAI's most
 # intelligent/aligned model; state-of-the-art on computer use, software
@@ -36,7 +43,7 @@ import os
 # medium/low tasks stay on the cheaper models below.
 OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-5.5"
 OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-5.4-mini"
-OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-5.4-nano"
+OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-6-luna"
 # Optional "frontier" tier — the most capable (and most expensive) model, used
 # ONLY when a caller explicitly asks for complexity="frontier" (never the
 # standard default). Wired 2026-09-21 so modules with a model picker (e.g.
@@ -90,7 +97,7 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-nano": {
-        # Low complexity model (override via OPENAI_LOW_MODEL). Default: gpt-5.4-nano
+        # Low complexity model (override via OPENAI_LOW_MODEL). Default: gpt-6-luna
         "name": OPENAI_LOW_MODEL,
         "description": "Fastest and most cost-effective, good for simple tasks",
         "use_cases": [

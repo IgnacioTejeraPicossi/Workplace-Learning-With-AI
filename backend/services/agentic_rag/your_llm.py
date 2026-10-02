@@ -73,7 +73,7 @@ class LLMClient:
                     
                     # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                     response = openai.chat.completions.create(
-                        model="gpt-5.4-nano",
+                        model="gpt-6-luna",
                         messages=[{"role": "user", "content": prompt}],
                         max_completion_tokens=800,
                         temperature=0.2

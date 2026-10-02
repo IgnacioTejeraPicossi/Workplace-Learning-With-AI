@@ -41,7 +41,7 @@ async def test_api_connection(request: APITestRequest):
             # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             openai.api_key = effective_key
             response = openai.chat.completions.create(
-                model="gpt-5.4-nano",
+                model="gpt-6-luna",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenAI API is working correctly.'"}],
                 max_completion_tokens=50
             )
@@ -68,7 +68,7 @@ async def test_api_connection(request: APITestRequest):
             # OpenRouter naming: "openai/<model>" — use cheapest current-gen for connectivity check.
             # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             response = openrouter.ChatCompletion.create(
-                model="openai/gpt-5.4-nano",
+                model="openai/gpt-6-luna",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
                 max_completion_tokens=50
             )
