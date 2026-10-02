@@ -586,7 +586,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         if max_tokens:
             params["max_tokens"] = max_tokens
         
-        # Use old OpenAI syntax for compatibility with openai==0.28.1
+        # OpenAI Python SDK 1.x — Chat Completions API (installed: openai>=1.107)
         openai.api_key = effective_openai_key
 
         response = _call_openai(model_to_use)
@@ -847,7 +847,7 @@ Would you like to know more about any specific feature?"""
         # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
         params = _normalize_params_for_model(params, model_to_use)
         
-        # Use old OpenAI syntax for compatibility with openai==0.28.1
+        # OpenAI Python SDK 1.x — Chat Completions API (installed: openai>=1.107)
         openai.api_key = config.get('openai_key') or OPENAI_API_KEY
         
         if messages:

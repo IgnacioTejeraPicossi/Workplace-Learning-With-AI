@@ -3,6 +3,17 @@ from pydantic import BaseModel
 import openai
 import os
 
+# Single source of truth for the low-cost connectivity-check model, so a future
+# OpenAI deprecation is a one-line change in gpt5_config.py. Literal fallback
+# keeps this module working even if the import path differs.
+try:
+    from backend.gpt5_config import OPENAI_LOW_MODEL
+except Exception:  # pragma: no cover
+    try:
+        from gpt5_config import OPENAI_LOW_MODEL  # type: ignore
+    except Exception:
+        OPENAI_LOW_MODEL = "gpt-6-luna"
+
 # OpenRouter support
 try:
     import openrouter
@@ -41,7 +52,7 @@ async def test_api_connection(request: APITestRequest):
             # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             openai.api_key = effective_key
             response = openai.chat.completions.create(
-                model="gpt-6-luna",
+                model=OPENAI_LOW_MODEL,
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenAI API is working correctly.'"}],
                 max_completion_tokens=50
             )
@@ -68,7 +79,7 @@ async def test_api_connection(request: APITestRequest):
             # OpenRouter naming: "openai/<model>" — use cheapest current-gen for connectivity check.
             # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             response = openrouter.ChatCompletion.create(
-                model="openai/gpt-6-luna",
+                model=f"openai/{OPENAI_LOW_MODEL}",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
                 max_completion_tokens=50
             )

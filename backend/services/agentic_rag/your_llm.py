@@ -2,6 +2,16 @@
 import os, json, time
 from typing import Any, Dict, Optional
 
+# Single source of truth for the low-cost OpenAI model (one-line swap on the next
+# OpenAI deprecation, via gpt5_config.py). Literal fallback keeps this safe.
+try:
+    from backend.gpt5_config import OPENAI_LOW_MODEL
+except Exception:  # pragma: no cover
+    try:
+        from gpt5_config import OPENAI_LOW_MODEL  # type: ignore
+    except Exception:
+        OPENAI_LOW_MODEL = "gpt-6-luna"
+
 def _approx_tokens(s: str) -> int:
     # aproximación -> ~4 chars por token (rápido)
     return max(1, len(s)//4)
@@ -73,7 +83,7 @@ class LLMClient:
                     
                     # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                     response = openai.chat.completions.create(
-                        model="gpt-6-luna",
+                        model=OPENAI_LOW_MODEL,
                         messages=[{"role": "user", "content": prompt}],
                         max_completion_tokens=800,
                         temperature=0.2

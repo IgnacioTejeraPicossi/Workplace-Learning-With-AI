@@ -3,6 +3,16 @@ from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 from backend.services.agentops.schemas import PromptRun, SafetyPolicy
 
+# Single source of truth for the low-cost OpenAI model (survives OpenAI
+# deprecations in one place — gpt5_config.py). Literal fallback for safety.
+try:
+    from backend.gpt5_config import OPENAI_LOW_MODEL
+except Exception:  # pragma: no cover
+    try:
+        from gpt5_config import OPENAI_LOW_MODEL  # type: ignore
+    except Exception:
+        OPENAI_LOW_MODEL = "gpt-6-luna"
+
 router = APIRouter(tags=["prompt"])
 
 DEFAULT_MODEL = "deepseek-r1-distill-qwen-7b"
@@ -179,7 +189,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                 
                 # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                 response = openai.chat.completions.create(
-                    model="openai/gpt-6-luna",
+                    model=f"openai/{OPENAI_LOW_MODEL}",
                     messages=messages,
                     max_completion_tokens=prompt_run.max_tokens,
                     temperature=prompt_run.temperature
@@ -192,7 +202,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                         "success": True,
                         "response": completion_text,
                         "ai_provider": "OpenRouter",
-                        "model": "gpt-6-luna",
+                        "model": OPENAI_LOW_MODEL,
                         "safety_check": "PASSED",
                         "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
                     }
@@ -209,7 +219,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                 
                 # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                 response = openai.chat.completions.create(
-                    model="gpt-6-luna",
+                    model=OPENAI_LOW_MODEL,
                     messages=messages,
                     max_completion_tokens=prompt_run.max_tokens,
                     temperature=prompt_run.temperature
@@ -222,7 +232,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                         "success": True,
                         "response": completion_text,
                         "ai_provider": "OpenAI",
-                        "model": "gpt-6-luna",
+                        "model": OPENAI_LOW_MODEL,
                         "safety_check": "PASSED",
                         "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
                     }
