@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 
+// Absolute backend base — same pattern as every other module (red-cross, j-messages…).
+// Avoids depending on the CRA dev-server proxy, which only forwards /api in dev and
+// must be reloaded to take effect (was the cause of a "Failed to fetch" on save).
+const API_BASE = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+
 const ITEMSERVERAI_DEFAULT_URL = 'http://192.168.50.142:1234';
 const ITEMSERVERAI_OLD_URL = 'http://192.168.50.214:1234';
 
@@ -55,7 +60,7 @@ const APIConfig = () => {
 
     if (savedProvider === 'itemai' || savedProvider === 'itemserverai') {
       const url = savedProvider === 'itemserverai' ? savedItemserveraiUrl : savedItemaiUrl;
-      fetch('/api/test-itemai', {
+      fetch(`${API_BASE}/api/test-itemai`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ local_url: url })
@@ -82,7 +87,7 @@ const APIConfig = () => {
     if (provider === 'itemserverai' || provider === 'itemai') {
       try {
         const url = provider === 'itemserverai' ? itemserveraiUrl : itemaiUrl;
-        const response = await fetch('/api/test-itemai', {
+        const response = await fetch(`${API_BASE}/api/test-itemai`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ local_url: url })
@@ -117,7 +122,7 @@ const APIConfig = () => {
     localStorage.setItem('itemserveraiUrl', normalizedItemserveraiUrl);
 
     try {
-      const response = await fetch('/api/save-api-config', {
+      const response = await fetch(`${API_BASE}/api/save-api-config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,19 +153,19 @@ const APIConfig = () => {
       let response;
 
       if (apiProvider === 'itemai') {
-        response = await fetch('/api/test-itemai', {
+        response = await fetch(`${API_BASE}/api/test-itemai`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ local_url: itemaiUrl })
         });
       } else if (apiProvider === 'itemserverai') {
-        response = await fetch('/api/test-itemai', {
+        response = await fetch(`${API_BASE}/api/test-itemai`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ local_url: itemserveraiUrl })
         });
       } else {
-        response = await fetch('/api/test-api', {
+        response = await fetch(`${API_BASE}/api/test-api`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
