@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 import openai
 try:
     from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-    from gpt5_config import get_optimal_model, get_gpt5_parameters
+    from gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL
 
 # OpenRouter support
 try:
@@ -674,17 +674,20 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         if temp is not None:
             params["temperature"] = temp
         
-        # Extract model from params and remove it to avoid conflict
-        model_to_use = params.pop("model", model)
-        
-        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
+        # On OpenRouter we use the configured OpenRouter model (default: the FREE
+        # Nex-N2-Pro, `nex-agi/nex-n2-pro:free`) — NOT the OpenAI tier names, which
+        # are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
+        params.pop("model", None)
+        model_to_use = OPENROUTER_MODEL
+
+        # Override max_tokens if provided (Nex-N2-Pro is a standard model → keeps
+        # max_tokens; _normalize only rewrites it for gpt-5/gpt-6/o1/o3 reasoning models)
         if max_tokens:
             params["max_tokens"] = max_tokens
-        
-        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
-        # Note: OpenRouter may handle this differently, but we normalize for consistency
+
+        # Normalize parameters for the specific model (no-op for non-reasoning models)
         params = _normalize_params_for_model(params, model_to_use)
-        
+
         # Configure OpenRouter client
         openrouter.api_key = OPENROUTER_API_KEY
         openrouter.api_base = OPENROUTER_BASE_URL
@@ -950,17 +953,20 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
         
-        # Extract model from params and remove it to avoid conflict
-        model_to_use = params.pop("model", model)
-        
-        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
+        # On OpenRouter we use the configured OpenRouter model (default: the FREE
+        # Nex-N2-Pro, `nex-agi/nex-n2-pro:free`) — NOT the OpenAI tier names, which
+        # are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
+        params.pop("model", None)
+        model_to_use = OPENROUTER_MODEL
+
+        # Override max_tokens if provided (Nex-N2-Pro is a standard model → keeps
+        # max_tokens; _normalize only rewrites it for gpt-5/gpt-6/o1/o3 reasoning models)
         if max_tokens:
             params["max_tokens"] = max_tokens
-        
-        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
-        # Note: OpenRouter may handle this differently, but we normalize for consistency
+
+        # Normalize parameters for the specific model (no-op for non-reasoning models)
         params = _normalize_params_for_model(params, model_to_use)
-        
+
         # Configure OpenRouter client
         openrouter.api_key = OPENROUTER_API_KEY
         openrouter.api_base = OPENROUTER_BASE_URL

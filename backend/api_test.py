@@ -7,12 +7,13 @@ import os
 # OpenAI deprecation is a one-line change in gpt5_config.py. Literal fallback
 # keeps this module working even if the import path differs.
 try:
-    from backend.gpt5_config import OPENAI_LOW_MODEL
+    from backend.gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL
 except Exception:  # pragma: no cover
     try:
-        from gpt5_config import OPENAI_LOW_MODEL  # type: ignore
+        from gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL  # type: ignore
     except Exception:
         OPENAI_LOW_MODEL = "gpt-6-luna"
+        OPENROUTER_MODEL = "nex-agi/nex-n2-pro:free"
 
 # OpenRouter support
 try:
@@ -76,12 +77,12 @@ async def test_api_connection(request: APITestRequest):
             openrouter.api_key = effective_key
             openrouter.api_base = "https://openrouter.ai/api/v1"
             
-            # OpenRouter naming: "openai/<model>" — use cheapest current-gen for connectivity check.
-            # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
+            # Connectivity check uses the configured OpenRouter model (default: the
+            # FREE Nex-N2-Pro). Standard (non-reasoning) model → uses max_tokens.
             response = openrouter.ChatCompletion.create(
-                model=f"openai/{OPENAI_LOW_MODEL}",
+                model=OPENROUTER_MODEL,
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
-                max_completion_tokens=50
+                max_tokens=50
             )
             
             return {

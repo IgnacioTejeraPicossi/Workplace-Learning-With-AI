@@ -51,6 +51,15 @@ OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-6-luna"
 # while everything else stays on the cheaper high/medium/low tiers.
 OPENAI_FRONTIER_MODEL = os.getenv("OPENAI_FRONTIER_MODEL", "").strip() or "gpt-6-astra"
 
+# OpenRouter model (used only when the provider is "openrouter"). Default is the
+# FREE open-source Nex-N2-Pro (Nex AGI, Apache-2.0) exposed on OpenRouter as
+# `nex-agi/nex-n2-pro:free` ($0 in/out, 262K ctx, text+image). Override with env
+# OPENROUTER_MODEL. NOTE: still requires a valid OpenRouter API key (free account);
+# the free tier is rate-limited and its "free" status may change — verify on the
+# OpenRouter model page. Standard (non-reasoning) model → uses max_tokens, not
+# max_completion_tokens, and accepts temperature.
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "nex-agi/nex-n2-pro:free"
+
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-6": {

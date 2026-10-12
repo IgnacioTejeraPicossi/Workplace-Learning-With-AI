@@ -6,12 +6,13 @@ from backend.services.agentops.schemas import PromptRun, SafetyPolicy
 # Single source of truth for the low-cost OpenAI model (survives OpenAI
 # deprecations in one place — gpt5_config.py). Literal fallback for safety.
 try:
-    from backend.gpt5_config import OPENAI_LOW_MODEL
+    from backend.gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL
 except Exception:  # pragma: no cover
     try:
-        from gpt5_config import OPENAI_LOW_MODEL  # type: ignore
+        from gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL  # type: ignore
     except Exception:
         OPENAI_LOW_MODEL = "gpt-6-luna"
+        OPENROUTER_MODEL = "nex-agi/nex-n2-pro:free"
 
 router = APIRouter(tags=["prompt"])
 
@@ -187,11 +188,12 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                 openai.api_key = openrouter_key
                 openai.api_base = "https://openrouter.ai/api/v1"
                 
-                # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
+                # OpenRouter → configured OpenRouter model (default: FREE Nex-N2-Pro).
+                # Standard (non-reasoning) model → uses max_tokens + temperature.
                 response = openai.chat.completions.create(
-                    model=f"openai/{OPENAI_LOW_MODEL}",
+                    model=OPENROUTER_MODEL,
                     messages=messages,
-                    max_completion_tokens=prompt_run.max_tokens,
+                    max_tokens=prompt_run.max_tokens,
                     temperature=prompt_run.temperature
                 )
                 
@@ -202,7 +204,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                         "success": True,
                         "response": completion_text,
                         "ai_provider": "OpenRouter",
-                        "model": OPENAI_LOW_MODEL,
+                        "model": OPENROUTER_MODEL,
                         "safety_check": "PASSED",
                         "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
                     }

@@ -10,7 +10,7 @@
     "descItemai": "Local AI powered by LM Studio - 100% free, 100% private, runs on your own computer with downloaded models.",
     "descItemserverai": "Network AI powered by LM Studio - 100% free, 100% private, runs on your internal network server with downloaded models.",
     "descOpenai": "Direct access to OpenAI models (GPT-5, GPT-4, etc.) with full control and reliability.",
-    "descOpenrouter": "Access to multiple AI providers through OpenRouter, often more cost-effective with access to Claude, Gemini, and other models.",
+    "descOpenrouter": "Access to multiple AI providers through OpenRouter. Defaults to the FREE Nex-N2-Pro model (nex-agi/nex-n2-pro:free) — still needs a valid OpenRouter API key (free account; the free tier is rate-limited).",
     "sectionConfig": "API Configuration",
     "labelItemaiUrl": "ItemAI Local URL",
     "hintItemaiUrl": "Local URL where LM Studio is running (default: http://localhost:1234)",
