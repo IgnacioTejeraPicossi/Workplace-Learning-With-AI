@@ -10,7 +10,7 @@
     "descItemai": "IA local impulsada por LM Studio — 100% gratuita, 100% privada, se ejecuta en tu propio ordenador con modelos descargados.",
     "descItemserverai": "IA en red impulsada por LM Studio — 100% gratuita, 100% privada, se ejecuta en el servidor de tu red interna con modelos descargados.",
     "descOpenai": "Acceso directo a los modelos de OpenAI (GPT-5, GPT-4, etc.) con control total y alta fiabilidad.",
-    "descOpenrouter": "Acceso a múltiples proveedores de IA a través de OpenRouter. Usa por defecto el modelo GRATIS Nex-N2-Pro (nex-agi/nex-n2-pro:free) — sigue necesitando una clave de API de OpenRouter válida (cuenta gratuita; el nivel gratis tiene límites de uso).",
+    "descOpenrouter": "Acceso a múltiples proveedores de IA a través de OpenRouter. Usa por defecto un modelo GRATIS (nvidia/nemotron-3-super-120b-a12b:free) — sigue necesitando una clave de API de OpenRouter válida (cuenta gratuita; un saldo de pago en 0 sirve para los modelos :free, que tienen límites de uso). Cambia el modelo con la variable de entorno OPENROUTER_MODEL.",
     "sectionConfig": "Configuración de API",
     "labelItemaiUrl": "URL local de ItemAI",
     "hintItemaiUrl": "URL local donde se ejecuta LM Studio (por defecto: http://localhost:1234)",

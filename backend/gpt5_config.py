@@ -51,14 +51,17 @@ OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-6-luna"
 # while everything else stays on the cheaper high/medium/low tiers.
 OPENAI_FRONTIER_MODEL = os.getenv("OPENAI_FRONTIER_MODEL", "").strip() or "gpt-6-astra"
 
-# OpenRouter model (used only when the provider is "openrouter"). Default is the
-# FREE open-source Nex-N2-Pro (Nex AGI, Apache-2.0) exposed on OpenRouter as
-# `nex-agi/nex-n2-pro:free` ($0 in/out, 262K ctx, text+image). Override with env
-# OPENROUTER_MODEL. NOTE: still requires a valid OpenRouter API key (free account);
-# the free tier is rate-limited and its "free" status may change — verify on the
-# OpenRouter model page. Standard (non-reasoning) model → uses max_tokens, not
-# max_completion_tokens, and accepts temperature.
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "nex-agi/nex-n2-pro:free"
+# OpenRouter model (used only when the provider is "openrouter"). Default is a
+# FREE ($0 in/out) model on OpenRouter. NOTE: OpenRouter's free catalogue is
+# VOLATILE — `nex-agi/nex-n2-pro:free` was retired by 2026-10 (now only the PAID
+# nex-n2.5-mini/pro remain), so the default is a currently-live free model.
+# Override anytime with env OPENROUTER_MODEL (no code change). Other live free
+# options (checked 2026-10-12): nvidia/nemotron-3-ultra-550b-a55b:free (most
+# capable, 1M ctx), google/gemma-4-31b-it:free, thinkingmachines/inkling:free.
+# Still requires a valid OpenRouter API key (free account — a $0 paid balance is
+# fine for :free models, subject to rate limits). Standard (non-reasoning) model
+# → uses max_tokens, not max_completion_tokens, and accepts temperature.
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "nvidia/nemotron-3-super-120b-a12b:free"
 
 # GPT-5 Model Variants
 GPT5_MODELS = {

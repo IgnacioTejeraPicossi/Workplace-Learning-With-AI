@@ -674,9 +674,9 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         if temp is not None:
             params["temperature"] = temp
         
-        # On OpenRouter we use the configured OpenRouter model (default: the FREE
-        # Nex-N2-Pro, `nex-agi/nex-n2-pro:free`) — NOT the OpenAI tier names, which
-        # are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
+        # On OpenRouter we use the configured OpenRouter model (OPENROUTER_MODEL in
+        # gpt5_config — a live free model by default) — NOT the OpenAI tier names,
+        # which are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
         params.pop("model", None)
         model_to_use = OPENROUTER_MODEL
 
@@ -953,9 +953,9 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
         
-        # On OpenRouter we use the configured OpenRouter model (default: the FREE
-        # Nex-N2-Pro, `nex-agi/nex-n2-pro:free`) — NOT the OpenAI tier names, which
-        # are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
+        # On OpenRouter we use the configured OpenRouter model (OPENROUTER_MODEL in
+        # gpt5_config — a live free model by default) — NOT the OpenAI tier names,
+        # which are paid/credit-gated on OpenRouter. Override via env OPENROUTER_MODEL.
         params.pop("model", None)
         model_to_use = OPENROUTER_MODEL
 
