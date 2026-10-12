@@ -21,6 +21,23 @@ try:
 except ImportError:
     openrouter = None
 
+
+def _saved_cfg() -> dict:
+    """Server-side saved keys (api_config.json, written by 'Save Keys'). Used as
+    the last fallback so a saved key is actually usable for the connectivity test.
+    Never raises."""
+    try:
+        from backend.api_config_storage import get_api_config
+    except Exception:  # pragma: no cover
+        try:
+            from api_config_storage import get_api_config  # type: ignore
+        except Exception:
+            return {}
+    try:
+        return get_api_config() or {}
+    except Exception:
+        return {}
+
 router = APIRouter(prefix="/api", tags=["api-test"])
 
 class APITestRequest(BaseModel):
@@ -45,7 +62,7 @@ async def test_api_connection(request: APITestRequest):
             # Fall back to the server-side key (.env OPENAI_API_KEY) when the UI
             # field is empty — so "Test API" works with the key already configured
             # internally, mirroring how the rest of the app resolves the key.
-            effective_key = request.openaiKey or os.getenv("OPENAI_API_KEY", "")
+            effective_key = request.openaiKey or os.getenv("OPENAI_API_KEY", "") or _saved_cfg().get("openai_key", "")
             if not effective_key:
                 raise HTTPException(status_code=400, detail="OpenAI API key is required (none entered and OPENAI_API_KEY is not set on the server)")
 
@@ -66,7 +83,7 @@ async def test_api_connection(request: APITestRequest):
             }
             
         elif request.provider == "openrouter":
-            effective_key = request.openrouterKey or os.getenv("OPENROUTER_API_KEY", "")
+            effective_key = request.openrouterKey or os.getenv("OPENROUTER_API_KEY", "") or _saved_cfg().get("openrouter_key", "")
             if not effective_key:
                 raise HTTPException(status_code=400, detail="OpenRouter API key is required (none entered and OPENROUTER_API_KEY is not set on the server)")
 

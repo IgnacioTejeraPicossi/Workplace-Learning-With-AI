@@ -28,6 +28,23 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
+
+def _saved_api_config() -> dict:
+    """Server-side keys persisted by API Config's 'Save Keys' (api_config.json).
+    Used as the LAST fallback so a saved key is actually used for calls — not just
+    stored. Never raises; returns {} if unavailable."""
+    try:
+        from backend.api_config_storage import get_api_config
+    except Exception:
+        try:
+            from api_config_storage import get_api_config  # type: ignore
+        except Exception:
+            return {}
+    try:
+        return get_api_config() or {}
+    except Exception:
+        return {}
+
 # Debug: Log if API key was loaded
 if OPENAI_API_KEY:
     print(f"[llm.py] ✅ OPENAI_API_KEY loaded from .env (length: {len(OPENAI_API_KEY)}, starts with 'sk-': {OPENAI_API_KEY.startswith('sk-')})")
@@ -145,16 +162,16 @@ def get_api_config_from_headers(request_headers=None):
         if openai_key_header and openai_key_header.startswith('sk-') and len(openai_key_header) > 20:
             openai_key = openai_key_header
         else:
-            # Use .env fallback if header key is invalid or placeholder
-            openai_key = OPENAI_API_KEY
-        
+            # Fallback: .env, then the server-side saved key (api_config.json)
+            openai_key = OPENAI_API_KEY or _saved_api_config().get('openai_key', '')
+
         # Validate OpenRouter key: must be reasonably long
         openrouter_key_header = request_headers.get('x-openrouter-key', '')
         if openrouter_key_header and len(openrouter_key_header) > 10:
             openrouter_key = openrouter_key_header
         else:
-            # Use .env fallback if header key is invalid or placeholder
-            openrouter_key = OPENROUTER_API_KEY
+            # Fallback: .env, then the server-side saved key (api_config.json)
+            openrouter_key = OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', '')
         
         return {
             'provider': api_provider,
@@ -164,13 +181,14 @@ def get_api_config_from_headers(request_headers=None):
             'openrouter_key': openrouter_key
         }
     
-    # Fallback to environment variables
+    # Fallback to environment variables, then the server-side saved keys (api_config.json)
+    _saved = _saved_api_config()
     return {
         'provider': API_PROVIDER,
         'itemai_url': 'http://localhost:1234',
         'itemserverai_url': 'http://192.168.50.142:1234',
-        'openai_key': OPENAI_API_KEY,
-        'openrouter_key': OPENROUTER_API_KEY
+        'openai_key': OPENAI_API_KEY or _saved.get('openai_key', ''),
+        'openrouter_key': OPENROUTER_API_KEY or _saved.get('openrouter_key', '')
     }
 
 def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None, temperature=None):
@@ -661,7 +679,8 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         max_tokens: Maximum tokens for response
         messages: Alternative to prompt for conversation format
     """
-    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY.strip() == "":
+    _or_key = OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', '')
+    if not _or_key or _or_key.strip() == "":
         return f"[MOCKED RESPONSE] OpenRouter API key not configured."
     
     try:
@@ -689,7 +708,7 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         params = _normalize_params_for_model(params, model_to_use)
 
         # Configure OpenRouter client
-        openrouter.api_key = OPENROUTER_API_KEY
+        openrouter.api_key = _or_key
         openrouter.api_base = OPENROUTER_BASE_URL
         
         if messages:
@@ -921,7 +940,7 @@ def web_search_openrouter(query):
     params = get_gpt5_parameters(model, "web_search")
     
     # Configure OpenRouter client
-    openrouter.api_key = OPENROUTER_API_KEY
+    openrouter.api_key = OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', '')
     openrouter.api_base = OPENROUTER_BASE_URL
     
     response = openrouter.ChatCompletion.create(
@@ -944,7 +963,8 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         max_tokens: Maximum tokens for response
         messages: Alternative to prompt for conversation format
     """
-    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY.strip() == "":
+    _or_key = OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', '')
+    if not _or_key or _or_key.strip() == "":
         yield f"[MOCKED RESPONSE] OpenRouter API key not configured."
         return
     
@@ -968,7 +988,7 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         params = _normalize_params_for_model(params, model_to_use)
 
         # Configure OpenRouter client
-        openrouter.api_key = OPENROUTER_API_KEY
+        openrouter.api_key = _or_key
         openrouter.api_base = OPENROUTER_BASE_URL
         
         if messages:
