@@ -87,16 +87,12 @@ async def test_api_connection(request: APITestRequest):
             if not effective_key:
                 raise HTTPException(status_code=400, detail="OpenRouter API key is required (none entered and OPENROUTER_API_KEY is not set on the server)")
 
-            if not openrouter:
-                raise HTTPException(status_code=500, detail="OpenRouter library not installed")
-
-            # Test OpenRouter
-            openrouter.api_key = effective_key
-            openrouter.api_base = "https://openrouter.ai/api/v1"
-            
-            # Connectivity check uses the configured OpenRouter model (default: the
-            # FREE Nex-N2-Pro). Standard (non-reasoning) model → uses max_tokens.
-            response = openrouter.ChatCompletion.create(
+            # OpenRouter via the OpenAI SDK pointed at OpenRouter's base URL (no
+            # separate 'openrouter' package needed). Connectivity check uses the
+            # configured free model; standard (non-reasoning) model → max_tokens.
+            from openai import OpenAI
+            or_client = OpenAI(api_key=effective_key, base_url="https://openrouter.ai/api/v1")
+            response = or_client.chat.completions.create(
                 model=OPENROUTER_MODEL,
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
                 max_tokens=50

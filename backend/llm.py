@@ -707,18 +707,19 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         # Normalize parameters for the specific model (no-op for non-reasoning models)
         params = _normalize_params_for_model(params, model_to_use)
 
-        # Configure OpenRouter client
-        openrouter.api_key = _or_key
-        openrouter.api_base = OPENROUTER_BASE_URL
-        
+        # OpenRouter via the OpenAI SDK pointed at OpenRouter's base URL (no separate
+        # 'openrouter' package needed — uses the installed openai 1.x client).
+        from openai import OpenAI
+        or_client = OpenAI(api_key=_or_key, base_url=OPENROUTER_BASE_URL)
+
         if messages:
-            response = openrouter.ChatCompletion.create(
+            response = or_client.chat.completions.create(
                 model=model_to_use,
                 messages=messages,
                 **params
             )
         else:
-            response = openrouter.ChatCompletion.create(
+            response = or_client.chat.completions.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 **params
@@ -939,11 +940,13 @@ def web_search_openrouter(query):
     model = get_optimal_model("web_search", "medium")
     params = get_gpt5_parameters(model, "web_search")
     
-    # Configure OpenRouter client
-    openrouter.api_key = OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', '')
-    openrouter.api_base = OPENROUTER_BASE_URL
-    
-    response = openrouter.ChatCompletion.create(
+    # OpenRouter via the OpenAI SDK pointed at OpenRouter's base URL (no separate package)
+    from openai import OpenAI
+    or_client = OpenAI(
+        api_key=OPENROUTER_API_KEY or _saved_api_config().get('openrouter_key', ''),
+        base_url=OPENROUTER_BASE_URL,
+    )
+    response = or_client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": query}],
         tools=[{"type": "web_search"}],
@@ -987,19 +990,20 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         # Normalize parameters for the specific model (no-op for non-reasoning models)
         params = _normalize_params_for_model(params, model_to_use)
 
-        # Configure OpenRouter client
-        openrouter.api_key = _or_key
-        openrouter.api_base = OPENROUTER_BASE_URL
-        
+        # OpenRouter via the OpenAI SDK pointed at OpenRouter's base URL (no separate
+        # 'openrouter' package needed — uses the installed openai 1.x client).
+        from openai import OpenAI
+        or_client = OpenAI(api_key=_or_key, base_url=OPENROUTER_BASE_URL)
+
         if messages:
-            response = openrouter.ChatCompletion.create(
+            response = or_client.chat.completions.create(
                 model=model_to_use,
                 messages=messages,
                 stream=True,
                 **params
             )
         else:
-            response = openrouter.ChatCompletion.create(
+            response = or_client.chat.completions.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 stream=True,
