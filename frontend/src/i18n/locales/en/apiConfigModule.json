@@ -10,7 +10,7 @@
     "descItemai": "Local AI powered by LM Studio - 100% free, 100% private, runs on your own computer with downloaded models.",
     "descItemserverai": "Network AI powered by LM Studio - 100% free, 100% private, runs on your internal network server with downloaded models.",
     "descOpenai": "Direct access to OpenAI models (GPT-5, GPT-4, etc.) with full control and reliability.",
-    "descOpenrouter": "Access to multiple AI providers through OpenRouter. Defaults to a FREE model (nvidia/nemotron-3-super-120b-a12b:free) — still needs a valid OpenRouter API key (free account; a $0 paid balance works for :free models, which are rate-limited). Change the model via the OPENROUTER_MODEL env var.",
+    "descOpenrouter": "Access to multiple AI providers through OpenRouter. Uses a FREE model by default (nvidia/nemotron-3-super-120b-a12b:free). OpenRouter always requires an API key to authenticate — even for free models — but free models don't consume credit (a $0 balance works; they're rate-limited). Change the model via the OPENROUTER_MODEL env var.",
     "sectionConfig": "API Configuration",
     "labelItemaiUrl": "ItemAI Local URL",
     "hintItemaiUrl": "Local URL where LM Studio is running (default: http://localhost:1234)",
