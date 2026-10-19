@@ -424,9 +424,9 @@ export default function JMessagesPreAnalyzer() {
                     cursor: 'pointer'
                   }}
                 >
-                  <option value="low">{t('jMessages.preAnalyzer.aiLevelLow')} (GPT-3.5)</option>
-                  <option value="medium">{t('jMessages.preAnalyzer.aiLevelMedium')} (GPT-4o-mini)</option>
-                  <option value="high">{t('jMessages.preAnalyzer.aiLevelHigh')} (GPT-4o / GPT-5 if available)</option>
+                  <option value="low">{t('jMessages.preAnalyzer.aiLevelLow')} (gpt-6-luna)</option>
+                  <option value="medium">{t('jMessages.preAnalyzer.aiLevelMedium')} (gpt-5.4-mini)</option>
+                  <option value="high">{t('jMessages.preAnalyzer.aiLevelHigh')} (gpt-5.5)</option>
                 </select>
               </label>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
