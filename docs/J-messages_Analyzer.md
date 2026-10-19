@@ -148,10 +148,11 @@ The **J-messages Analyzer** is a specialized document processing system designed
 
 **AI Configuration**
 - **API Config Display**: Shows the current API provider (OpenAI, OpenRouter, or ItemAI) and model in use
-- **AI Level Selector**: Choose between three complexity levels:
-  - **Low** (GPT-3.5): Fast, cost-effective for standard extraction
-  - **Medium** (GPT-4o-mini): Balanced performance and accuracy
-  - **High** (GPT-4o / GPT-5 if available): Maximum accuracy for complex documents
+- **AI Level Selector**: Choose between complexity levels (the concrete model per level is resolved in `backend/gpt5_config.py` and may change over time):
+  - **Low** (gpt-6-luna): Fast, cost-effective for standard extraction
+  - **Medium** (gpt-5.4-mini): Balanced performance and accuracy
+  - **High** (gpt-5.5): Maximum accuracy for complex documents
+  - **Frontier** (GPT-6 Astra): opt-in for the hardest documents — most capable, premium cost
 - **Temperature Control**: Slider to adjust AI response creativity/precision (0.0-2.0)
   - **Lower values (0.0-0.3)**: More deterministic, consistent extraction (recommended for metadata)
   - **Default: 0.2**: Optimal balance for structured data extraction
@@ -492,7 +493,7 @@ Tekst:
 - `body_text`: First 4000 characters of the regulation body (truncated in `build_metadata_prompt()`)
 
 **AI Configuration**:
-- Supports `complexity` parameter: `low` (GPT-3.5), `medium` (GPT-4o-mini), `high` (GPT-4o / GPT-5)
+- Supports `complexity` parameter: `low` (gpt-6-luna), `medium` (gpt-5.4-mini), `high` (gpt-5.5), `frontier` (GPT-6 Astra, opt-in) — concrete models resolved in `gpt5_config.py`
 - Supports `temperature` parameter (0.0-2.0): Controls creativity/precision. Default: 0.2 (recommended for structured extraction)
 
 **Expected Output Format**:
@@ -560,7 +561,7 @@ Text:
 - `body_text`: First 12000 characters of the note document (truncated in `build_note_prompt()`)
 
 **AI Configuration**:
-- Supports `complexity` parameter: `low` (GPT-3.5), `medium` (GPT-4o-mini), `high` (GPT-4o / GPT-5)
+- Supports `complexity` parameter: `low` (gpt-6-luna), `medium` (gpt-5.4-mini), `high` (gpt-5.5), `frontier` (GPT-6 Astra, opt-in) — concrete models resolved in `gpt5_config.py`
 - Supports `temperature` parameter (0.0-2.0): Controls creativity/precision. Default: 0.2
 
 **Expected Output Format**:
