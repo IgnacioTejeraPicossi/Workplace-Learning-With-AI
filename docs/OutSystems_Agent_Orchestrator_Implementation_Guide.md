@@ -44,7 +44,7 @@ Callback → Our Backend (Audit Trail)
 2. **Add AI Model** → **Azure OpenAI Trial** (or Amazon Bedrock Trial)
 3. **Configuration:**
    - **Name**: `AgentOrchestrator-LLM`
-   - **Model**: `gpt-4` (or `gpt-3.5-turbo`)
+   - **Model**: `gpt-5.5` (or a cheaper tier like `gpt-5.4-mini`) — pick a current model; avoid retiring ones (GPT-4o/4o-mini/4.1/4.1-mini retire 2027-01-14). These mirror the app's model tiers in `backend/gpt5_config.py`.
    - **Daily Limit**: `100` (trial limit)
    - **No API key required** for trial models
 
