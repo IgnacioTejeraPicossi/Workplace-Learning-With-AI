@@ -15,6 +15,17 @@ except Exception:  # pragma: no cover
         OPENAI_LOW_MODEL = "gpt-6-luna"
         OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
 
+# Shared helper: retry the OpenRouter call across diverse free models on a
+# transient 404/429 so the "Test API" button doesn't fail just because one free
+# model's upstream pool is momentarily rate-limited.
+try:
+    from backend.llm import _openrouter_create_with_fallback
+except Exception:  # pragma: no cover
+    try:
+        from llm import _openrouter_create_with_fallback  # type: ignore
+    except Exception:
+        _openrouter_create_with_fallback = None
+
 # OpenRouter support
 try:
     import openrouter
@@ -101,16 +112,19 @@ async def test_api_connection(request: APITestRequest):
             # configured free model; standard (non-reasoning) model → max_tokens.
             from openai import OpenAI
             or_client = OpenAI(api_key=effective_key, base_url="https://openrouter.ai/api/v1")
-            response = or_client.chat.completions.create(
-                model=OPENROUTER_MODEL,
-                messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
-                max_tokens=50
-            )
-            
+            msgs = [{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}]
+            params = {"max_tokens": 50}
+            if _openrouter_create_with_fallback is not None:
+                response, used_model = _openrouter_create_with_fallback(or_client, msgs, params, OPENROUTER_MODEL)
+            else:  # pragma: no cover — defensive if the helper import failed
+                used_model = OPENROUTER_MODEL
+                response = or_client.chat.completions.create(model=OPENROUTER_MODEL, messages=msgs, **params)
+
+            note = "" if used_model == OPENROUTER_MODEL else f" (default model was rate-limited; used free fallback {used_model})"
             return {
                 "success": True,
                 "provider": "openrouter",
-                "message": "OpenRouter API connection successful",
+                "message": f"OpenRouter API connection successful{note}",
                 "response": response.choices[0].message.content.strip()
             }
             

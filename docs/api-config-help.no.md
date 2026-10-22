@@ -32,7 +32,8 @@
 | **"API key is required"** | Ingen nøkkel skrevet inn og ingen lagret/på server. Lim inn nøkkelen → Save Keys. |
 | **"Failed to fetch"** (ved lagring) | Nettleseren nådde ikke backend. Sjekk at backend kjører på `:8000`; start React-dev-serveren på nytt ved behov. |
 | **"OpenRouter library not installed"** | Gammel backend-kode. **Start backend på nytt** (gjeldende kode trenger ikke den pakken lenger). |
-| **401 "User not found"** | Selve **OpenRouter-nøkkelen er ugyldig/tilbakekalt** (ikke et kredittproblem — det ville vært 402). **Generer en ny nøkkel** og lagre. |
+| **401 "User not found"** / **"Incorrect API key"** | Feil nøkkel for valgt leverandør (en OpenRouter-nøkkel `sk-or-` brukt med OpenAI, eller en tilbakekalt nøkkel). Appen avviser nå leverandør-forveksling med en tydelig melding; ellers **generer en ny nøkkel** og lagre. |
+| **429 "temporarily rate-limited"** | Den gratis modellens delte pool er ratebegrenset. Backend **prøver automatisk andre gratis modeller** (Google → MiniMax → NVIDIA), så dette løser seg vanligvis selv; hvis alle er opptatt, vent et minutt eller sett `OPENROUTER_MODEL` til en annen `:free`-modell. |
 | Svar ser standardiserte ut / `[MOCKED RESPONSE]` | Ingen gyldig nøkkel nådde leverandøren → falt tilbake til offline-mock. Sjekk nøkkelen + start på nytt. |
 
 ---

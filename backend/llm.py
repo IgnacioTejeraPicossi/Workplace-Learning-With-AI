@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 import openai
 try:
     from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL
+    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL, OPENROUTER_FREE_FALLBACKS
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-    from gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL
+    from gpt5_config import get_optimal_model, get_gpt5_parameters, OPENROUTER_MODEL, OPENROUTER_FREE_FALLBACKS
 
 # OpenRouter support
 try:
@@ -675,6 +675,36 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
 
         return f"[MOCKED RESPONSE - Error: {err_str}] This would be the AI's answer to: {prompt[:60]}..."
 
+# Substrings that mark a retryable OpenRouter/provider failure (transient pool
+# throttle or a down/removed free model) — as opposed to a real auth error (401).
+_OPENROUTER_RETRYABLE_MARKERS = (
+    "429", "404", "rate-limit", "rate limit", "temporarily",
+    "provider returned error", "not found", "no endpoints",
+)
+
+
+def _openrouter_create_with_fallback(or_client, messages, params, primary_model):
+    """Call OpenRouter chat.completions, falling back across free models on 404/429.
+
+    Returns (response, model_used). Re-raises immediately on a non-retryable error
+    (e.g. 401 bad key — trying other models would not help) and raises the last
+    error if every candidate fails.
+    """
+    candidates = [primary_model] + [m for m in OPENROUTER_FREE_FALLBACKS if m != primary_model]
+    last_exc = None
+    for model_id in candidates:
+        try:
+            resp = or_client.chat.completions.create(model=model_id, messages=messages, **params)
+            return resp, model_id
+        except Exception as e:
+            last_exc = e
+            err = str(e).lower()
+            if any(tok in err for tok in _OPENROUTER_RETRYABLE_MARKERS):
+                continue  # transient/provider issue → try the next free model
+            raise  # real error (auth, bad request, …) → surface immediately
+    raise last_exc
+
+
 def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None):
     """
     OpenRouter API function with model selection and optimization.
@@ -719,21 +749,13 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         from openai import OpenAI
         or_client = OpenAI(api_key=_or_key, base_url=OPENROUTER_BASE_URL)
 
-        if messages:
-            response = or_client.chat.completions.create(
-                model=model_to_use,
-                messages=messages,
-                **params
-            )
-        else:
-            response = or_client.chat.completions.create(
-                model=model_to_use,
-                messages=[{"role": "user", "content": prompt}],
-                **params
-            )
+        msgs = messages if messages else [{"role": "user", "content": prompt}]
+        # Free models can be transiently 404/429 on their shared pool → fall back
+        # across diverse free providers instead of failing the whole call.
+        response, _used_model = _openrouter_create_with_fallback(or_client, msgs, params, model_to_use)
         return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
+        return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..."
 
 def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
     """

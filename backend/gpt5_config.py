@@ -63,6 +63,20 @@ OPENAI_FRONTIER_MODEL = os.getenv("OPENAI_FRONTIER_MODEL", "").strip() or "gpt-6
 # → uses max_tokens, not max_completion_tokens, and accepts temperature.
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "google/gemma-4-31b-it:free"
 
+# Free models share upstream rate-limit pools per provider, so a single :free model
+# can return a transient 404 (provider down/removed) or 429 (pool rate-limited) at
+# any time. This ordered fallback list lets the OpenRouter path retry across free
+# models from DIFFERENT upstream providers (Google / MiniMax / NVIDIA) so one
+# provider's throttle doesn't take the whole app down. OPENROUTER_MODEL is tried
+# first; override the whole list via env OPENROUTER_FREE_FALLBACKS (comma-separated).
+OPENROUTER_FREE_FALLBACKS = [
+    m.strip() for m in os.getenv("OPENROUTER_FREE_FALLBACKS", "").split(",") if m.strip()
+] or [
+    OPENROUTER_MODEL,
+    "minimax/minimax-m3.1-flash:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+]
+
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-6": {
