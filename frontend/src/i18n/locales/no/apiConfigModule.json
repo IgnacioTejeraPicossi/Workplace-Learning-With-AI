@@ -10,7 +10,7 @@
     "descItemai": "Lokal KI med LM Studio – 100 % gratis, 100 % privat, kjører på din egen maskin med nedlastede modeller.",
     "descItemserverai": "Nettverks-KI med LM Studio – 100 % gratis, 100 % privat, kjører på intern server med nedlastede modeller.",
     "descOpenai": "Direkte tilgang til OpenAI-modeller (GPT-5, GPT-4 m.fl.) med full kontroll og høy pålitelighet.",
-    "descOpenrouter": "Tilgang til flere KI-leverandører via OpenRouter. Bruker som standard en GRATIS modell (nvidia/nemotron-3-super-120b-a12b:free). OpenRouter krever alltid en API-nøkkel for å autentisere — også for gratis modeller — men gratis modeller bruker ikke kreditt (en saldo på $0 holder; de er ratebegrenset). Endre modellen med miljøvariabelen OPENROUTER_MODEL.",
+    "descOpenrouter": "Tilgang til flere KI-leverandører via OpenRouter. Bruker som standard en GRATIS modell (google/gemma-4-31b-it:free). OpenRouter krever alltid en API-nøkkel for å autentisere — også for gratis modeller — men gratis modeller bruker ikke kreditt (en saldo på $0 holder; de er ratebegrenset). Endre modellen med miljøvariabelen OPENROUTER_MODEL.",
     "sectionConfig": "API-innstillinger",
     "labelItemaiUrl": "ItemAI lokal URL",
     "hintItemaiUrl": "Lokal URL der LM Studio kjører (standard: http://localhost:1234)",

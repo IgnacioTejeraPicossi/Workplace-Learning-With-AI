@@ -12,7 +12,7 @@ except Exception:  # pragma: no cover
         from gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL  # type: ignore
     except Exception:
         OPENAI_LOW_MODEL = "gpt-6-luna"
-        OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+        OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
 
 router = APIRouter(tags=["prompt"])
 

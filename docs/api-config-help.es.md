@@ -22,7 +22,7 @@
 > "Guardado correctamente" solo confirma el **guardado**. El resultado verde de **Test API** confirma la **conexión**.
 
 ### OpenRouter + modelos gratis
-- La app usa por defecto un modelo **GRATIS**: `nvidia/nemotron-3-super-120b-a12b:free` ($0 por token).
+- La app usa por defecto un modelo **GRATIS**: `google/gemma-4-31b-it:free` ($0 por token).
 - **"Modelo gratis" ≠ "sin clave".** OpenRouter sigue exigiendo una clave válida para autenticar **cada** petición. El modelo gratis solo significa que no te cobran por token — un **saldo de pago en $0 sirve** para los modelos `:free` (tienen **límites de uso**).
 - Consigue una clave en **https://openrouter.ai/keys** → *Create Key* (cópiala una sola vez; empieza por `sk-or-v1-`). Una cuenta gratuita normalmente no necesita tarjeta para modelos `:free`.
 
@@ -48,7 +48,7 @@
 | Medium | `OPENAI_MEDIUM_MODEL` | `gpt-5.4-mini` |
 | High | `OPENAI_HIGH_MODEL` | `gpt-5.5` |
 | Frontier (opt-in) | `OPENAI_FRONTIER_MODEL` | `gpt-6-astra` |
-| OpenRouter | `OPENROUTER_MODEL` | `nvidia/nemotron-3-super-120b-a12b:free` |
+| OpenRouter | `OPENROUTER_MODEL` | `google/gemma-4-31b-it:free` |
 
 `get_optimal_model(task_type, complexity)` mapea `complexity` (`low`/`medium`/`high`/`frontier`) a un nivel. **Frontier** (GPT-6 Astra) es **solo opt-in** — p. ej. el desplegable "AI Level" del Analizador J-messages envía `complexity=frontier`; nunca es un valor por defecto (cuesta ~5× el nivel alto).
 

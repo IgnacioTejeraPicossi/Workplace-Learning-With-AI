@@ -61,7 +61,7 @@ OPENAI_FRONTIER_MODEL = os.getenv("OPENAI_FRONTIER_MODEL", "").strip() or "gpt-6
 # Still requires a valid OpenRouter API key (free account — a $0 paid balance is
 # fine for :free models, subject to rate limits). Standard (non-reasoning) model
 # → uses max_tokens, not max_completion_tokens, and accepts temperature.
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "nvidia/nemotron-3-super-120b-a12b:free"
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "").strip() or "google/gemma-4-31b-it:free"
 
 # GPT-5 Model Variants
 GPT5_MODELS = {

@@ -159,11 +159,18 @@ def get_api_config_from_headers(request_headers=None):
         # Validate OpenAI key: must start with "sk-" and be reasonably long
         # If invalid or placeholder, use .env fallback
         openai_key_header = request_headers.get('x-openai-key', '')
-        if openai_key_header and openai_key_header.startswith('sk-') and len(openai_key_header) > 20:
+        # An OpenRouter key (sk-or-...) also starts with "sk-" but is NOT a valid
+        # OpenAI key; never accept it as one (it would cause a 401 at OpenAI).
+        if (openai_key_header and openai_key_header.startswith('sk-')
+                and not openai_key_header.startswith('sk-or-')
+                and len(openai_key_header) > 20):
             openai_key = openai_key_header
         else:
             # Fallback: .env, then the server-side saved key (api_config.json)
             openai_key = OPENAI_API_KEY or _saved_api_config().get('openai_key', '')
+        # Final safety net: drop a misfiled OpenRouter key so it is never sent to OpenAI.
+        if openai_key.startswith('sk-or-'):
+            openai_key = ''
 
         # Validate OpenRouter key: must be reasonably long
         openrouter_key_header = request_headers.get('x-openrouter-key', '')

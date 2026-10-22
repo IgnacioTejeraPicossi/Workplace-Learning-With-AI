@@ -13,7 +13,7 @@ except Exception:  # pragma: no cover
         from gpt5_config import OPENAI_LOW_MODEL, OPENROUTER_MODEL  # type: ignore
     except Exception:
         OPENAI_LOW_MODEL = "gpt-6-luna"
-        OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+        OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
 
 # OpenRouter support
 try:
@@ -65,6 +65,11 @@ async def test_api_connection(request: APITestRequest):
             effective_key = request.openaiKey or os.getenv("OPENAI_API_KEY", "") or _saved_cfg().get("openai_key", "")
             if not effective_key:
                 raise HTTPException(status_code=400, detail="OpenAI API key is required (none entered and OPENAI_API_KEY is not set on the server)")
+            # Guard against a cross-provider key mix-up: an OpenRouter key
+            # (sk-or-...) sent to OpenAI returns a confusing 401 "Incorrect API
+            # key". Reject it here with an actionable message instead.
+            if effective_key.startswith("sk-or-"):
+                raise HTTPException(status_code=400, detail="This looks like an OpenRouter key (sk-or-...), not an OpenAI key. Select the OpenRouter provider, or enter an OpenAI key (sk-...).")
 
             # Test OpenAI — use lightest current-gen model for cheap connectivity check.
             # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
@@ -86,6 +91,10 @@ async def test_api_connection(request: APITestRequest):
             effective_key = request.openrouterKey or os.getenv("OPENROUTER_API_KEY", "") or _saved_cfg().get("openrouter_key", "")
             if not effective_key:
                 raise HTTPException(status_code=400, detail="OpenRouter API key is required (none entered and OPENROUTER_API_KEY is not set on the server)")
+            # Symmetric guard: a plain OpenAI key (sk-... but not sk-or-...) sent
+            # to OpenRouter will fail auth; flag the mix-up clearly.
+            if effective_key.startswith("sk-") and not effective_key.startswith("sk-or-"):
+                raise HTTPException(status_code=400, detail="This looks like an OpenAI key (sk-...), not an OpenRouter key. Select the OpenAI provider, or enter an OpenRouter key (sk-or-...).")
 
             # OpenRouter via the OpenAI SDK pointed at OpenRouter's base URL (no
             # separate 'openrouter' package needed). Connectivity check uses the
