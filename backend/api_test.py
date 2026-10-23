@@ -73,8 +73,17 @@ async def test_api_connection(request: APITestRequest):
             # Fall back to the server-side key (.env OPENAI_API_KEY) when the UI
             # field is empty — so "Test API" works with the key already configured
             # internally, mirroring how the rest of the app resolves the key.
-            effective_key = request.openaiKey or os.getenv("OPENAI_API_KEY", "") or _saved_cfg().get("openai_key", "")
+            # A misfiled OpenRouter key (sk-or-...) in the UI field is ignored, the same
+            # way llm.get_api_config_from_headers does for real requests, so the test
+            # reflects the key the app will actually use (.env / saved key).
+            field_key = request.openaiKey or ""
+            ignored_field_key = field_key.startswith("sk-or-")
+            if ignored_field_key:
+                field_key = ""
+            effective_key = field_key or os.getenv("OPENAI_API_KEY", "") or _saved_cfg().get("openai_key", "")
             if not effective_key:
+                if ignored_field_key:
+                    raise HTTPException(status_code=400, detail="This looks like an OpenRouter key (sk-or-...), not an OpenAI key. Select the OpenRouter provider, or enter an OpenAI key (sk-...).")
                 raise HTTPException(status_code=400, detail="OpenAI API key is required (none entered and OPENAI_API_KEY is not set on the server)")
             # Guard against a cross-provider key mix-up: an OpenRouter key
             # (sk-or-...) sent to OpenAI returns a confusing 401 "Incorrect API
@@ -94,7 +103,8 @@ async def test_api_connection(request: APITestRequest):
             return {
                 "success": True,
                 "provider": "openai",
-                "message": "OpenAI API connection successful",
+                "message": "OpenAI API connection successful"
+                           + (" (the OpenAI field held an OpenRouter key sk-or-...; it was ignored and the server's OpenAI key was used; clear or replace the field)" if ignored_field_key else ""),
                 "response": response.choices[0].message.content.strip()
             }
             

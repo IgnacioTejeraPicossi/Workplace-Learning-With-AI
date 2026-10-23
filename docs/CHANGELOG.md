@@ -28,6 +28,11 @@ Changes shipped 2026-10-22 (commits `47759e7`, `467a9bc`), now documented and co
 - The fallback `minimax/minimax-m3.1-flash:free` does not exist on OpenRouter (no free MiniMax
   model is listed), so it always failed and was skipped. Replaced with `poolside/laguna-s-2.1:free`,
   which was checked live on 2026-10-23 with a small test request.
+- **Test API (OpenAI) failed while the app itself worked**: the browser's stored OpenAI field held
+  an OpenRouter key (`sk-or-…`), and the test endpoint rejected it even though the server has a
+  valid `OPENAI_API_KEY`. The endpoint now ignores a `sk-or-` key in that field (as
+  `get_api_config_from_headers` already did), tests with the server key and says so in the message.
+  It only returns the "looks like an OpenRouter key" error when there is no server key.
 
 ### Tests / config
 - New `backend/tests/test_openrouter_fallback.py` (10 offline tests, fake client), added to CI.

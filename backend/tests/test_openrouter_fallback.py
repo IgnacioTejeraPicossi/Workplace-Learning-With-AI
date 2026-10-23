@@ -8,6 +8,7 @@ Covers the API Config changes of 2026-10-22:
 
 No network and no real key: the OpenAI SDK client is replaced by a fake.
 """
+import os
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -99,10 +100,27 @@ async def test_test_api_openrouter_default_model_has_no_fallback_note():
 # ── cross-provider key guard ───────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_openrouter_key_rejected_for_openai_provider():
-    res = await run_test_api(APITestRequest(provider="openai", openaiKey="sk-or-v1-test-key-123456"))
+async def test_openrouter_key_in_openai_field_falls_back_to_server_key():
+    with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-proj-server-test-key"}), \
+         patch("backend.api_test.openai.chat.completions.create", return_value=_ok("ok")) as create:
+        res = await run_test_api(APITestRequest(provider="openai", openaiKey="sk-or-v1-test-key-123456"))
+    assert res["success"] is True
+    assert "ignored" in res["message"]
+    assert create.called
+    import backend.api_test as api_test_mod
+    assert api_test_mod.openai.api_key == "sk-proj-server-test-key"  # never the sk-or- key
+
+
+@pytest.mark.asyncio
+async def test_openrouter_key_rejected_for_openai_when_no_server_key():
+    env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+    with patch.dict(os.environ, env, clear=True), \
+         patch("backend.api_test._saved_cfg", return_value={}), \
+         patch("backend.api_test.openai.chat.completions.create") as create:
+        res = await run_test_api(APITestRequest(provider="openai", openaiKey="sk-or-v1-test-key-123456"))
     assert res["success"] is False
     assert "OpenRouter key" in res["error"]
+    assert not create.called
 
 
 @pytest.mark.asyncio
