@@ -25,8 +25,8 @@ Changes shipped 2026-10-22 (commits `47759e7`, `467a9bc`), now documented and co
 - A bad/revoked OpenRouter key (401 `"User not found"`) matched the generic `"not found"`
   retry marker and was retried on every fallback model. Auth errors are now checked first
   and raised immediately. The 404/429 fallback path is unchanged.
-- The fallback `minimax/minimax-m3.1-flash:free` does not exist on OpenRouter (no free MiniMax
-  model is listed), so it always failed and was skipped. Replaced with `poolside/laguna-s-2.1:free`,
+- The fallback `minimax/minimax-m3.1-flash:free` (live-tested OK on 2026-10-22) was retired from
+  OpenRouter by 2026-10-23 (no free MiniMax model is listed any more), so it failed and was skipped. Replaced with `poolside/laguna-s-2.1:free`,
   which was checked live on 2026-10-23 with a small test request.
 - **Test API (OpenAI) failed while the app itself worked**: the browser's stored OpenAI field held
   an OpenRouter key (`sk-or-…`), and the test endpoint rejected it even though the server has a
