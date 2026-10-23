@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.45.6] - 2026-10-23
+
+### API Config — OpenRouter free-model fallback + cross-provider key guard
+
+Changes shipped 2026-10-22 (commits `47759e7`, `467a9bc`), now documented and covered by tests:
+- **Default free model** changed from `nvidia/nemotron-3-super-120b-a12b:free` to
+  `google/gemma-4-31b-it:free` (`OPENROUTER_MODEL`; `gpt5_config.py`, `api_test.py`,
+  `routers/agentops/prompt.py`, help docs + `apiConfigModule.json` en/es/no).
+- **Free-model fallback**: `_openrouter_create_with_fallback()` in `llm.py` retries across
+  `OPENROUTER_FREE_FALLBACKS` (Google → MiniMax → NVIDIA; env-overridable) on a transient
+  404/429. Used by `ask_openrouter` and the **Test API** button, which reports the fallback used.
+- **Key guard**: an OpenRouter key (`sk-or-…`) is rejected for the OpenAI provider (and an
+  OpenAI key for OpenRouter) with an actionable 400, and is never forwarded to OpenAI from headers.
+
+### Fixed
+- A bad/revoked OpenRouter key (401 `"User not found"`) matched the generic `"not found"`
+  retry marker and was retried on every fallback model. Auth errors are now checked first
+  and raised immediately. The 404/429 fallback path is unchanged.
+
+### Tests / config
+- New `backend/tests/test_openrouter_fallback.py` (10 offline tests, fake client), added to CI.
+- `.env.example` documents `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_FREE_FALLBACKS`.
+
+---
+
 ## [1.45.5] - 2026-09-10
 
 ### Docs — Andrés user guide deepened after a coverage audit (all 13 tabs)

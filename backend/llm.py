@@ -681,6 +681,9 @@ _OPENROUTER_RETRYABLE_MARKERS = (
     "429", "404", "rate-limit", "rate limit", "temporarily",
     "provider returned error", "not found", "no endpoints",
 )
+# Auth failures are checked FIRST: OpenRouter's 401 body is "User not found", which
+# would otherwise match the generic "not found" marker and be retried pointlessly.
+_OPENROUTER_AUTH_MARKERS = ("401", "user not found", "unauthorized", "invalid api key")
 
 
 def _openrouter_create_with_fallback(or_client, messages, params, primary_model):
@@ -699,6 +702,8 @@ def _openrouter_create_with_fallback(or_client, messages, params, primary_model)
         except Exception as e:
             last_exc = e
             err = str(e).lower()
+            if any(tok in err for tok in _OPENROUTER_AUTH_MARKERS):
+                raise  # bad/revoked key → other models would fail the same way
             if any(tok in err for tok in _OPENROUTER_RETRYABLE_MARKERS):
                 continue  # transient/provider issue → try the next free model
             raise  # real error (auth, bad request, …) → surface immediately
