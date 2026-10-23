@@ -16,7 +16,7 @@ Changes shipped 2026-10-22 (commits `47759e7`, `467a9bc`), now documented and co
   `google/gemma-4-31b-it:free` (`OPENROUTER_MODEL`; `gpt5_config.py`, `api_test.py`,
   `routers/agentops/prompt.py`, help docs + `apiConfigModule.json` en/es/no).
 - **Free-model fallback**: `_openrouter_create_with_fallback()` in `llm.py` retries across
-  `OPENROUTER_FREE_FALLBACKS` (Google → MiniMax → NVIDIA; env-overridable) on a transient
+  `OPENROUTER_FREE_FALLBACKS` (Google → Poolside → NVIDIA; env-overridable) on a transient
   404/429. Used by `ask_openrouter` and the **Test API** button, which reports the fallback used.
 - **Key guard**: an OpenRouter key (`sk-or-…`) is rejected for the OpenAI provider (and an
   OpenAI key for OpenRouter) with an actionable 400, and is never forwarded to OpenAI from headers.
@@ -25,6 +25,9 @@ Changes shipped 2026-10-22 (commits `47759e7`, `467a9bc`), now documented and co
 - A bad/revoked OpenRouter key (401 `"User not found"`) matched the generic `"not found"`
   retry marker and was retried on every fallback model. Auth errors are now checked first
   and raised immediately. The 404/429 fallback path is unchanged.
+- The fallback `minimax/minimax-m3.1-flash:free` does not exist on OpenRouter (no free MiniMax
+  model is listed), so it always failed and was skipped. Replaced with `poolside/laguna-s-2.1:free`,
+  which was checked live on 2026-10-23 with a small test request.
 
 ### Tests / config
 - New `backend/tests/test_openrouter_fallback.py` (10 offline tests, fake client), added to CI.

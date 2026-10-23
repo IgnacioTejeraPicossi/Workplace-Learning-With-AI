@@ -33,7 +33,7 @@
 | **"Failed to fetch"** (al guardar) | El navegador no alcanzó el backend. Asegúrate de que el backend corre en `:8000`; reinicia el dev-server de React si hace falta. |
 | **"OpenRouter library not installed"** | Código viejo del backend. **Reinícialo** (el código actual ya no necesita ese paquete). |
 | **401 "User not found"** / **"Incorrect API key"** | Clave incorrecta para el proveedor elegido (una clave de OpenRouter `sk-or-` usada con OpenAI, o una clave revocada). La app ahora rechaza el cruce de proveedor con un mensaje claro; si no, **genera una clave nueva** y guárdala. |
-| **429 "temporarily rate-limited"** | El pool compartido del modelo gratis está saturado. El backend **reintenta automáticamente con otros modelos gratis** (Google → MiniMax → NVIDIA), así que suele resolverse solo; si todos están ocupados, espera un minuto o pon `OPENROUTER_MODEL` a otro modelo `:free`. |
+| **429 "temporarily rate-limited"** | El pool compartido del modelo gratis está saturado. El backend **reintenta automáticamente con otros modelos gratis** (Google → Poolside → NVIDIA), así que suele resolverse solo; si todos están ocupados, espera un minuto o pon `OPENROUTER_MODEL` a otro modelo `:free`. |
 | Respuestas enlatadas / `[MOCKED RESPONSE]` | No llegó una clave válida al proveedor → cayó al mock offline. Revisa la clave + reinicia. |
 
 ---

@@ -33,7 +33,7 @@
 | **"Failed to fetch"** (on save) | The browser couldn't reach the backend. Make sure the backend is running on `:8000`; restart the React dev server if needed. |
 | **"OpenRouter library not installed"** | Old backend code. **Restart the backend** (the current code no longer needs that package). |
 | **401 "User not found"** / **"Incorrect API key"** | Wrong/invalid key for the selected provider (an OpenRouter `sk-or-` key used with OpenAI, or a revoked key). The app now rejects a provider mismatch with a clear message; otherwise **generate a new key** and Save. |
-| **429 "temporarily rate-limited"** | The free model's shared upstream pool is throttled. The backend **auto-retries across other free models** (Google → MiniMax → NVIDIA), so this usually self-heals; if all are busy, wait a minute or set `OPENROUTER_MODEL` to another `:free` model. |
+| **429 "temporarily rate-limited"** | The free model's shared upstream pool is throttled. The backend **auto-retries across other free models** (Google → Poolside → NVIDIA), so this usually self-heals; if all are busy, wait a minute or set `OPENROUTER_MODEL` to another `:free` model. |
 | Replies look canned / `[MOCKED RESPONSE]` | No valid key reached the provider → it fell back to offline mock. Check the key + restart. |
 
 ---
