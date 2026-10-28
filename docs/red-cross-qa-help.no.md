@@ -7,18 +7,35 @@ Den er **mock-first**: hver fane fungerer offline med realistiske eksempeldata, 
 > ⚠️ **KI brukes kun som støtte.** Ekte persondata, produksjonsdata og API-nøkler hører **ikke** hjemme i KI-en. Bekreft banneret i appen før du kjører KI-assisterte handlinger.
 
 ## Kom i gang
-1. Velg et **Miljø** (øverst til høyre): `Local` eller `Test`.
-2. Velg en **Kjøremodus**: **Generer skript og rapporter** (lager artefakter du kjører i Cursor / Claude / GitHub Actions) eller **Kjør direkte** (kjører Playwright / Cypress / axe / Lighthouse / k6 i appen når verktøyet er tilgjengelig).
-3. Åpne fanen du trenger, sett mål-**URL** (eller klikk en preset-chip), og kjør.
-4. Se gjennom resultatet; funn kan sendes til **Azure DevOps** og samles i en **Sprintrapport**.
+1. Åpne **Innstillinger** én gang og bekreft (deretter **Lagre**):
+   - **Lokal URL** → vanligvis `http://localhost:3000`
+   - **Test-URL** → `https://next.lunix.cloud/testside`
+   - **Enonic XP admin-URL** → `https://rodekors-xp8dev.enonic.cloud/admin`
+2. Velg et **Miljø** (øverst til høyre): `Local` eller `Test`. Header-chipen **🎯** viser det levende målet fra Innstillinger.
+3. Velg en **Kjøremodus**: **Generer skript og rapporter** eller **Kjør direkte**.
+4. Åpne fanen du trenger. URL-feltene (Performance / Accessibility / Designsystemet) synkes fra Innstillinger når du bytter miljø; andre faner sender samme `base_url` til backend når de genererer skript.
+5. Se gjennom resultatet; funn kan sendes til **Azure DevOps** og samles i en **Sprintrapport**.
 
-## Mål-URL-er (presets)
-Ett-klikks chips som setter målet for en kjøring:
-- ❤️‍🩹 **rodekors.no** — produksjon.
-- 🧪 **https://next.lunix.cloud/testside** — publisert TestSide (NextJS + Enonic XP + GraphQL). Standard smoke-mål for Test-miljøet.
-- 💻 **localhost:3000** — din lokale utviklingsbygg.
+## Mål-URL-er (presets og Innstillinger)
+Standardverdier og ett-klikks chips:
+- ❤️‍🩹 **rodekors.no** — produksjon (kun eksplisitt preset).
+- 🧪 **https://next.lunix.cloud/testside** — publisert TestSide (NextJS + Enonic XP + GraphQL). Standard **Test**-BASE_URL.
+- 💻 **localhost:3000** — **Local**-BASE_URL.
 
-**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — konfigureres under **Innstillinger → Enonic XP admin‑URL**. Dette er CMS-konsollen, **ikke** den offentlige Test BASE_URL brukt av Playwright / Lighthouse / axe.
+**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — konfigureres under **Innstillinger → Enonic XP admin‑URL**. Dette er CMS-konsollen, **ikke** den offentlige Test BASE_URL brukt av Playwright / Lighthouse / axe / k6.
+
+### Hvordan Innstillinger styrer alle faner (runtime)
+Innstillingene lastes når agenten åpnes og deles med alle faner (`settingsApi.js`):
+
+| Innstilling | Brukes som |
+|---|---|
+| `env_local_url` | BASE_URL når miljø = **Local** |
+| `env_test_url` | BASE_URL når miljø = **Test** |
+| `enonic_admin_url` | CMS-adminlenke (CMS QA-fanen + preview-verktøy) |
+
+- Bytting av **Local / Test** i headeren oppdaterer 🎯-chipen og synker URL-feltene på Performance, Accessibility og Designsystemet.
+- Etter **Lagre** i Innstillinger oppdateres cachen, så alle faner ser de nye URL-ene med en gang.
+- Generatorene (Playwright, Cypress, Postman, k6, Loadster, Forms QA, …) mottar `base_url` fra frontend og bygger den inn i skript — de hardkoder ikke lenger `test.rodekors.no`.
 
 ## Fanene i korte trekk
 | Fane | Hva den gjør |
@@ -42,7 +59,7 @@ Ett-klikks chips som setter målet for en kjøring:
 | ✅ UAT Support | Støttemateriale for brukeraksepttest |
 | 🎲 Risk Matrix | Risikoanalyse (sannsynlighet × konsekvens) |
 | 📜 Runs | Historikk over hver kjøring — gjenåpne tidligere resultater |
-| ⚙️ Settings | Miljø, kjøremodus, sprintoppsett, grunnlinjer |
+| ⚙️ Settings | Local- / Test- / Enonic admin-URL-er, kjøremodus, Azure DevOps-prosjekt, sprintoppsett, terskler — **kilde til sannhet for BASE_URL på tvers av alle faner** |
 
 ## Kjøremodi
 - **Generer skript og rapporter** — agenten skriver artefaktene (Playwright- / Cypress-spec-er, k6-skript, Postman-samlinger, rapporter) som du kjører i din egen pipeline (Cursor, Claude, GitHub Actions). Ingenting kjøres mot nettstedet.
@@ -67,5 +84,8 @@ Lim inn et arbeidselement eller hent en sprint, gjør funn om til arbeidselement
 - **Trenger jeg et live nettsted eller en API-nøkkel?** Nei — den er mock-first; alt fungerer offline med eksempeldata.
 - **Hvor ble `test.lunix.cloud` av?** Den flyttet til **`next.lunix.cloud`** (2026-09-28). Publisert Test-sti er nå **`/testside`**. Den gamle daterte eksempelrapporten beholder sitt opprinnelige navn.
 - **Hva med `test.rodekors.no`?** Erstattet som standard Test-URL av **`https://next.lunix.cloud/testside`**. Enonic-admin er **`https://rodekors-xp8dev.enonic.cloud/admin`**.
+- **Jeg endret Innstillinger, men en fane viser fortsatt en gammel URL.** Klikk **Lagre** i Innstillinger, bytt Local ↔ Test én gang (eller last siden på nytt). Header-chipen 🎯 skal matche Innstillinger.
+- **Kan jeg fortsatt overstyre URL-en på Performance / Accessibility?** Ja — skriv eller velg en preset. Neste miljø-/Innstillinger-synk gjenoppretter BASE_URL fra Innstillinger.
 - **Sendes dataene mine til KI?** Bare det du skriver inn. Hold ekte person-/produksjonsdata og API-nøkler utenfor KI-inndata (se banneret).
 - **Hvor er tidligere resultater?** I **Runs**-fanen.
+- **Hvor finner jeg denne veiledningen i appen?** README Viewer → `docs/red-cross-qa-help.no.md` (også `.md` / `.es.md`).

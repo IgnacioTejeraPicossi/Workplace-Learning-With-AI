@@ -7,18 +7,35 @@ It is **mock-first**: every tab works offline with realistic sample data, so you
 > ⚠️ **AI is used as support only.** Real personal data, production data and API keys do **not** belong in the AI. Acknowledge the in-app banner before running AI-assisted actions.
 
 ## Quick start
-1. Pick an **Environment** (top right): `Local` or `Test`.
-2. Pick an **Execution Mode**: **Generate scripts & reports** (produces artifacts you run in Cursor / Claude / GitHub Actions) or **Execute directly** (runs Playwright / Cypress / axe / Lighthouse / k6 in-app when the tooling is available).
-3. Open the tab you need, set the target **URL** (or click a preset chip), and run.
-4. Review the result; findings can be pushed to **Azure DevOps** and rolled up into a **Sprint Report**.
+1. Open **Settings** once and confirm (then **Save**):
+   - **Local URL** → usually `http://localhost:3000`
+   - **Test URL** → `https://next.lunix.cloud/testside`
+   - **Enonic XP admin URL** → `https://rodekors-xp8dev.enonic.cloud/admin`
+2. Pick an **Environment** (top right): `Local` or `Test`. The header chip **🎯** shows the live target from Settings.
+3. Pick an **Execution Mode**: **Generate scripts & reports** or **Execute directly**.
+4. Open the tab you need. URL fields (Performance / Accessibility / Designsystemet) sync from Settings when you change environment; other tabs send that same `base_url` to the backend when generating scripts.
+5. Review the result; findings can be pushed to **Azure DevOps** and rolled up into a **Sprint Report**.
 
-## Target URLs (presets)
-One-click chips set the target for a run:
-- ❤️‍🩹 **rodekors.no** — production.
-- 🧪 **https://next.lunix.cloud/testside** — published TestSide (NextJS + Enonic XP + GraphQL). The default smoke target for Test environment.
-- 💻 **localhost:3000** — your local dev build.
+## Target URLs (presets & Settings)
+Defaults and one-click chips:
+- ❤️‍🩹 **rodekors.no** — production (explicit preset only).
+- 🧪 **https://next.lunix.cloud/testside** — published TestSide (NextJS + Enonic XP + GraphQL). Default **Test** BASE_URL.
+- 💻 **localhost:3000** — local / **Local** BASE_URL.
 
-**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — configured under **Settings → Enonic XP admin URL**. This is the CMS console, **not** the public Test BASE_URL used by Playwright / Lighthouse / axe.
+**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — configured under **Settings → Enonic XP admin URL**. This is the CMS console, **not** the public Test BASE_URL used by Playwright / Lighthouse / axe / k6.
+
+### How Settings drive every tab (runtime)
+Settings are loaded once when the agent opens and shared with all tabs (`settingsApi.js`):
+
+| Setting | Used as |
+|---|---|
+| `env_local_url` | BASE_URL when Environment = **Local** |
+| `env_test_url` | BASE_URL when Environment = **Test** |
+| `enonic_admin_url` | CMS admin link (CMS QA tab + CMS preview tooling) |
+
+- Changing **Local / Test** in the header updates the 🎯 chip and re-syncs URL inputs on Performance, Accessibility and Designsystemet.
+- After **Save** in Settings, the cache refreshes so every tab sees the new URLs immediately.
+- Generators (Playwright, Cypress, Postman, k6, Loadster, Forms QA, …) receive `base_url` from the frontend and embed that host in scripts — they no longer hardcode `test.rodekors.no`.
 
 ## The tabs at a glance
 | Tab | What it does |
@@ -42,7 +59,7 @@ One-click chips set the target for a run:
 | ✅ UAT Support | User-acceptance-test support material |
 | 🎲 Risk Matrix | Risk analysis (likelihood × impact) |
 | 📜 Runs | History of every run — re-open past results |
-| ⚙️ Settings | Environment, execution mode, sprint config, baselines |
+| ⚙️ Settings | Local / Test / Enonic admin URLs, execution mode, Azure DevOps project, sprint config, thresholds — **source of truth for BASE_URL across all tabs** |
 
 ## Execution modes
 - **Generate scripts & reports** — the agent writes the artifacts (Playwright / Cypress specs, k6 scripts, Postman collections, reports) for you to run in your own pipeline (Cursor, Claude, GitHub Actions). Nothing is executed against the site.
@@ -67,5 +84,8 @@ Paste a work item or fetch a sprint, turn findings into work items, preview the 
 - **Do I need a live site or an API key?** No — it is mock-first; everything works offline with sample data.
 - **Where did `test.lunix.cloud` go?** It moved to **`next.lunix.cloud`** (2026-09-28). The published Test path is now **`/testside`**. The old dated sample report keeps its original name.
 - **What about `test.rodekors.no`?** Replaced as the default Test URL by **`https://next.lunix.cloud/testside`**. Enonic admin is at **`https://rodekors-xp8dev.enonic.cloud/admin`**.
+- **I changed Settings but a tab still shows an old URL.** Click **Save** in Settings, then switch Local ↔ Test once (or reload the page). The header 🎯 chip should match Settings.
+- **Can I still override the URL on Performance / Accessibility?** Yes — type or pick a preset. The next environment / Settings sync will restore the Settings BASE_URL.
 - **Is my data sent to AI?** Only what you type in. Keep real personal / production data and API keys out of AI inputs (see the banner).
 - **Where are past results?** The **Runs** tab.
+- **Where is this guide in the app?** README Viewer → `docs/red-cross-qa-help.md` (also `.es.md` / `.no.md`).
