@@ -48,7 +48,7 @@ const cellStyle = (decision) => ({
   color: decision === 'allow' ? '#047857' : decision === 'deny' ? '#b91c1c' : '#94a3b8',
 });
 
-const RoleMatrix = ({ environment }) => {
+const RoleMatrix = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
@@ -58,7 +58,7 @@ const RoleMatrix = ({ environment }) => {
     try {
       const res = await fetch(`${API}/run-role-matrix-audit`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ environment, lang: i18n.language }),
+        body: JSON.stringify({ environment, base_url: baseUrl, lang: i18n.language }),
       });
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }

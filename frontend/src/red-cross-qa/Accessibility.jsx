@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
@@ -54,11 +54,14 @@ const NVDA_SCOPES = [
   { key: 'forms',      icon: '📝' },
 ];
 
-const Accessibility = ({ environment }) => {
+const Accessibility = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [tool, setTool] = useState('axe');
-  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
+  const [url, setUrl] = useState(baseUrl || 'https://next.lunix.cloud/testside');
   const [wcagVersion, setWcagVersion] = useState('2.2-AA');
+  useEffect(() => {
+    if (baseUrl) setUrl(baseUrl);
+  }, [baseUrl]);
 
   // axe + Lighthouse state (existing)
   const [running, setRunning] = useState(false);

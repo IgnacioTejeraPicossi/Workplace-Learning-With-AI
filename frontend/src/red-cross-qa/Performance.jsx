@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
@@ -71,13 +71,18 @@ const URL_PRESETS = [
   },
 ];
 
-const Performance = ({ environment }) => {
+const Performance = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
-  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
+  const [url, setUrl] = useState(baseUrl || 'https://next.lunix.cloud/testside');
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
   const [enonicRunning, setEnonicRunning] = useState(false);
   const [enonicReport, setEnonicReport] = useState(null);
+  // Keep the URL field in sync with Settings when environment / settings change.
+  // Preset chips and manual edits still override until the next env/settings sync.
+  useEffect(() => {
+    if (baseUrl) setUrl(baseUrl);
+  }, [baseUrl]);
   // 1.18.0 — Lighthouse data-source mode. "auto" tries the CLI and falls
   // back to mock; "live" forces the CLI and surfaces the error if it fails;
   // "mock" always returns the deterministic example data.

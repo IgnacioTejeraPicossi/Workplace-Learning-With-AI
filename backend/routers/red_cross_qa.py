@@ -124,12 +124,15 @@ class TestPlanRequest(BaseModel):
 class PlaywrightRequest(BaseModel):
     scopes: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    # Optional override from FE Settings (env_local_url / env_test_url).
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
 class CypressRequest(BaseModel):
     scopes: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -137,6 +140,7 @@ class ApiAnalyzeRequest(BaseModel):
     endpoint: str
     method: str = "POST"
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -147,6 +151,7 @@ class PostmanExportRequest(BaseModel):
         description="Optional sub-set tag ('donation', 'distrikt', ...). None = full collection.",
     )
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -156,12 +161,15 @@ class GraphqlIntrospectionRequest(BaseModel):
         description="Guillotine GraphQL endpoint URL. Optional; mock-first when omitted.",
     )
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
 class CmsRequest(BaseModel):
     areas: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
+    enonic_admin_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -196,6 +204,7 @@ class K6Request(BaseModel):
     profile: str = "profileNormal"
     scenarios: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -205,6 +214,7 @@ class LoadsterRequest(BaseModel):
     profile: str = "profileNormal"
     scenarios: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -216,6 +226,7 @@ class SecurityRequest(BaseModel):
 class FormsQaRequest(BaseModel):
     scopes: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -283,6 +294,7 @@ class ResilienceRequest(BaseModel):
     profile: str = "profileNormal"
     scenarios: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
+    base_url: Optional[str] = None
     lang: Optional[str] = "en"
 
 
@@ -304,6 +316,7 @@ class RiskMatrixRequest(BaseModel):
 class SettingsRequest(BaseModel):
     env_local_url: Optional[str] = None
     env_test_url: Optional[str] = None
+    enonic_admin_url: Optional[str] = None
     env_default: Optional[str] = None
     execution_mode: Optional[str] = None
     # Azure DevOps settings (replaces former Jira fields)
@@ -344,7 +357,7 @@ async def api_generate_test_plan(body: TestPlanRequest):
 @router.post("/generate-playwright-tests")
 async def api_generate_playwright(body: PlaywrightRequest):
     env = _check_env(body.environment)
-    return await generate_playwright_tests(body.scopes, env, body.lang or "en")
+    return await generate_playwright_tests(body.scopes, env, body.lang or "en", body.base_url)
 
 
 @router.post("/run-playwright")
@@ -357,7 +370,7 @@ async def api_run_playwright(body: PlaywrightRequest):
 @router.post("/generate-cypress-tests")
 async def api_generate_cypress(body: CypressRequest):
     env = _check_env(body.environment)
-    return await generate_cypress_tests(body.scopes, env, body.lang or "en")
+    return await generate_cypress_tests(body.scopes, env, body.lang or "en", body.base_url)
 
 
 @router.post("/run-cypress")
@@ -370,7 +383,7 @@ async def api_run_cypress(body: CypressRequest):
 @router.post("/analyze-api")
 async def api_analyze_api(body: ApiAnalyzeRequest):
     env = _check_env(body.environment)
-    return await analyze_api(body.endpoint, body.method, env, body.lang or "en")
+    return await analyze_api(body.endpoint, body.method, env, body.lang or "en", body.base_url)
 
 
 # Phase F (Tom's tip) — Postman export + GraphQL introspection for Guillotine/XP
@@ -381,7 +394,7 @@ async def api_export_postman(body: PostmanExportRequest):
     import directly into Postman (Tom's preferred workflow for poking at the
     XP backend during the rebuild)."""
     env = _check_env(body.environment)
-    return await export_postman_collection(body.scope, env, body.lang or "en")
+    return await export_postman_collection(body.scope, env, body.lang or "en", body.base_url)
 
 
 @router.post("/run-graphql-introspection")
@@ -391,14 +404,14 @@ async def api_run_graphql_introspection(body: GraphqlIntrospectionRequest):
     list of the operations expected for the rodekors.no rebuild so the
     workshop demo always renders."""
     env = _check_env(body.environment)
-    return await run_graphql_introspection(body.url, env, body.lang or "en")
+    return await run_graphql_introspection(body.url, env, body.lang or "en", body.base_url)
 
 
 # ── CMS QA ────────────────────────────────────────────────────────
 @router.post("/generate-cms-test-cases")
 async def api_generate_cms(body: CmsRequest):
     env = _check_env(body.environment)
-    return await generate_cms_test_cases(body.areas, env, body.lang or "en")
+    return await generate_cms_test_cases(body.areas, env, body.lang or "en", body.base_url, body.enonic_admin_url)
 
 
 # ── Accessibility ─────────────────────────────────────────────────
@@ -440,7 +453,7 @@ async def api_run_lighthouse(body: UrlRequest):
 @router.post("/generate-k6-script")
 async def api_generate_k6(body: K6Request):
     env = _check_env(body.environment)
-    return await generate_k6_script(body.profile, body.scenarios, env, body.lang or "en")
+    return await generate_k6_script(body.profile, body.scenarios, env, body.lang or "en", body.base_url)
 
 
 @router.post("/run-k6")
@@ -455,7 +468,7 @@ async def api_run_k6(body: K6Request):
 @router.post("/generate-loadster-script")
 async def api_generate_loadster(body: LoadsterRequest):
     env = _check_env(body.environment)
-    return await generate_loadster_script(body.profile, body.scenarios, env, body.lang or "en")
+    return await generate_loadster_script(body.profile, body.scenarios, env, body.lang or "en", body.base_url)
 
 
 @router.post("/run-loadster")
@@ -475,7 +488,7 @@ async def api_run_security(body: SecurityRequest):
 @router.post("/run-forms-qa")
 async def api_run_forms_qa(body: FormsQaRequest):
     env = _check_env(body.environment)
-    return await run_forms_qa(body.scopes, env, body.lang or "en")
+    return await run_forms_qa(body.scopes, env, body.lang or "en", body.base_url)
 
 
 # ── Content Migration Audit ───────────────────────────────────────
@@ -605,7 +618,7 @@ async def api_verify_dod(body: DodRequest):
 @router.post("/run-resilience-check")
 async def api_run_resilience(body: ResilienceRequest):
     env = _check_env(body.environment)
-    return await run_resilience_check(body.profile, body.scenarios, env, body.lang or "en")
+    return await run_resilience_check(body.profile, body.scenarios, env, body.lang or "en", body.base_url)
 
 
 # ── UAT-støtte (Akseptansetest-støtte for Røde Kors-stakeholders) ─

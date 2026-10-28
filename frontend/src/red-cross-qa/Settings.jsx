@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import { RCQA_API, invalidateRcqaSettingsCache } from './settingsApi';
 
-const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
+const API = RCQA_API;
 
 const PAYMENT_OPTIONS = [
   { val: 'handoff',  key: 'paymentHandoff',  icon: '🤝', color: '#2563eb' },
@@ -100,7 +101,7 @@ const STAKEHOLDERS = [
 // per locale under stakeholders.people.{slug}.{r1|r2|r3}.
 const RESPONSIBILITY_KEYS = ['r1', 'r2', 'r3'];
 
-const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode }) => {
+const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode, reloadSettings }) => {
   const { t } = useTranslation();
   const [envLocalUrl, setEnvLocalUrl] = useState('http://localhost:3000');
   const [envTestUrl, setEnvTestUrl] = useState('https://next.lunix.cloud/testside');
@@ -182,7 +183,12 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (data.status === 'ok') setSavedAt(new Date().toLocaleTimeString());
+      if (data.status === 'ok') {
+        setSavedAt(new Date().toLocaleTimeString());
+        // Push saved URLs to every tab via the shell cache
+        invalidateRcqaSettingsCache();
+        if (reloadSettings) await reloadSettings();
+      }
     } catch { /* ignore */ }
     finally { setSaving(false); }
   };

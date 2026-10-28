@@ -20,6 +20,7 @@ import UatSupport from './red-cross-qa/UatSupport';
 import RiskMatrix from './red-cross-qa/RiskMatrix';
 import Runs from './red-cross-qa/Runs';
 import Settings from './red-cross-qa/Settings';
+import { useRcqaSettings } from './red-cross-qa/settingsApi';
 
 /**
  * Red Cross Web QA Agent — main shell.
@@ -29,13 +30,16 @@ import Settings from './red-cross-qa/Settings';
  *   - Generate-only: produces scripts & reports for Cursor / Claude / GitHub Actions
  *   - Execute-directly: runs Playwright/Cypress/axe/Lighthouse/k6 in-app
  *
- * Two environments (MVP): local (http://localhost:3000) and test.
+ * Two environments (MVP): local and test. Target URLs come from Settings
+ * (env_local_url / env_test_url) and are passed to every tab as baseUrl.
  */
 const RedCrossWebQAAgent = ({ onNavigateSection }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [environment, setEnvironment] = useState('local');
   const [executionMode, setExecutionMode] = useState('generate'); // 'generate' | 'execute'
+  const { settings, reloadSettings, baseUrlFor, enonicAdminUrl } = useRcqaSettings();
+  const baseUrl = baseUrlFor(environment);
 
   const tabs = [
     { id: 'dashboard',         label: t('redCrossWebQaModule.tabDashboard'),        icon: '📊' },
@@ -60,7 +64,14 @@ const RedCrossWebQAAgent = ({ onNavigateSection }) => {
     { id: 'settings',          label: t('redCrossWebQaModule.tabSettings'),         icon: '⚙️' },
   ];
 
-  const sharedProps = { environment, executionMode };
+  const sharedProps = {
+    environment,
+    executionMode,
+    settings,
+    baseUrl,
+    enonicAdminUrl,
+    reloadSettings,
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -83,7 +94,16 @@ const RedCrossWebQAAgent = ({ onNavigateSection }) => {
       case 'uat-support':       return <UatSupport {...sharedProps} />;
       case 'risk-matrix':       return <RiskMatrix {...sharedProps} />;
       case 'runs':              return <Runs {...sharedProps} />;
-      case 'settings':          return <Settings environment={environment} setEnvironment={setEnvironment} executionMode={executionMode} setExecutionMode={setExecutionMode} />;
+      case 'settings':
+        return (
+          <Settings
+            environment={environment}
+            setEnvironment={setEnvironment}
+            executionMode={executionMode}
+            setExecutionMode={setExecutionMode}
+            reloadSettings={reloadSettings}
+          />
+        );
       default:                  return <Dashboard {...sharedProps} onNavigate={setActiveTab} />;
     }
   };
@@ -105,8 +125,8 @@ const RedCrossWebQAAgent = ({ onNavigateSection }) => {
             </div>
           </div>
 
-          {/* Environment + Mode quick selectors */}
-          <div className="flex items-center gap-3">
+          {/* Environment + Mode quick selectors + live target from Settings */}
+          <div className="flex items-center gap-3 flex-wrap justify-end">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-500">{t('redCrossWebQaModule.common.environment')}:</span>
               <select
@@ -129,6 +149,15 @@ const RedCrossWebQAAgent = ({ onNavigateSection }) => {
                 <option value="execute">{t('redCrossWebQaModule.modes.executeDirectly')}</option>
               </select>
             </div>
+            <a
+              href={baseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={baseUrl}
+              className="text-xs font-mono text-red-700 bg-red-50 border border-red-200 rounded-md px-2 py-1 max-w-[280px] truncate hover:bg-red-100"
+            >
+              🎯 {baseUrl}
+            </a>
           </div>
         </div>
       </div>

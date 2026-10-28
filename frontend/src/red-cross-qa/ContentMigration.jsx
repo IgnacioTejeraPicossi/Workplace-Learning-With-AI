@@ -49,7 +49,7 @@ const PROVENANCE_STYLES = {
   newly_created: { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7', icon: '✨' },
 };
 
-const ContentMigration = ({ environment }) => {
+const ContentMigration = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
@@ -66,7 +66,7 @@ const ContentMigration = ({ environment }) => {
       const res = await fetch(`${API}/run-content-migration-audit`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          scopes: activeTypes, environment,
+          scopes: activeTypes, environment, base_url: baseUrl,
           legacy_sample_size: Number(sampleSize) || 100, lang: i18n.language,
         }),
       });

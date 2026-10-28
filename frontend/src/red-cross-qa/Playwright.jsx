@@ -21,7 +21,7 @@ const SCOPES = [
   { key: 'scenarioStorybook',  icon: '📚', color: '#a16207' },
 ];
 
-const Playwright = ({ environment, executionMode }) => {
+const Playwright = ({ environment, executionMode, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [selected, setSelected] = useState(['scopeNavigation', 'scopeDonation', 'scopeAccessibility']);
   const [generating, setGenerating] = useState(false);
@@ -35,7 +35,7 @@ const Playwright = ({ environment, executionMode }) => {
     try {
       const res = await fetch(`${API}/${path}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scopes: selected, environment, lang: i18n.language }),
+        body: JSON.stringify({ scopes: selected, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setResult(await res.json());
     } catch { setResult({ status: 'error', message: 'Network error' }); }

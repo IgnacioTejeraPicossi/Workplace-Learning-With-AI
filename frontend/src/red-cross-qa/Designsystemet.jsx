@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import { EnonicPatternBadge, DeltaPct, CrossToolRefs } from './_EnonicSignals';
@@ -30,11 +30,14 @@ const STATUS_STYLES = {
 };
 const SEV_COLOR = { critical: '#b91c1c', high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
-const Designsystemet = ({ environment }) => {
+const Designsystemet = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
-  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
+  const [url, setUrl] = useState(baseUrl || 'https://next.lunix.cloud/testside');
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
+  useEffect(() => {
+    if (baseUrl) setUrl(baseUrl);
+  }, [baseUrl]);
 
   const handleRun = async () => {
     setRunning(true); setReport(null);

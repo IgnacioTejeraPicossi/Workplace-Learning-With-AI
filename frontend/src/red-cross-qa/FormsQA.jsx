@@ -42,7 +42,7 @@ const STATUS_STYLES = {
 };
 const SEV_COLOR = { critical: '#b91c1c', high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
-const FormsQA = ({ environment }) => {
+const FormsQA = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
@@ -57,7 +57,7 @@ const FormsQA = ({ environment }) => {
     try {
       const res = await fetch(`${API}/run-forms-qa`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scopes: activeScopes, environment, lang: i18n.language }),
+        body: JSON.stringify({ scopes: activeScopes, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }

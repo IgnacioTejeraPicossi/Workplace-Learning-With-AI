@@ -29,7 +29,7 @@ const STATUS_STYLES = {
   pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
 };
 
-const ApiQA = ({ environment }) => {
+const ApiQA = ({ environment, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [endpoint, setEndpoint] = useState('/site/api/graphql');
   const [method, setMethod] = useState('POST');
@@ -51,7 +51,7 @@ const ApiQA = ({ environment }) => {
     try {
       const res = await fetch(`${API}/analyze-api`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpoint, method, environment, lang: i18n.language }),
+        body: JSON.stringify({ endpoint, method, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }
@@ -61,9 +61,10 @@ const ApiQA = ({ environment }) => {
   const handleIntrospect = async () => {
     setIntrospecting(true); setIntrospection(null);
     try {
+      const graphqlUrl = baseUrl ? `${baseUrl.replace(/\/+$/, '')}/api/graphql` : null;
       const res = await fetch(`${API}/run-graphql-introspection`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: null, environment, lang: i18n.language }),
+        body: JSON.stringify({ url: graphqlUrl, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setIntrospection(await res.json());
     } catch { setIntrospection({ status: 'error', message: 'Network error' }); }
@@ -75,7 +76,7 @@ const ApiQA = ({ environment }) => {
     try {
       const res = await fetch(`${API}/export-postman-collection`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scope: null, environment, lang: i18n.language }),
+        body: JSON.stringify({ scope: null, environment, base_url: baseUrl, lang: i18n.language }),
       });
       const data = await res.json();
       if (data?.status !== 'ok') {

@@ -117,23 +117,30 @@ DEFAULT_SETTINGS = {
 }
 
 
-def default_base_url(environment: str = "test") -> str:
-    """Published-site BASE_URL from DEFAULT_SETTINGS (sync; for script templates)."""
+def default_base_url(environment: str = "test", override: Optional[str] = None) -> str:
+    """Published-site BASE_URL from DEFAULT_SETTINGS (sync; for script templates).
+
+    `override` comes from the FE Settings payload (`base_url`) when present.
+    """
+    if override:
+        return override.rstrip("/")
     if environment == "local":
         return DEFAULT_SETTINGS["env_local_url"].rstrip("/")
     return DEFAULT_SETTINGS["env_test_url"].rstrip("/")
 
 
-def default_enonic_host() -> str:
+def default_enonic_host(override_admin: Optional[str] = None) -> str:
     """Enonic XP host (without trailing /admin) for CMS preview script paths."""
-    admin = (DEFAULT_SETTINGS.get("enonic_admin_url") or "").rstrip("/")
+    admin = (override_admin or DEFAULT_SETTINGS.get("enonic_admin_url") or "").rstrip("/")
     if admin.endswith("/admin"):
         return admin[: -len("/admin")] or admin
     return admin or "https://rodekors-xp8dev.enonic.cloud"
 
 
-async def resolve_base_url(environment: str = "test") -> str:
-    """Published-site BASE_URL from persisted Settings (falls back to defaults)."""
+async def resolve_base_url(environment: str = "test", override: Optional[str] = None) -> str:
+    """Published-site BASE_URL from FE override or persisted Settings."""
+    if override:
+        return override.rstrip("/")
     key = "env_local_url" if environment == "local" else "env_test_url"
     try:
         settings = (await get_settings()).get("settings") or {}
@@ -1282,7 +1289,8 @@ async def generate_test_plan_from_ado_item(
 # Tool 2 — Playwright generator + runner
 # ═══════════════════════════════════════════════════════════════════
 async def generate_playwright_tests(scopes: List[str], environment: str,
-                                    lang: str = "en") -> Dict[str, Any]:
+                                    lang: str = "en",
+                                    base_url: Optional[str] = None) -> Dict[str, Any]:
     """Phase F (Tom's tip · 2026-05-12):
     When 'scenarioStorybook' is included in `scopes`, the generator emits a
     Playwright spec wired to Storybook (`@storybook/test-runner` style) so the
@@ -1292,8 +1300,10 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
     The Storybook scope is generated DETERMINISTICALLY (template below) so the
     output is identical with or without an LLM — workshop-demo friendly.
     """
+    site = await resolve_base_url(environment, base_url)
     prompt = (
         f"Scopes: {', '.join(scopes)}\nEnvironment: {environment}\n"
+        f"BASE_URL: {site}\n"
         "Generate one Playwright TS file per scope (max 5 scripts)."
     )
     raw = await _llm(prompt, PLAYWRIGHT_PROMPT, lang)
@@ -1338,7 +1348,7 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
             for s in scripts
         )
         if not already_has_migrated_links:
-            scripts.append(_migrated_links_playwright_spec())
+            scripts.append(_migrated_links_playwright_spec(site))
 
     if not scripts:
         # Non-Storybook fallback — generic per-scope smoke.
@@ -1347,7 +1357,7 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
             "content": (
                 "import { test, expect } from '@playwright/test';\n\n"
                 f"test('{s} smoke', async ({{ page }}) => {{\n"
-                f"  await page.goto(process.env.BASE_URL || '{default_base_url(environment)}');\n"
+                f"  await page.goto(process.env.BASE_URL || '{site}');\n"
                 "  await expect(page).toHaveTitle(/Røde Kors|Red Cross/);\n"
                 "});\n"
             ),
@@ -1514,7 +1524,7 @@ def _cms_preview_playwright_spec() -> Dict[str, str]:
     return {"filename": "cms-preview.spec.ts", "content": content}
 
 
-def _migrated_links_playwright_spec() -> Dict[str, str]:
+def _migrated_links_playwright_spec(base_url: Optional[str] = None) -> Dict[str, str]:
     """Deterministic migrated-publication-link round-trip spec.
 
     Phase H+ (Enonic skill 0.1.0, 2026-05-19): direct regression guard
@@ -1525,6 +1535,7 @@ def _migrated_links_playwright_spec() -> Dict[str, str]:
     Generic shape — it parameterises both ends so the same spec works
     for any 'list → header' migration (Cristin→NVA, Jira→ADO, etc.).
     """
+    site = default_base_url("test", base_url)
     content = (
         "import { test, expect } from '@playwright/test';\n\n"
         "/**\n"
@@ -1539,7 +1550,7 @@ def _migrated_links_playwright_spec() -> Dict[str, str]:
         " *   MIGRATED_LINK_SELECTOR — CSS for the list item link, default 'a[href*=publication]'\n"
         " *   MIGRATED_HEADER_SELECTOR — CSS for the header rendered on the detail page\n"
         " */\n\n"
-        f"const BASE_URL = process.env.BASE_URL || '{default_base_url()}';\n"
+        f"const BASE_URL = process.env.BASE_URL || '{site}';\n"
         "const LIST_URL = process.env.MIGRATED_LIST_URL || '/forskning';\n"
         "const PARAM = process.env.MIGRATED_PARAM || 'id';\n"
         "const LINK_SEL = process.env.MIGRATED_LINK_SELECTOR || 'a[href*=publication]';\n"
@@ -1587,8 +1598,10 @@ async def run_playwright(scopes: List[str], environment: str) -> Dict[str, Any]:
 # Tool 3 — Cypress generator + runner
 # ═══════════════════════════════════════════════════════════════════
 async def generate_cypress_tests(scopes: List[str], environment: str,
-                                 lang: str = "en") -> Dict[str, Any]:
-    prompt = f"Scopes: {', '.join(scopes)}\nEnvironment: {environment}\n"
+                                 lang: str = "en",
+                                 base_url: Optional[str] = None) -> Dict[str, Any]:
+    site = await resolve_base_url(environment, base_url)
+    prompt = f"Scopes: {', '.join(scopes)}\nEnvironment: {environment}\nBASE_URL: {site}\n"
     raw = await _llm(prompt, CYPRESS_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
     scripts = parsed.get("scripts") or []
@@ -2151,7 +2164,8 @@ def _path_specific_checks(endpoint: str, environment: str) -> Dict[str, str]:
 
 
 async def analyze_api(endpoint: str, method: str, environment: str,
-                      lang: str = "en") -> Dict[str, Any]:
+                      lang: str = "en",
+                      base_url: Optional[str] = None) -> Dict[str, Any]:
     """Mock-first API analysis. Returns checks dict aligned with frontend keys.
 
     Phase H+ (Enonic skill 0.1.0, 2026-05-19):
@@ -2409,7 +2423,8 @@ def _negative_guillotine_items(_json) -> List[Dict[str, Any]]:
 
 
 async def export_postman_collection(scope: Optional[str], environment: str,
-                                    lang: str = "en") -> Dict[str, Any]:
+                                    lang: str = "en",
+                                    base_url: Optional[str] = None) -> Dict[str, Any]:
     """Generate a Postman Collection v2.1 JSON for the Guillotine GraphQL
     endpoints. Returns the parsed dict so the router can either echo it back
     or stream it as a download. Mock-first: works without LLM, without Mongo.
@@ -2422,7 +2437,7 @@ async def export_postman_collection(scope: Optional[str], environment: str,
     """
     import json as _json
 
-    base_url_var = default_base_url(environment)
+    base_url_var = await resolve_base_url(environment, base_url)
 
     items = []
     for q in _GUILLOTINE_QUERIES:
@@ -2526,7 +2541,8 @@ async def export_postman_collection(scope: Optional[str], environment: str,
 
 
 async def run_graphql_introspection(url: Optional[str], environment: str,
-                                    lang: str = "en") -> Dict[str, Any]:
+                                    lang: str = "en",
+                                    base_url: Optional[str] = None) -> Dict[str, Any]:
     """List the GraphQL operations exposed by Guillotine. Mock-first: returns a
     curated list of expected operations for the rodekors.no rebuild when no
     live introspection happens.
@@ -2534,6 +2550,8 @@ async def run_graphql_introspection(url: Optional[str], environment: str,
     to {url}/api/graphql; the response shape returned here matches what the
     frontend renders so swapping in real introspection is a drop-in change.
     """
+    if not url and base_url:
+        url = f"{base_url.rstrip('/')}/api/graphql"
     operations: List[Dict[str, Any]] = [
         {"name": "guillotine.get",
          "kind": "query", "args": ["key: ID!"],
@@ -2918,7 +2936,9 @@ def _cms_mock_test_cases(areas: List[str]) -> List[Dict[str, Any]]:
 
 
 async def generate_cms_test_cases(areas: List[str], environment: str,
-                                  lang: str = "en") -> Dict[str, Any]:
+                                  lang: str = "en",
+                                  base_url: Optional[str] = None,
+                                  enonic_admin_url: Optional[str] = None) -> Dict[str, Any]:
     """Generate CMS-area test cases.
 
     Phase H+ (Enonic skill 0.1.0, 2026-05-19): mock fallback now emits a
@@ -2929,7 +2949,12 @@ async def generate_cms_test_cases(areas: List[str], environment: str,
       - acceptance_criteria (verifiable bullets)
       - automation_ref (cross-link to existing Playwright/Cypress specs)
     """
-    prompt = f"Areas: {', '.join(areas)}\nEnvironment: {environment}\n"
+    site = await resolve_base_url(environment, base_url)
+    admin = (enonic_admin_url or DEFAULT_SETTINGS.get("enonic_admin_url") or "").rstrip("/")
+    prompt = (
+        f"Areas: {', '.join(areas)}\nEnvironment: {environment}\n"
+        f"Published site: {site}\nEnonic admin: {admin}\n"
+    )
     raw = await _llm(prompt, CMS_QA_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
     cases = parsed.get("test_cases") or []
@@ -3800,10 +3825,12 @@ async def run_lighthouse(url: str, environment: str,
 # Tool 8 — k6 generator + runner
 # ═══════════════════════════════════════════════════════════════════
 async def generate_k6_script(profile: str, scenarios: List[str], environment: str,
-                             lang: str = "en") -> Dict[str, Any]:
+                             lang: str = "en",
+                             base_url: Optional[str] = None) -> Dict[str, Any]:
+    site = await resolve_base_url(environment, base_url)
     prompt = (
         f"Profile: {profile}\nScenarios: {', '.join(scenarios)}\n"
-        f"Environment: {environment}\n"
+        f"Environment: {environment}\nBASE_URL: {site}\n"
     )
     raw = await _llm(prompt, K6_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
@@ -3823,7 +3850,7 @@ async def generate_k6_script(profile: str, scenarios: List[str], environment: st
             "  thresholds: { http_req_duration: ['p(95)<800'] },\n"
             "};\n\n"
             "export default function () {\n"
-            f"  const res = http.get(__ENV.BASE_URL || '{default_base_url(environment)}');\n"
+            f"  const res = http.get(__ENV.BASE_URL || '{site}');\n"
             "  check(res, { 'status 200': (r) => r.status === 200 });\n"
             "  sleep(1);\n"
             "}\n"
@@ -3912,14 +3939,16 @@ Use these profile mappings:
 
 
 async def generate_loadster_script(profile: str, scenarios: List[str], environment: str,
-                                   lang: str = "en") -> Dict[str, Any]:
+                                   lang: str = "en",
+                                   base_url: Optional[str] = None) -> Dict[str, Any]:
     """Generate a Loadster scenario for the selected profile. Mock-first
     graceful degradation — falls back to a deterministic browser-scenario
     template if the LLM doesn't produce parseable JSON.
     """
+    site = await resolve_base_url(environment, base_url)
     prompt = (
         f"Profile: {profile}\nScenarios: {', '.join(scenarios) or '(default)'}\n"
-        f"Environment: {environment}\n"
+        f"Environment: {environment}\nBASE_URL: {site}\n"
     )
     raw = await _llm(prompt, LOADSTER_GENERATOR_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
@@ -3958,7 +3987,7 @@ async def generate_loadster_script(profile: str, scenarios: List[str], environme
                 "p95_ms": 2500,
             },
             "variables": {
-                "BASE_URL": default_base_url(environment),
+                "BASE_URL": site,
             },
         }
         # Serialize as pretty JSON since real Loadster .lhx is XML but the
@@ -4175,12 +4204,14 @@ async def run_security_scan(environment: str, lang: str = "en") -> Dict[str, Any
 # Tool 9b — Forms QA (Skjemabygger / Adam Silver / JSON Schema)
 # ═══════════════════════════════════════════════════════════════════
 async def run_forms_qa(scopes: List[str], environment: str,
-                       lang: str = "en") -> Dict[str, Any]:
+                       lang: str = "en",
+                       base_url: Optional[str] = None) -> Dict[str, Any]:
     """Audit Skjemabygger forms across the requested scopes (donation,
     volunteer, contact, course, beredskap, vipps-handoff). Mock-first."""
+    site = await resolve_base_url(environment, base_url)
     prompt = (
         f"Forms in scope: {', '.join(scopes) if scopes else 'donation, volunteer, contact, course'}\n"
-        f"Environment: {environment}\n"
+        f"Environment: {environment}\nBASE_URL: {site}\n"
         "Audit each scope and return the JSON contract."
     )
     raw = await _llm(prompt, FORMS_QA_PROMPT, lang)
@@ -5847,7 +5878,8 @@ _BASELINE_CACHES: Dict[str, Dict[Any, Any]] = {
 
 
 async def run_resilience_check(profile: str, scenarios: List[str],
-                                environment: str, lang: str = "en") -> Dict[str, Any]:
+                                environment: str, lang: str = "en",
+                                base_url: Optional[str] = None) -> Dict[str, Any]:
     """Resilience-focused k6 wrapper — emphasizes breakpoint, recovery, and soak
     metrics that Trine treats as a separate quality dimension from ytelse.
 

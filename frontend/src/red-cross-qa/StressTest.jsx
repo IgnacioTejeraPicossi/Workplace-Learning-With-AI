@@ -33,7 +33,7 @@ const SCENARIOS = [
   { key: 'scenarioCachePurge', icon: '🧹' },
 ];
 
-const StressTest = ({ environment, executionMode }) => {
+const StressTest = ({ environment, executionMode, baseUrl }) => {
   const { t, i18n } = useTranslation();
   const [tool, setTool] = useState('k6');  // Phase D: 'k6' | 'loadster'
   const [profile, setProfile] = useState('profileNormal');
@@ -56,7 +56,7 @@ const StressTest = ({ environment, executionMode }) => {
     try {
       const res = await fetch(`${API}/${path}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile, scenarios, environment, lang: i18n.language }),
+        body: JSON.stringify({ profile, scenarios, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setResult(await res.json());
     } catch { setResult({ status: 'error', message: 'Network error' }); }
@@ -68,7 +68,7 @@ const StressTest = ({ environment, executionMode }) => {
     try {
       const res = await fetch(`${API}/run-resilience-check`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile, scenarios, environment, lang: i18n.language }),
+        body: JSON.stringify({ profile, scenarios, environment, base_url: baseUrl, lang: i18n.language }),
       });
       setResilience(await res.json());
     } catch { setResilience({ status: 'error', message: 'Network error' }); }

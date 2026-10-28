@@ -21,7 +21,7 @@ const ROLE_COLORS = {
 };
 const ROLES = Object.keys(ROLE_COLORS);
 
-const CmsQA = ({ environment }) => {
+const CmsQA = ({ environment, baseUrl, enonicAdminUrl }) => {
   const { t, i18n } = useTranslation();
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState(null);
@@ -31,7 +31,13 @@ const CmsQA = ({ environment }) => {
     try {
       const res = await fetch(`${API}/generate-cms-test-cases`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ areas: AREAS.map(a => a.key), environment, lang: i18n.language }),
+        body: JSON.stringify({
+          areas: AREAS.map(a => a.key),
+          environment,
+          base_url: baseUrl,
+          enonic_admin_url: enonicAdminUrl,
+          lang: i18n.language,
+        }),
       });
       setResult(await res.json());
     } catch { setResult({ status: 'error', message: 'Network error' }); }
@@ -48,6 +54,26 @@ const CmsQA = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #4338ca 100%)"
         />
+        {(baseUrl || enonicAdminUrl) && (
+          <div style={{
+            display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 12,
+            color: '#475569', background: '#f8fafc', border: '1px solid #e2e8f0',
+            borderRadius: 10, padding: '10px 14px',
+          }}>
+            {baseUrl && (
+              <a href={baseUrl} target="_blank" rel="noopener noreferrer"
+                 style={{ color: '#6b21a8', fontWeight: 700, textDecoration: 'none' }}>
+                🎯 {baseUrl}
+              </a>
+            )}
+            {enonicAdminUrl && (
+              <a href={enonicAdminUrl} target="_blank" rel="noopener noreferrer"
+                 style={{ color: '#7c3aed', fontWeight: 700, textDecoration: 'none' }}>
+                🛠️ {enonicAdminUrl}
+              </a>
+            )}
+          </div>
+        )}
 
         <AiUsagePolicy variant="compact" />
 
