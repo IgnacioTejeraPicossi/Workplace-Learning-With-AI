@@ -32,7 +32,7 @@ const SEV_COLOR = { critical: '#b91c1c', high: '#dc2626', medium: '#f59e0b', low
 
 const Designsystemet = ({ environment }) => {
   const { t, i18n } = useTranslation();
-  const [url, setUrl] = useState('https://www.rodekors.no/');
+  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
 

@@ -60,7 +60,7 @@ Mongo collection as-is.
     "p95_ms": 2500
   },
   "variables": {
-    "BASE_URL": "https://test.rodekors.no"
+    "BASE_URL": "https://next.lunix.cloud/testside"
   }
 }
 ```

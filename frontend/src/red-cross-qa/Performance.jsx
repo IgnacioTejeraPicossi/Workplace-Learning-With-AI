@@ -46,9 +46,9 @@ const ENONIC_CHECKS = [
 const PRIORITY_COLOR = { high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
 // URL presets — quick targets for the rodekors.no rebuild stack.
-// `lunixHello` is Tom's NextJS + Enonic XP + GraphQL "hello world" preview
-// (moved 2026-09-28 from test.lunix.cloud → next.lunix.cloud) — perfect smoke
-// for the Enonic-specific performance suite (Guillotine waterfall / N+1 / overfetch).
+// `lunixHello` is the published TestSide on next.lunix.cloud (NextJS + Enonic XP
+// + GraphQL). Best smoke target for Enonic-specific perf (Guillotine waterfall /
+// N+1 / overfetch). Enonic admin console is separate (Settings → Enonic admin URL).
 const URL_PRESETS = [
   {
     key: 'rodekorsProd',
@@ -58,10 +58,10 @@ const URL_PRESETS = [
   },
   {
     key: 'lunixHello',
-    url: 'https://next.lunix.cloud/',
+    url: 'https://next.lunix.cloud/testside',
     icon: '🧪',
     color: '#7c3aed',
-    badge: 'Tom · NextJS + XP + GraphQL',
+    badge: 'Test · next.lunix.cloud/testside',
   },
   {
     key: 'localDev',
@@ -73,7 +73,7 @@ const URL_PRESETS = [
 
 const Performance = ({ environment }) => {
   const { t, i18n } = useTranslation();
-  const [url, setUrl] = useState('https://www.rodekors.no/');
+  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
   const [enonicRunning, setEnonicRunning] = useState(false);

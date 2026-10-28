@@ -15,8 +15,10 @@ Es **mock-first**: cada pestaña funciona sin conexión con datos de ejemplo rea
 ## URLs objetivo (presets)
 Chips de un clic que fijan el objetivo de una ejecución:
 - ❤️‍🩹 **rodekors.no** — producción.
-- 🧪 **next.lunix.cloud** — preview de Tom con NextJS + Enonic XP + GraphQL (movido desde `test.lunix.cloud` el 2026-09-28). El mejor objetivo de smoke para las comprobaciones específicas de Enonic.
+- 🧪 **https://next.lunix.cloud/testside** — TestSide publicado (NextJS + Enonic XP + GraphQL). Objetivo de smoke por defecto del entorno Test.
 - 💻 **localhost:3000** — tu build de desarrollo local.
+
+**Admin Enonic XP (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — se configura en **Ajustes → URL admin Enonic XP**. Es la consola CMS, **no** la BASE_URL pública de Test usada por Playwright / Lighthouse / axe.
 
 ## Las pestañas de un vistazo
 | Pestaña | Qué hace |
@@ -63,6 +65,7 @@ Pega un work item o trae un sprint, convierte los hallazgos en work items, previ
 
 ## Preguntas frecuentes
 - **¿Necesito un sitio en vivo o una clave de API?** No — es mock-first; todo funciona sin conexión con datos de ejemplo.
-- **¿Adónde fue `test.lunix.cloud`?** Se movió a **`next.lunix.cloud`** (2026-09-28). El informe de ejemplo fechado conserva su nombre original.
+- **¿Adónde fue `test.lunix.cloud`?** Se movió a **`next.lunix.cloud`** (2026-09-28). La ruta de Test publicada es ahora **`/testside`**. El informe de ejemplo fechado conserva su nombre original.
+- **¿Y `test.rodekors.no`?** Sustituida como URL de Test por defecto por **`https://next.lunix.cloud/testside`**. El admin de Enonic es **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **¿Se envían mis datos a la IA?** Solo lo que escribas. Mantén datos personales / de producción reales y claves de API fuera de las entradas a la IA (ver el aviso).
 - **¿Dónde están los resultados pasados?** En la pestaña **Runs**.

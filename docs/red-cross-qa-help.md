@@ -15,8 +15,10 @@ It is **mock-first**: every tab works offline with realistic sample data, so you
 ## Target URLs (presets)
 One-click chips set the target for a run:
 - ❤️‍🩹 **rodekors.no** — production.
-- 🧪 **next.lunix.cloud** — Tom's NextJS + Enonic XP + GraphQL preview (moved from `test.lunix.cloud` on 2026-09-28). The best smoke target for the Enonic-specific checks.
+- 🧪 **https://next.lunix.cloud/testside** — published TestSide (NextJS + Enonic XP + GraphQL). The default smoke target for Test environment.
 - 💻 **localhost:3000** — your local dev build.
+
+**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — configured under **Settings → Enonic XP admin URL**. This is the CMS console, **not** the public Test BASE_URL used by Playwright / Lighthouse / axe.
 
 ## The tabs at a glance
 | Tab | What it does |
@@ -63,6 +65,7 @@ Paste a work item or fetch a sprint, turn findings into work items, preview the 
 
 ## Frequently asked
 - **Do I need a live site or an API key?** No — it is mock-first; everything works offline with sample data.
-- **Where did `test.lunix.cloud` go?** It moved to **`next.lunix.cloud`** (2026-09-28). The old dated sample report keeps its original name.
+- **Where did `test.lunix.cloud` go?** It moved to **`next.lunix.cloud`** (2026-09-28). The published Test path is now **`/testside`**. The old dated sample report keeps its original name.
+- **What about `test.rodekors.no`?** Replaced as the default Test URL by **`https://next.lunix.cloud/testside`**. Enonic admin is at **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **Is my data sent to AI?** Only what you type in. Keep real personal / production data and API keys out of AI inputs (see the banner).
 - **Where are past results?** The **Runs** tab.

@@ -57,7 +57,7 @@ const NVDA_SCOPES = [
 const Accessibility = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [tool, setTool] = useState('axe');
-  const [url, setUrl] = useState('https://www.rodekors.no/');
+  const [url, setUrl] = useState('https://next.lunix.cloud/testside');
   const [wcagVersion, setWcagVersion] = useState('2.2-AA');
 
   // axe + Lighthouse state (existing)

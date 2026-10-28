@@ -103,12 +103,13 @@ const RESPONSIBILITY_KEYS = ['r1', 'r2', 'r3'];
 const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode }) => {
   const { t } = useTranslation();
   const [envLocalUrl, setEnvLocalUrl] = useState('http://localhost:3000');
-  const [envTestUrl, setEnvTestUrl] = useState('https://test.rodekors.no');
-  // Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3 §5)
-  const [adoOrganization, setAdoOrganization] = useState('rodekors');
-  const [adoProject, setAdoProject] = useState('rodekors-web');
-  const [adoAreaPath, setAdoAreaPath] = useState('rodekors-web\\Web QA');
-  const [adoIterationPath, setAdoIterationPath] = useState('rodekors-web\\Sprint 1');
+  const [envTestUrl, setEnvTestUrl] = useState('https://next.lunix.cloud/testside');
+  const [enonicAdminUrl, setEnonicAdminUrl] = useState('https://rodekors-xp8dev.enonic.cloud/admin');
+  // Azure DevOps — aligned with backend DEFAULT_SETTINGS (RedCrossNorway / rkdotno)
+  const [adoOrganization, setAdoOrganization] = useState('RedCrossNorway');
+  const [adoProject, setAdoProject] = useState('rkdotno');
+  const [adoAreaPath, setAdoAreaPath] = useState('rkdotno\\Web QA');
+  const [adoIterationPath, setAdoIterationPath] = useState('rkdotno\\Sprint 2');
   const [adoTags, setAdoTags] = useState('red-cross-qa, ai-generated');
   const [currentSprint, setCurrentSprint] = useState('Sprint 1');
   const [sprintLengthWeeks, setSprintLengthWeeks] = useState(2);
@@ -129,6 +130,7 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
           const s = data.settings;
           if (s.env_local_url) setEnvLocalUrl(s.env_local_url);
           if (s.env_test_url) setEnvTestUrl(s.env_test_url);
+          if (s.enonic_admin_url) setEnonicAdminUrl(s.enonic_admin_url);
           if (s.ado_organization) setAdoOrganization(s.ado_organization);
           if (s.ado_project) setAdoProject(s.ado_project);
           if (s.ado_area_path) setAdoAreaPath(s.ado_area_path);
@@ -141,10 +143,17 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
           if (s.threshold_seo != null) setThresholdSeo(s.threshold_seo);
           if (s.threshold_axe_critical != null) setThresholdAxeCritical(s.threshold_axe_critical);
           if (s.outsystems_url) setOutsystemsUrl(s.outsystems_url);
+          // Hydrate shell toggles from persisted settings (once on load)
+          if (s.env_default && setEnvironment && (s.env_default === 'local' || s.env_default === 'test')) {
+            setEnvironment(s.env_default);
+          }
+          if (s.execution_mode && setExecutionMode && (s.execution_mode === 'generate' || s.execution_mode === 'execute')) {
+            setExecutionMode(s.execution_mode);
+          }
         }
       } catch { /* offline */ }
     })();
-  }, []);
+  }, [setEnvironment, setExecutionMode]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -152,6 +161,7 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
       const payload = {
         env_local_url: envLocalUrl,
         env_test_url: envTestUrl,
+        enonic_admin_url: enonicAdminUrl,
         env_default: environment,
         execution_mode: executionMode,
         ado_organization: adoOrganization,
@@ -199,6 +209,10 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
               </Field>
               <Field label={t('redCrossWebQaModule.settings.envTestUrl')}>
                 <input value={envTestUrl} onChange={e => setEnvTestUrl(e.target.value)} style={input} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.enonicAdminUrl')}>
+                <input value={enonicAdminUrl} onChange={e => setEnonicAdminUrl(e.target.value)} style={input}
+                  placeholder="https://rodekors-xp8dev.enonic.cloud/admin" />
               </Field>
               <Field label={t('redCrossWebQaModule.settings.envDefault')}>
                 <select value={environment} onChange={e => setEnvironment && setEnvironment(e.target.value)} style={input}>

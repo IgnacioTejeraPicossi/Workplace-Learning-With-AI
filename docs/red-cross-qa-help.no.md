@@ -15,8 +15,10 @@ Den er **mock-first**: hver fane fungerer offline med realistiske eksempeldata, 
 ## Mål-URL-er (presets)
 Ett-klikks chips som setter målet for en kjøring:
 - ❤️‍🩹 **rodekors.no** — produksjon.
-- 🧪 **next.lunix.cloud** — Toms NextJS + Enonic XP + GraphQL-forhåndsvisning (flyttet fra `test.lunix.cloud` 2026-09-28). Det beste smoke-målet for de Enonic-spesifikke sjekkene.
+- 🧪 **https://next.lunix.cloud/testside** — publisert TestSide (NextJS + Enonic XP + GraphQL). Standard smoke-mål for Test-miljøet.
 - 💻 **localhost:3000** — din lokale utviklingsbygg.
+
+**Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — konfigureres under **Innstillinger → Enonic XP admin‑URL**. Dette er CMS-konsollen, **ikke** den offentlige Test BASE_URL brukt av Playwright / Lighthouse / axe.
 
 ## Fanene i korte trekk
 | Fane | Hva den gjør |
@@ -63,6 +65,7 @@ Lim inn et arbeidselement eller hent en sprint, gjør funn om til arbeidselement
 
 ## Ofte stilte spørsmål
 - **Trenger jeg et live nettsted eller en API-nøkkel?** Nei — den er mock-first; alt fungerer offline med eksempeldata.
-- **Hvor ble `test.lunix.cloud` av?** Den flyttet til **`next.lunix.cloud`** (2026-09-28). Den gamle daterte eksempelrapporten beholder sitt opprinnelige navn.
+- **Hvor ble `test.lunix.cloud` av?** Den flyttet til **`next.lunix.cloud`** (2026-09-28). Publisert Test-sti er nå **`/testside`**. Den gamle daterte eksempelrapporten beholder sitt opprinnelige navn.
+- **Hva med `test.rodekors.no`?** Erstattet som standard Test-URL av **`https://next.lunix.cloud/testside`**. Enonic-admin er **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **Sendes dataene mine til KI?** Bare det du skriver inn. Hold ekte person-/produksjonsdata og API-nøkler utenfor KI-inndata (se banneret).
 - **Hvor er tidligere resultater?** I **Runs**-fanen.

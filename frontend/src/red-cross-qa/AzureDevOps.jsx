@@ -154,10 +154,10 @@ const AzureDevOps = ({ environment }) => {
         <div style={panel}>
           <h3 style={panelTitle}>🏷️ {t('redCrossWebQaModule.ado.bundleConfig')}</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            <ConfigChip label={t('redCrossWebQaModule.ado.organization')} value={bundle?.organization || 'rodekors'} color="#2563eb" mono />
-            <ConfigChip label={t('redCrossWebQaModule.ado.project')} value={bundle?.project || 'rodekors-web'} color="#7c3aed" />
-            <ConfigChip label={t('redCrossWebQaModule.ado.areaPath')} value={bundle?.area_path || 'rodekors-web\\Web QA'} color="#0891b2" mono />
-            <ConfigChip label={t('redCrossWebQaModule.ado.iterationPath')} value={bundle?.iteration_path || 'rodekors-web\\Sprint 1'} color="#0d9488" mono />
+            <ConfigChip label={t('redCrossWebQaModule.ado.organization')} value={bundle?.organization || 'RedCrossNorway'} color="#2563eb" mono />
+            <ConfigChip label={t('redCrossWebQaModule.ado.project')} value={bundle?.project || 'rkdotno'} color="#7c3aed" />
+            <ConfigChip label={t('redCrossWebQaModule.ado.areaPath')} value={bundle?.area_path || 'rkdotno\\Web QA'} color="#0891b2" mono />
+            <ConfigChip label={t('redCrossWebQaModule.ado.iterationPath')} value={bundle?.iteration_path || 'rkdotno\\Sprint 2'} color="#0d9488" mono />
             <ConfigChip label={t('redCrossWebQaModule.ado.tags')} value={(bundle?.tags || ['red-cross-qa']).join(', ')} color="#f59e0b" mono />
           </div>
         </div>

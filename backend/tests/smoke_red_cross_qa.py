@@ -920,7 +920,7 @@ async def main():
     #    checklist with NVDA keyboard shortcuts + expected announcements
     #    per step + WCAG SC mapping.
     nvda = await generate_nvda_script(
-        "https://test.rodekors.no/giverstotte", "donation", "test", "en"
+        "https://next.lunix.cloud/testside/giverstotte", "donation", "test", "en"
     )
     assert nvda["status"] == "ok"
     assert nvda["tool"] == "nvda"
@@ -940,7 +940,7 @@ async def main():
 
     # 2. WAVE (WebAIM) report must carry the canonical category counts +
     #    deep link to the public report.
-    wave = await run_wave_audit("https://test.rodekors.no/", "test", "en")
+    wave = await run_wave_audit("https://next.lunix.cloud/testside/", "test", "en")
     assert wave["status"] == "ok"
     assert wave["tool"] == "wave"
     cats = wave["categories"]

@@ -88,8 +88,13 @@ SUITE_NAMES = [
 ]
 
 DEFAULT_SETTINGS = {
+    # Published site targets (NOT the Enonic admin console).
+    # Test = NextJS + Enonic preview published at /testside (2026-10).
     "env_local_url": "http://localhost:3000",
-    "env_test_url": "https://test.rodekors.no",
+    "env_test_url": "https://next.lunix.cloud/testside",
+    # Enonic XP Content Studio (admin). Used by CMS preview tooling / docs —
+    # do NOT use this as the public Test BASE_URL for Playwright/Lighthouse.
+    "enonic_admin_url": "https://rodekors-xp8dev.enonic.cloud/admin",
     "env_default": "test",
     "execution_mode": "generate",
     # Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3).
@@ -110,6 +115,31 @@ DEFAULT_SETTINGS = {
     "threshold_axe_critical": 0,
     "outsystems_url": "",
 }
+
+
+def default_base_url(environment: str = "test") -> str:
+    """Published-site BASE_URL from DEFAULT_SETTINGS (sync; for script templates)."""
+    if environment == "local":
+        return DEFAULT_SETTINGS["env_local_url"].rstrip("/")
+    return DEFAULT_SETTINGS["env_test_url"].rstrip("/")
+
+
+def default_enonic_host() -> str:
+    """Enonic XP host (without trailing /admin) for CMS preview script paths."""
+    admin = (DEFAULT_SETTINGS.get("enonic_admin_url") or "").rstrip("/")
+    if admin.endswith("/admin"):
+        return admin[: -len("/admin")] or admin
+    return admin or "https://rodekors-xp8dev.enonic.cloud"
+
+
+async def resolve_base_url(environment: str = "test") -> str:
+    """Published-site BASE_URL from persisted Settings (falls back to defaults)."""
+    key = "env_local_url" if environment == "local" else "env_test_url"
+    try:
+        settings = (await get_settings()).get("settings") or {}
+        return (settings.get(key) or DEFAULT_SETTINGS[key]).rstrip("/")
+    except Exception:
+        return DEFAULT_SETTINGS[key].rstrip("/")
 
 # ═══════════════════════════════════════════════════════════════════
 # Prompt templates
@@ -1317,7 +1347,7 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
             "content": (
                 "import { test, expect } from '@playwright/test';\n\n"
                 f"test('{s} smoke', async ({{ page }}) => {{\n"
-                "  await page.goto(process.env.BASE_URL || 'https://test.rodekors.no');\n"
+                f"  await page.goto(process.env.BASE_URL || '{default_base_url(environment)}');\n"
                 "  await expect(page).toHaveTitle(/Røde Kors|Red Cross/);\n"
                 "});\n"
             ),
@@ -1433,12 +1463,12 @@ def _cms_preview_playwright_spec() -> Dict[str, str]:
         " * cookies / renamed admin paths.\n"
         " *\n"
         " * Env vars expected:\n"
-        " *   BASE_URL              — site root (e.g. https://test.rodekors.no)\n"
+        f" *   BASE_URL              — Enonic XP host (e.g. {default_enonic_host()})\n"
         " *   CMS_PREVIEW_COOKIE    — the preview session cookie name\n"
         " *   CMS_PREVIEW_VALUE     — the preview session cookie value\n"
         " *   CMS_PREVIEW_PATH      — content path under preview, default '/'\n"
         " */\n\n"
-        "const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';\n"
+        f"const BASE_URL = process.env.BASE_URL || '{default_enonic_host()}';\n"
         "const COOKIE_NAME = process.env.CMS_PREVIEW_COOKIE || 'JSESSIONID';\n"
         "const COOKIE_VALUE = process.env.CMS_PREVIEW_VALUE || '';\n"
         "const CONTENT_PATH = process.env.CMS_PREVIEW_PATH || '/';\n\n"
@@ -1509,7 +1539,7 @@ def _migrated_links_playwright_spec() -> Dict[str, str]:
         " *   MIGRATED_LINK_SELECTOR — CSS for the list item link, default 'a[href*=publication]'\n"
         " *   MIGRATED_HEADER_SELECTOR — CSS for the header rendered on the detail page\n"
         " */\n\n"
-        "const BASE_URL = process.env.BASE_URL || 'https://test.rodekors.no';\n"
+        f"const BASE_URL = process.env.BASE_URL || '{default_base_url()}';\n"
         "const LIST_URL = process.env.MIGRATED_LIST_URL || '/forskning';\n"
         "const PARAM = process.env.MIGRATED_PARAM || 'id';\n"
         "const LINK_SEL = process.env.MIGRATED_LINK_SELECTOR || 'a[href*=publication]';\n"
@@ -2392,8 +2422,7 @@ async def export_postman_collection(scope: Optional[str], environment: str,
     """
     import json as _json
 
-    base_url_var = ("https://test.rodekors.no" if environment == "test"
-                     else "http://localhost:3000")
+    base_url_var = default_base_url(environment)
 
     items = []
     for q in _GUILLOTINE_QUERIES:
@@ -3129,7 +3158,7 @@ async def generate_nvda_script(url: str, scope: str, environment: str,
     announcement format and WCAG mapping must NOT drift between runs.
     """
     spec = _NVDA_SCOPE_PATHS.get(scope) or _NVDA_SCOPE_PATHS["navigation"]
-    target = url or f"https://test.rodekors.no{spec['default_path']}"
+    target = url or f"{await resolve_base_url(environment)}{spec['default_path']}"
     scope_label = spec["label"]
 
     # Per-scope expected announcements rendered as a numbered checklist
@@ -3231,7 +3260,7 @@ async def run_wave_audit(url: str, environment: str,
     synthetic report sized to the rodekors.no rebuild.
     """
     import os as _os
-    target = url or "https://test.rodekors.no/"
+    target = url or f"{await resolve_base_url(environment)}/"
 
     # Categories shape mirrors WAVE's API report.json output.
     categories = {
@@ -3794,7 +3823,7 @@ async def generate_k6_script(profile: str, scenarios: List[str], environment: st
             "  thresholds: { http_req_duration: ['p(95)<800'] },\n"
             "};\n\n"
             "export default function () {\n"
-            "  const res = http.get(__ENV.BASE_URL || 'https://test.rodekors.no');\n"
+            f"  const res = http.get(__ENV.BASE_URL || '{default_base_url(environment)}');\n"
             "  check(res, { 'status 200': (r) => r.status === 200 });\n"
             "  sleep(1);\n"
             "}\n"
@@ -3929,8 +3958,7 @@ async def generate_loadster_script(profile: str, scenarios: List[str], environme
                 "p95_ms": 2500,
             },
             "variables": {
-                "BASE_URL": "https://test.rodekors.no" if environment == "test"
-                            else "http://localhost:3000",
+                "BASE_URL": default_base_url(environment),
             },
         }
         # Serialize as pretty JSON since real Loadster .lhx is XML but the
@@ -5325,10 +5353,10 @@ async def get_ado_bundle_preview(environment: str) -> Dict[str, Any]:
         ]
 
     bundle = {
-        "organization": s.get("ado_organization", "rodekors"),
-        "project": s.get("ado_project", "rodekors-web"),
-        "area_path": s.get("ado_area_path", "rodekors-web\\Web QA"),
-        "iteration_path": s.get("ado_iteration_path", "rodekors-web\\Sprint 1"),
+        "organization": s.get("ado_organization", DEFAULT_SETTINGS["ado_organization"]),
+        "project": s.get("ado_project", DEFAULT_SETTINGS["ado_project"]),
+        "area_path": s.get("ado_area_path", DEFAULT_SETTINGS["ado_area_path"]),
+        "iteration_path": s.get("ado_iteration_path", DEFAULT_SETTINGS["ado_iteration_path"]),
         "tags": s.get("ado_tags", ["red-cross-qa", "ai-generated"]),
         "work_items": work_items,
         "environment": environment,
@@ -6462,6 +6490,17 @@ async def get_stats(environment: Optional[str] = None) -> Dict[str, Any]:
     }
 
 
+# Stale Test URLs previously used as defaults. If a saved settings doc still
+# has one of these, rewrite to the current published TestSide so operators do
+# not keep targeting a dead host after upgrade.
+_STALE_ENV_TEST_URLS = {
+    "https://test.rodekors.no",
+    "https://test.rodekors.no/",
+    "https://next.lunix.cloud",
+    "https://next.lunix.cloud/",
+}
+
+
 async def get_settings() -> Dict[str, Any]:
     try:
         doc = await red_cross_qa_settings_collection.find_one({"_singleton": "main"})
@@ -6469,6 +6508,13 @@ async def get_settings() -> Dict[str, Any]:
             doc.pop("_id", None)
             doc.pop("_singleton", None)
             merged = {**DEFAULT_SETTINGS, **doc}
+            # Soft-migrate outdated Test URL + fill missing Enonic admin URL.
+            if (merged.get("env_test_url") or "").rstrip("/") in {
+                u.rstrip("/") for u in _STALE_ENV_TEST_URLS
+            }:
+                merged["env_test_url"] = DEFAULT_SETTINGS["env_test_url"]
+            if not merged.get("enonic_admin_url"):
+                merged["enonic_admin_url"] = DEFAULT_SETTINGS["enonic_admin_url"]
             return {"status": "ok", "settings": merged}
     except Exception:
         pass
