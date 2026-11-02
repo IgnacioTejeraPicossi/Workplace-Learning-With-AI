@@ -9,6 +9,11 @@ import WebLabPage from './_WebLabPage';
  * understand the relationship (Web Lab = the actual web pages; RC QA
  * Agent = the QA testing patterns).
  *
+ * V1 contract (docs/web-lab-plan.md §7): "Use as local env" must set
+ * RCQA `env_local_url` → http://localhost:3102, keep `env_test_url`
+ * (TestSide) + `enonic_admin_url`, invalidate settingsApi cache, open
+ * RCQA with Environment = Local. Do NOT write env_test_url.
+ *
  * `onNavigate` prop comes from App.jsx and switches the active section
  * to "red-cross-web-qa" when the user clicks the cross-link button.
  */

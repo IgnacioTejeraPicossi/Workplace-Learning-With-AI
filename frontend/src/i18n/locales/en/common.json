@@ -275,7 +275,7 @@
       "productionUrl": "Production URL",
       "plannedLocalPort": "Planned local port",
       "relatedAgent": "Related: Red Cross Web QA Agent",
-      "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, that agent will be able to point its environment.test_url at the local server."
+      "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, 'Use as local env' will set RCQA Settings env_local_url to http://localhost:3102 (Environment = Local) and leave env_test_url (https://next.lunix.cloud/testside) and the Enonic admin URL unchanged."
     }
   },
   "selfSimReality": {
