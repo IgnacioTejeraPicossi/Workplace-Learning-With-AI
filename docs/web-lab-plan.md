@@ -270,7 +270,7 @@ EN / NO / ES parity preserved at all times. V0 adds 25 leaves × 3 locales (alre
 |---|---|
 | V1 | (1) `LOCAL_WEBSITES_ROOT` resolves & exists; (2) `GET /projects` returns 2 entries; (3) `POST /projects/redcross-no/clone` with path traversal payload returns 400; (4) `clone` with valid path returns 200 + status=cloned; (5) Idempotency: second `clone` returns 409 |
 | V2 | (6) `install` triggers npm with controlled args; (7) `start` returns 200 and port becomes listening within 30s; (8) `stop` kills the process via psutil; (9) Port collision detected pre-start; (10) Auto-stop fires after configured seconds |
-| V1+ | (V1-RCQA) After `useAsLocalEnv`: GET `/api/red-cross-qa/settings` has `env_local_url == http://localhost:3102` **and** `env_test_url` still equals `https://next.lunix.cloud/testside` (and `enonic_admin_url` unchanged) |
+| V1+ | (V1-RCQA) After `useAsLocalEnv`: GET `/api/red-cross-qa/settings` has `env_local_url == http://localhost:3102` **and** `env_test_url` still equals `https://next.lunix.cloud/testside` (and `enonic_admin_url` unchanged). **Implemented:** `backend/tests/smoke_web_lab_rcqa.py` (+ same assert in `smoke_red_cross_qa.py`). Run: `python -m backend.tests.smoke_web_lab_rcqa` from repo root (set `PYTHONIOENCODING=utf-8` on Windows if needed). |
 | V3 | (11) Snapshot capture stores HTML hash + screenshot hash; (12) Diff between two snapshots returns the right diff_mode; (13) same RCQA contract as V1-RCQA after connect |
 
 ---
@@ -340,4 +340,4 @@ Expected size: ~600 LOC across 5-6 files. Single commit, single PR review.
 
 ---
 
-*Last updated: 2026-11-02 — V1 RCQA integration contract corrected (`env_local_url` / preserve TestSide; aligns with Settings runtime). V0 still ships as 1.16.0 structure-only.*
+*Last updated: 2026-11-02 — V1 RCQA contract + ConnectToQaAgent (Settings-only) + smoke_web_lab_rcqa.py. Clone/install/start remain V1+/V2. V0 structure badge still accurate for clone lifecycle.*

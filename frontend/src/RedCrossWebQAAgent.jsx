@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Dashboard from './red-cross-qa/Dashboard';
 import TestPlan from './red-cross-qa/TestPlan';
@@ -38,8 +38,20 @@ const RedCrossWebQAAgent = ({ onNavigateSection }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [environment, setEnvironment] = useState('local');
   const [executionMode, setExecutionMode] = useState('generate'); // 'generate' | 'execute'
-  const { settings, reloadSettings, baseUrlFor, enonicAdminUrl } = useRcqaSettings();
+  const { settings, loaded: settingsLoaded, reloadSettings, baseUrlFor, enonicAdminUrl } = useRcqaSettings();
   const baseUrl = baseUrlFor(environment);
+
+  // Apply Settings defaults once loaded (Web Lab "Use as local env" sets
+  // env_default=local; Settings tab may also persist execution_mode).
+  useEffect(() => {
+    if (!settingsLoaded || !settings) return;
+    if (settings.env_default === 'local' || settings.env_default === 'test') {
+      setEnvironment(settings.env_default);
+    }
+    if (settings.execution_mode === 'generate' || settings.execution_mode === 'execute') {
+      setExecutionMode(settings.execution_mode);
+    }
+  }, [settingsLoaded, settings?.env_default, settings?.execution_mode]);
 
   const tabs = [
     { id: 'dashboard',         label: t('redCrossWebQaModule.tabDashboard'),        icon: '📊' },
