@@ -13,7 +13,10 @@ import { useTranslation } from 'react-i18next';
  * their estimators (e.g. METR) and flagged as revisable, and popular-but-shaky
  * framings carry an explicit "contested framing" note.
  *
- * First two signals (September 2026):
+ * Featured reading (September 2026):
+ *   0. Dario Amodei — "We Must Pace the Frontier" (essay + 3-step plan).
+ *      Full paraphrased reading notes also live under Voices on AGI.
+ * Then:
  *   1. The July 2026 loss-of-control incident — OpenAI evaluation agents broke
  *      containment and attacked Hugging Face (unintended reward hacking).
  *   2. The September 2026 governance shift — frontier labs ask Washington for
@@ -25,11 +28,23 @@ const BADGES = {
   governance: { color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' }, // a policy / posture move
   contested:  { color: '#b45309', bg: '#fffbeb', border: '#fde68a' }, // a shaky popular framing
   trend:      { color: '#0f766e', bg: '#f0fdfa', border: '#99f6e4' }, // a structural / tech shift
+  essay:      { color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' }, // a primary-source essay / proposal
 };
 
 // URLs are not translated (they are proper resources). Titles/summaries/why
 // come from i18n (agiSafety.items.*).
 const SIGNALS = [
+  {
+    id: 'paceFrontier',
+    badge: 'essay',
+    contested: true,
+    sources: [
+      { label: 'darioamodei.com (primary)', url: 'https://darioamodei.com/post/we-must-pace-the-frontier' },
+      { label: 'CNBC', url: 'https://www.cnbc.com/2026/09/12/anthropics-amodei-proposes-plan-to-slow-the-pace-of-advancing-ai-capabilities.html' },
+      { label: 'CNN', url: 'https://www.cnn.com/2026/09/12/tech/anthropic-ceo-essay-ai' },
+      { label: 'The Verge', url: 'https://www.theverge.com/ai-artificial-intelligence/994337/anthropic-ceo-slow-down-ai-development' },
+    ],
+  },
   {
     id: 'huggingface',
     badge: 'incident',
@@ -46,6 +61,7 @@ const SIGNALS = [
     badge: 'governance',
     contested: true,
     sources: [
+      { label: 'Amodei essay', url: 'https://darioamodei.com/post/we-must-pace-the-frontier' },
       { label: 'TechXplore', url: 'https://techxplore.com/news/2026-09-shift-openai-powerful-ai.html' },
       { label: 'CNBC', url: 'https://www.cnbc.com/2026/09/12/anthropics-amodei-proposes-plan-to-slow-the-pace-of-advancing-ai-capabilities.html' },
       { label: 'Congress.gov (CRS)', url: 'https://www.congress.gov/crs-product/IF13217' },
@@ -253,7 +269,7 @@ export default function AgiSafetySignals() {
           {t('agiSafety.legendTitle', { defaultValue: 'What the tags mean' })}
         </div>
         <div style={{ display: 'grid', gap: 8 }}>
-          {['incident', 'governance', 'trend', 'contested'].map(k => (
+          {['essay', 'incident', 'governance', 'trend', 'contested'].map(k => (
             <div key={k} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <Badge kind={k} t={t} />
               <span style={{ color: '#475569', fontSize: '0.83rem' }}>

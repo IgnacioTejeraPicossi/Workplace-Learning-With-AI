@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
  *   1. Marc Andreessen on The Joe Rogan Experience (17 points, via @cyrilXBT).
  *   2. Steve Hoffman ("Captain Hoff", Founders Space) — "AI's Hidden Internet",
  *      the headless / agentic web (brought in by the owner from TikTok).
+ *   3. Dario Amodei (Anthropic) — "We Must Pace the Frontier" (Sep 2026 essay):
+ *      why pace, embedded evaluators, democratic + global coordination.
  *
  * Design intent (unchanged): PRESENT, don't evangelize. Every point carries an
  * epistemic badge and the source's own caveats are shown up front, including
@@ -56,9 +58,29 @@ const HOFFMAN_POINTS = [
   { id: 'h5', badge: 'contested', counterpoint: true },
 ];
 
+// Third voice — Dario Amodei, "We Must Pace the Frontier" (Sep 2026).
+// Paraphrased reading notes of the public essay (not a verbatim reprint).
+const AMODEI_POINTS = [
+  { id: 'a1', badge: 'view' },
+  { id: 'a2', badge: 'view' },
+  { id: 'a3', badge: 'contested', counterpoint: true },
+  { id: 'a4', badge: 'technique' },
+  { id: 'a5', badge: 'view' },
+  { id: 'a6', badge: 'view' },
+  { id: 'a7', badge: 'view' },
+];
+
 // A voice = a heading + an attribution block + its points, each keyed to its own
 // i18n base so existing Andreessen keys never move.
 const VOICES = [
+  {
+    id: 'amodei',
+    icon: '🛡️',
+    headingKey: 'agiVoices.voices.amodei.heading',
+    itemsBase: 'agiVoices.amodei.items',
+    attribBase: 'agiVoices.amodei.attribution',
+    points: AMODEI_POINTS,
+  },
   {
     id: 'andreessen',
     icon: '🎙️',
