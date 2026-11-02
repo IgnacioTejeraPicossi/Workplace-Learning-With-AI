@@ -293,13 +293,13 @@ EN / NO / ES parity preserved at all times. V0 adds 25 leaves × 3 locales (alre
 ```
 frontend/src/
 ├── web-lab/
-│   ├── _WebLabPage.jsx              ← shared placeholder layout (~200 lines)
+│   ├── _WebLabPage.jsx              ← shared placeholder + optional urlContext panel
 │   ├── ItemNoWeb.jsx                ← Item.no instance (~23 lines)
-│   └── RedcrossNoWeb.jsx            ← Redcross.no instance with QA Agent cross-link (~31 lines)
+│   └── RedcrossNoWeb.jsx            ← Redcross.no + RCQA URL map (Local/Test/Enonic) + QA cross-link
 ├── App.jsx                          ← +2 imports, +2 routes
 ├── Sidebar.jsx                      ← +1 expandable group with 2 sub-items
 └── i18n/locales/{en,no,es}/common.json
-                                     ← +3 sidebar keys, +1 webLab top-level block (25 leaves)
+                                     ← sidebar keys + webLab block (incl. Redcross urlMap leaves)
 
 docs/
 └── web-lab-plan.md                  ← this document

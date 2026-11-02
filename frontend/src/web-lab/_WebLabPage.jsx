@@ -9,10 +9,16 @@ import { useTranslation } from 'react-i18next';
  *   - V0 status badge
  *   - "What this module will do" intent list (shared across both pages)
  *   - Per-project meta (production URL, planned local port)
+ *   - Optional URL context map (Redcross → RCQA Local / Test / Enonic)
  *   - Optional "Related agent" cross-link (used by Redcross.no → RC QA Agent)
  *   - Roadmap (V0 → V3)
  *
  * Strings come from common.json `webLab.*` so EN/NO/ES stay in sync.
+ *
+ * urlContext (optional): {
+ *   titleKey, hintKey, docsHintKey,
+ *   items: [{ labelKey, value, isLink?, noteKey? }]
+ * }
  */
 export default function WebLabPage({
   icon,
@@ -27,6 +33,7 @@ export default function WebLabPage({
   // all resolve to "Production URL" / "Planned local port")
   productionUrlLabelKey,
   plannedLocalPortLabelKey,
+  urlContext,              // optional — RCQA URL map (Redcross only)
   relatedAgentKey,         // optional — only Redcross.no uses this
   relatedAgentHintKey,     // optional
   onOpenRelatedAgent,      // optional click handler (sets active section)
@@ -77,6 +84,31 @@ export default function WebLabPage({
         </div>
       </div>
 
+      {/* Optional RCQA / URL context map (Redcross placeholder enrichment) */}
+      {urlContext?.items?.length > 0 && (
+        <div style={{ ...styles.panel, borderLeft: `4px solid ${accentColor}` }}>
+          <h3 style={styles.panelTitle}>🧭 {t(urlContext.titleKey)}</h3>
+          {urlContext.hintKey && (
+            <p style={styles.urlContextHint}>{t(urlContext.hintKey)}</p>
+          )}
+          <div style={styles.metaGrid}>
+            {urlContext.items.map((item) => (
+              <MetaItem
+                key={item.labelKey}
+                label={t(item.labelKey)}
+                value={item.value}
+                isLink={Boolean(item.isLink)}
+                note={item.noteKey ? t(item.noteKey) : undefined}
+                color={accentColor}
+              />
+            ))}
+          </div>
+          {urlContext.docsHintKey && (
+            <p style={styles.docsHint}>{t(urlContext.docsHintKey)}</p>
+          )}
+        </div>
+      )}
+
       {/* Intent — what this module will do */}
       <div style={styles.panel}>
         <h3 style={styles.panelTitle}>🎯 {t('webLab.intent')}</h3>
@@ -125,7 +157,7 @@ export default function WebLabPage({
 }
 
 // ── Small presentational helpers ──────────────────────────────────
-const MetaItem = ({ label, value, isLink, color }) => (
+const MetaItem = ({ label, value, isLink, note, color }) => (
   <div style={{
     padding: '12px 14px', borderRadius: 10,
     backgroundColor: `${color}08`, border: `1px solid ${color}30`,
@@ -144,7 +176,13 @@ const MetaItem = ({ label, value, isLink, color }) => (
       <div style={{
         fontSize: 14, fontWeight: 600, color: '#1e293b',
         fontFamily: 'ui-monospace, monospace',
+        wordBreak: 'break-all',
       }}>{value}</div>
+    )}
+    {note && (
+      <div style={{
+        marginTop: 6, fontSize: 11, color: '#64748b', lineHeight: 1.4,
+      }}>{note}</div>
     )}
   </div>
 );
@@ -181,6 +219,13 @@ const styles = {
   },
   panelTitle: { margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#1e293b' },
   statusHint: { margin: 0, fontSize: 13, color: '#475569', lineHeight: 1.55 },
+  urlContextHint: {
+    margin: '0 0 12px', fontSize: 13, color: '#475569', lineHeight: 1.55,
+  },
+  docsHint: {
+    margin: '14px 0 0', fontSize: 12, color: '#64748b', lineHeight: 1.5,
+    fontFamily: 'ui-monospace, monospace',
+  },
   metaGrid: {
     display: 'grid', gap: 10,
     gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',

@@ -565,6 +565,15 @@
       "subtitle": "Lokal klone av rodekors.no.",
       "productionUrl": "Produksjons‑URL",
       "plannedLocalPort": "Planlagt lokal port",
+      "urlMapTitle": "RCQA URL‑kart (V1‑kontrakt)",
+      "urlMapHint": "Tre ulike verter — ikke bland dem. V1 «Bruk som lokalt miljø» skriver bare env_local_url; TestSide og Enonic‑admin forblir som konfigurert i Røde Kors Web QA‑innstillinger.",
+      "plannedLocalUrl": "Planlagt lokal URL → env_local_url",
+      "plannedLocalUrlNote": "Klonen vil kjøre her (port 3102). Blir RCQA Miljø = Local.",
+      "rcqaTestUrl": "RCQA Test‑URL → env_test_url",
+      "rcqaTestUrlNote": "Publisert TestSide. Bevares — Web‑lab skal ikke overskrive denne.",
+      "enonicAdminUrl": "Enonic XP admin → enonic_admin_url",
+      "enonicAdminUrlNote": "CMS Content Studio. Ikke den offentlige BASE_URL for Playwright / Lighthouse / axe.",
+      "docsHint": "Docs: docs/web-lab-plan.md §7 · docs/red-cross-qa-help.no.md (også .md / .es.md i README Viewer)",
       "relatedAgent": "Relatert: Røde Kors Web QA‑agent",
       "relatedAgentHint": "QA‑testmønstrene for rodekors.no ligger i den eksisterende «Røde Kors Web QA‑agent»‑modulen. Når Web‑lab serverer en lokal klone, vil «Bruk som lokalt miljø» sette RCQA‑innstillinger env_local_url til http://localhost:3102 (Miljø = Local) og la env_test_url (https://next.lunix.cloud/testside) og Enonic admin‑URL forbli uendret."
     }

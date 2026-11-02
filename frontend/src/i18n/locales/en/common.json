@@ -274,6 +274,15 @@
       "subtitle": "Local clone of the rodekors.no website.",
       "productionUrl": "Production URL",
       "plannedLocalPort": "Planned local port",
+      "urlMapTitle": "RCQA URL map (V1 contract)",
+      "urlMapHint": "Three different hosts — do not conflate them. V1 “Use as local env” only writes env_local_url; TestSide and Enonic admin stay as configured in Red Cross Web QA Settings.",
+      "plannedLocalUrl": "Planned local URL → env_local_url",
+      "plannedLocalUrlNote": "Clone will serve here (port 3102). Becomes RCQA Environment = Local.",
+      "rcqaTestUrl": "RCQA Test URL → env_test_url",
+      "rcqaTestUrlNote": "Published TestSide. Preserved — Web Lab must not overwrite this.",
+      "enonicAdminUrl": "Enonic XP admin → enonic_admin_url",
+      "enonicAdminUrlNote": "CMS Content Studio. Not the public BASE_URL for Playwright / Lighthouse / axe.",
+      "docsHint": "Docs: docs/web-lab-plan.md §7 · docs/red-cross-qa-help.md (also .es.md / .no.md in README Viewer)",
       "relatedAgent": "Related: Red Cross Web QA Agent",
       "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, 'Use as local env' will set RCQA Settings env_local_url to http://localhost:3102 (Environment = Local) and leave env_test_url (https://next.lunix.cloud/testside) and the Enonic admin URL unchanged."
     }
