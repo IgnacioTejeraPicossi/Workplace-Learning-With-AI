@@ -44,6 +44,24 @@ def test_august_2026_refresh_present():
         assert expected in names, f"missing refreshed model: {expected}"
 
 
+def test_october_2026_refresh_present():
+    names = {it.model for it in DEFAULT_DATA}
+    for expected in (
+        "Gemini 4 Argon",
+        "Gemini 4 Carbon",
+        "GPT-6.1 Terra",
+        "Kimi K3.1 Pro",
+        "Claude Opus 5.5",
+        "GPT-6 Astra",
+    ):
+        assert expected in names, f"missing Oct/Sep frontier model: {expected}"
+    # Carbon should sit at the tip of the CHC-breadth seed (AA Index lead Oct/Nov 2026)
+    by_name = {it.model: it for it in DEFAULT_DATA}
+    assert by_name["Gemini 4 Carbon"].total >= by_name["Claude Opus 5.5"].total
+    assert by_name["Gemini 4 Carbon"].year == 2026 and by_name["Gemini 4 Carbon"].month == 10
+
+
+
 @pytest.mark.asyncio
 async def test_progress_endpoint_returns_seed():
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:

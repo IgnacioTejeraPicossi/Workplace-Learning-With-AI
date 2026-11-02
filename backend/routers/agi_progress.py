@@ -170,6 +170,35 @@ DEFAULT_DATA: List[AGIItem] = [
         total=61,
         notes="DeepSeek (China), Sep 2026 — an open-weight 'Flash' (fast/cheap) model that jumped from 7th to 1st on the CyberGym vulnerability-discovery test within ten days of release, and led global usage by request share the week of 14 Sep. Elite on cyber/coding and very fast, but text-centric — limited native vision/audio keeps its CHC-breadth total below the multimodal frontier (same honest divergence noted for Kimi). Domain scores here are directional; less public breadth data than the proprietary leaders.",
     ),
+    # ── October 2026 wave (added 2026-11-02, web-sourced). Gemini 4 finally
+    # refreshes Google's flagship line (Argon GA, then Carbon). OpenAI ships
+    # GPT-6.1 Terra after Astra; Moonshot ships Kimi K3.1 Pro as the new
+    # open-weight Intelligence Index leader. CHC totals remain multimodal-
+    # weighted approximations — Artificial Analysis ranks can diverge.
+    AGIItem(
+        model="Gemini 4 Argon", year=2026, month=10,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":9,"MS":0,"MR":8,"V":9,"A":8,"S":6},
+        total=80,
+        notes="Google DeepMind, general availability 13 Oct 2026 — first Gemini 4 flagship after a long gap since Gemini 3.1 Pro (Feb). Positioned for long-horizon reasoning across software engineering, enterprise knowledge work and cyber defence. Artificial Analysis Intelligence Index ~50 (High). Fully multimodal; CHC-breadth sits just under the Sep multimodal leaders (Opus 5.5 / Astra / Fable 5.1) and below its sibling Carbon. MS remains 0.",
+    ),
+    AGIItem(
+        model="Kimi K3.1 Pro", year=2026, month=10,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":8,"MS":0,"MR":7,"V":5,"A":3,"S":6},
+        total=69,
+        notes="Moonshot AI (China), 23 Oct 2026 — successor to Kimi K3 and the new open-weight leader on Artificial Analysis (~46 Intelligence Index at launch, ahead of prior open-weight peers). Stronger agentic/coding and retrieval than K3; still text-first, so native vision/audio keep its CHC-breadth below the fully-multimodal proprietary frontier despite elite text/reasoning. MS remains 0.",
+    ),
+    AGIItem(
+        model="GPT-6.1 Terra", year=2026, month=10,
+        scores={"K":10,"RW":10,"M":10,"R":9,"WM":9,"MS":0,"MR":8,"V":9,"A":7,"S":7},
+        total=79,
+        notes="OpenAI, 26 Oct 2026 — next GPT-6.1 line after GPT-6 Astra (Sep). ~1.1M context; Artificial Analysis Intelligence Index ~51 at Max effort (below Astra Max ~57 on the same board). Strong multimodal text+image; native audio still not its headline vs Claude/Gemini leaders, so CHC-breadth sits a step under Astra/Opus 5.5 despite being the current OpenAI shipping tip. Sibling variants (Terra Pro / Fast / EU) share the same capability class. MS remains 0.",
+    ),
+    AGIItem(
+        model="Gemini 4 Carbon", year=2026, month=10,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":10,"MS":0,"MR":9,"V":10,"A":9,"S":7},
+        total=85,
+        notes="Google DeepMind, announced 28 Oct 2026 — billed as Google's strongest model with SOTA cybersecurity and long-horizon capabilities; introductory price matched Argon ($2/$10 per M tokens). As of early Nov 2026 it leads Artificial Analysis's Intelligence Index at High effort (~59) just ahead of Claude Opus 5.5 Max (~58). Fully multimodal with Google's characteristic vision strength; CHC-breadth total edges Opus 5.5 as the new tracker tip. Honest caveats: consumer/dev rollout was still ramping (limited access in places); index leads can shift weekly; MS (persistent long-term memory) remains unsolved for this generation.",
+    ),
 ]
 
 
