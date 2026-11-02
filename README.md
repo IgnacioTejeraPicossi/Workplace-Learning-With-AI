@@ -175,7 +175,7 @@ The agent ships as a **20-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) wi
 | 17 | ✅ UAT Support | **NEW** — Item does not run UAT; Røde Kors does. Generates UAT scripts, per-stakeholder checklists and a sign-off form for the named stakeholders **Hilde Forslund** (Produkteier), **Trine Røsand Scheen** (Fagperson), **Astri Fretheim** (Fagperson) |
 | 18 | 🎲 Risk Matrix | **NEW** — Trine §10: the matrix lives outside the strategy document. Paste CSV/JSON, agent scores each risk (probability × impact, 1-25), assigns `level` (critical / high / medium / low), maps to test suites and produces `suite_priority` + `coverage_gaps` |
 | 19 | 📜 Runs | Run history with attestation hash, artifacts, screenshots |
-| 20 | ⚙️ Settings | **Local / Test / Enonic admin URLs** (runtime source of truth for BASE_URL across tabs via `settingsApi.js`), **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds. Defaults: Test=`https://next.lunix.cloud/testside`, Enonic admin=`https://rodekors-xp8dev.enonic.cloud/admin` |
+| 20 | ⚙️ Settings | **Local / Test / Enonic admin URLs** (runtime source of truth for BASE_URL across tabs via `settingsApi.js`; shell applies saved `env_default` / `execution_mode` on open). **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds. Defaults: Local=`http://localhost:3000` (or `http://localhost:3102` via Web Lab **Use as local env**), Test=`https://next.lunix.cloud/testside`, Enonic admin=`https://rodekors-xp8dev.enonic.cloud/admin` |
 
 **Backend:**
 - Service: `backend/services/red_cross_qa.py` — **23 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable). Generates `severity_dev` + `category_ops` annotations on every finding.
@@ -194,10 +194,11 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 3. Sidebar → **Future Item Agents** → ❤️‍🩹 **Red Cross Web QA Agent**
 4. Open **Settings** once → confirm Local / Test / Enonic admin URLs → **Save** (header 🎯 chip shows the live BASE_URL)
 5. Pick environment (`local` / `test`) and execution mode (`generate` / `execute`) in the header — URL tabs sync from Settings; generators receive `base_url`
-6. Open any tab and click its **Run** button. Findings + recommendations + suggested test cases render inline with `severity_dev` / `category_ops` annotations; runs are persisted under the **Runs** tab with the SHA-256 attestation hash.
-7. End of sprint → **Sprint Report** tab → click **Generate** for Trine's stakeholder-ready Norwegian narrative.
+6. Optional: Sidebar → **Web Lab** → **Redcross.no web** → **Use as local env for RC QA Agent** — sets `env_local_url` to `http://localhost:3102` only (preserves TestSide + Enonic admin), then opens this agent on Local
+7. Open any tab and click its **Run** button. Findings + recommendations + suggested test cases render inline with `severity_dev` / `category_ops` annotations; runs are persisted under the **Runs** tab with the SHA-256 attestation hash.
+8. End of sprint → **Sprint Report** tab → click **Generate** for Trine's stakeholder-ready Norwegian narrative.
 
-**User guide:** [docs/red-cross-qa-help.md](docs/red-cross-qa-help.md) (also `.es.md` / `.no.md`, and in the in-app README Viewer).
+**User guide:** [docs/red-cross-qa-help.md](docs/red-cross-qa-help.md) (also `.es.md` / `.no.md`, and in the in-app README Viewer). Web Lab plan / contract: [docs/web-lab-plan.md](docs/web-lab-plan.md). Contract smoke: `python -m backend.tests.smoke_web_lab_rcqa`.
 
 **Backward compatibility**: `TestPlanRequest` keeps `jira_epic` as a deprecated alias of `ado_work_item`; the MongoDB collection name `red_cross_qa_jira_dispatches_collection` is deliberately retained to avoid a DB migration. Only user-facing terminology changed.
 

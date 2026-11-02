@@ -8,10 +8,10 @@ Es **mock-first**: cada pestaña funciona sin conexión con datos de ejemplo rea
 
 ## Inicio rápido
 1. Abre **Ajustes** una vez y confirma (luego **Guardar**):
-   - **URL local** → normalmente `http://localhost:3000`
+   - **URL local** → normalmente `http://localhost:3000` (el propio WLWAI), o `http://localhost:3102` cuando apunta al clon **Web Lab** de Redcross
    - **URL de test** → `https://next.lunix.cloud/testside`
    - **URL admin Enonic XP** → `https://rodekors-xp8dev.enonic.cloud/admin`
-2. Elige un **Entorno** (arriba a la derecha): `Local` o `Test`. El chip **🎯** de la cabecera muestra el destino vivo según Ajustes.
+2. Elige un **Entorno** (arriba a la derecha): `Local` o `Test`. El chip **🎯** de la cabecera muestra el destino vivo según Ajustes. Al abrir, el agente también aplica el `env_default` / `execution_mode` guardados.
 3. Elige un **Modo de ejecución**: **Generar scripts e informes** o **Ejecutar directamente**.
 4. Abre la pestaña que necesites. Los campos URL (Performance / Accessibility / Designsystemet) se sincronizan con Ajustes al cambiar de entorno; el resto de pestañas envían esa misma `base_url` al backend al generar scripts.
 5. Revisa el resultado; los hallazgos pueden enviarse a **Azure DevOps** y resumirse en un **Informe de Sprint**.
@@ -20,7 +20,8 @@ Es **mock-first**: cada pestaña funciona sin conexión con datos de ejemplo rea
 Valores por defecto y chips de un clic:
 - ❤️‍🩹 **rodekors.no** — producción (solo como preset explícito).
 - 🧪 **https://next.lunix.cloud/testside** — TestSide publicado (NextJS + Enonic XP + GraphQL). BASE_URL por defecto de **Test**.
-- 💻 **localhost:3000** — BASE_URL de **Local**.
+- 💻 **localhost:3000** — BASE_URL **Local** por defecto (frontend WLWAI).
+- 🧪💻 **localhost:3102** — clon previsto **Web Lab** Redcross.no (vía Web Lab → **Usar como entorno local**).
 
 **Admin Enonic XP (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — se configura en **Ajustes → URL admin Enonic XP**. Es la consola CMS, **no** la BASE_URL pública de Test usada por Playwright / Lighthouse / axe / k6.
 
@@ -36,6 +37,17 @@ Los ajustes se cargan al abrir el agente y se comparten con todas las pestañas 
 - Cambiar **Local / Test** en la cabecera actualiza el chip 🎯 y re-sincroniza los campos URL de Performance, Accessibility y Designsystemet.
 - Tras **Guardar** en Ajustes, la caché se refresca para que todas las pestañas vean las URLs nuevas de inmediato.
 - Los generadores (Playwright, Cypress, Postman, k6, Loadster, Forms QA, …) reciben `base_url` del frontend y la incrustan en los scripts — ya no usan `test.rodekors.no` a fuego.
+
+### Web Lab (Redcross.no web) ↔ este agente
+Sidebar → **Laboratorio Web** → **Redcross.no web** es el espacio para un **clon local** de rodekors.no (aún V0 para clone/install/start). **No** es otro agente de QA.
+
+**Usar como entorno local para RC QA Agent** (en esa página) hace solo esto:
+
+1. `POST /api/red-cross-qa/settings` con `{ env_local_url: "http://localhost:3102", env_default: "local" }`
+2. Deja intactos **`env_test_url`** (TestSide) y **`enonic_admin_url`**
+3. Invalida la caché de Ajustes y abre este agente en **Local** (🎯 → `:3102`)
+
+El servidor del clon no tiene que estar en marcha aún (start/health llegan en Web Lab V2); las suites contra `:3102` fallarán hasta que lo esté. Plan: `docs/web-lab-plan.md` §7. Smoke del contrato: `python -m backend.tests.smoke_web_lab_rcqa` desde la raíz del repo.
 
 ## Las pestañas de un vistazo
 | Pestaña | Qué hace |
@@ -86,6 +98,9 @@ Pega un work item o trae un sprint, convierte los hallazgos en work items, previ
 - **¿Y `test.rodekors.no`?** Sustituida como URL de Test por defecto por **`https://next.lunix.cloud/testside`**. El admin de Enonic es **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **Cambié Ajustes pero una pestaña sigue mostrando una URL antigua.** Pulsa **Guardar** en Ajustes y cambia una vez Local ↔ Test (o recarga la página). El chip 🎯 de la cabecera debe coincidir con Ajustes.
 - **¿Puedo seguir sobrescribiendo la URL en Performance / Accessibility?** Sí — escribe o elige un preset. La siguiente sincronización de entorno / Ajustes restaurará la BASE_URL de Ajustes.
+- **¿Cómo apunto Local al clon del Web Lab?** Web Lab → Redcross.no web → **Usar como entorno local para RC QA Agent**. Fija `env_local_url` a `http://localhost:3102` y abre este agente en Local. **No** cambia TestSide.
+- **¿«Usar como entorno local» sobrescribe mi URL de Test?** No. Solo escribe `env_local_url` (+ `env_default=local`).
+- **Local muestra :3102 pero no responde nada.** Esperado hasta que Web Lab pueda arrancar el clon (V2). Cambia el entorno a **Test** para TestSide, o vuelve Local a `http://localhost:3000` en Ajustes.
 - **¿Se envían mis datos a la IA?** Solo lo que escribas. Mantén datos personales / de producción reales y claves de API fuera de las entradas a la IA (ver el aviso).
 - **¿Dónde están los resultados pasados?** En la pestaña **Runs**.
 - **¿Dónde está esta guía en la app?** Visor de README → `docs/red-cross-qa-help.es.md` (también `.md` / `.no.md`).

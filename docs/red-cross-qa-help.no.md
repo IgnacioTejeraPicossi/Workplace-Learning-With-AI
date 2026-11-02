@@ -8,10 +8,10 @@ Den er **mock-first**: hver fane fungerer offline med realistiske eksempeldata, 
 
 ## Kom i gang
 1. Åpne **Innstillinger** én gang og bekreft (deretter **Lagre**):
-   - **Lokal URL** → vanligvis `http://localhost:3000`
+   - **Lokal URL** → vanligvis `http://localhost:3000` (WLWAI selv), eller `http://localhost:3102` når den peker på **Web‑lab**-klonen for Redcross
    - **Test-URL** → `https://next.lunix.cloud/testside`
    - **Enonic XP admin-URL** → `https://rodekors-xp8dev.enonic.cloud/admin`
-2. Velg et **Miljø** (øverst til høyre): `Local` eller `Test`. Header-chipen **🎯** viser det levende målet fra Innstillinger.
+2. Velg et **Miljø** (øverst til høyre): `Local` eller `Test`. Header-chipen **🎯** viser det levende målet fra Innstillinger. Ved åpning bruker agenten også lagret `env_default` / `execution_mode`.
 3. Velg en **Kjøremodus**: **Generer skript og rapporter** eller **Kjør direkte**.
 4. Åpne fanen du trenger. URL-feltene (Performance / Accessibility / Designsystemet) synkes fra Innstillinger når du bytter miljø; andre faner sender samme `base_url` til backend når de genererer skript.
 5. Se gjennom resultatet; funn kan sendes til **Azure DevOps** og samles i en **Sprintrapport**.
@@ -20,7 +20,8 @@ Den er **mock-first**: hver fane fungerer offline med realistiske eksempeldata, 
 Standardverdier og ett-klikks chips:
 - ❤️‍🩹 **rodekors.no** — produksjon (kun eksplisitt preset).
 - 🧪 **https://next.lunix.cloud/testside** — publisert TestSide (NextJS + Enonic XP + GraphQL). Standard **Test**-BASE_URL.
-- 💻 **localhost:3000** — **Local**-BASE_URL.
+- 💻 **localhost:3000** — standard **Local**-BASE_URL (WLWAI-frontend).
+- 🧪💻 **localhost:3102** — planlagt **Web‑lab**-klone for Redcross.no (via Web‑lab → **Bruk som lokalt miljø**).
 
 **Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — konfigureres under **Innstillinger → Enonic XP admin‑URL**. Dette er CMS-konsollen, **ikke** den offentlige Test BASE_URL brukt av Playwright / Lighthouse / axe / k6.
 
@@ -36,6 +37,17 @@ Innstillingene lastes når agenten åpnes og deles med alle faner (`settingsApi.
 - Bytting av **Local / Test** i headeren oppdaterer 🎯-chipen og synker URL-feltene på Performance, Accessibility og Designsystemet.
 - Etter **Lagre** i Innstillinger oppdateres cachen, så alle faner ser de nye URL-ene med en gang.
 - Generatorene (Playwright, Cypress, Postman, k6, Loadster, Forms QA, …) mottar `base_url` fra frontend og bygger den inn i skript — de hardkoder ikke lenger `test.rodekors.no`.
+
+### Web‑lab (Redcross.no‑web) ↔ denne agenten
+Sidebar → **Web‑lab** → **Redcross.no‑web** er arbeidsflaten for en **lokal klone** av rodekors.no (fortsatt V0 for clone/install/start). Det er **ikke** en ny QA‑agent.
+
+**Bruk som lokalt miljø for RC QA‑agent** (på den siden) gjør bare dette:
+
+1. `POST /api/red-cross-qa/settings` med `{ env_local_url: "http://localhost:3102", env_default: "local" }`
+2. Lar **`env_test_url`** (TestSide) og **`enonic_admin_url`** være uendret
+3. Invaliderer Innstillinger‑cachen og åpner denne agenten på **Local** (🎯 → `:3102`)
+
+Kloneserveren trenger ikke kjøre ennå (start/health kommer i Web‑lab V2); suiter mot `:3102` vil feile til den kjører. Plan: `docs/web-lab-plan.md` §7. Kontrakt‑smoke: `python -m backend.tests.smoke_web_lab_rcqa` fra repo‑roten.
 
 ## Fanene i korte trekk
 | Fane | Hva den gjør |
@@ -86,6 +98,9 @@ Lim inn et arbeidselement eller hent en sprint, gjør funn om til arbeidselement
 - **Hva med `test.rodekors.no`?** Erstattet som standard Test-URL av **`https://next.lunix.cloud/testside`**. Enonic-admin er **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **Jeg endret Innstillinger, men en fane viser fortsatt en gammel URL.** Klikk **Lagre** i Innstillinger, bytt Local ↔ Test én gang (eller last siden på nytt). Header-chipen 🎯 skal matche Innstillinger.
 - **Kan jeg fortsatt overstyre URL-en på Performance / Accessibility?** Ja — skriv eller velg en preset. Neste miljø-/Innstillinger-synk gjenoppretter BASE_URL fra Innstillinger.
+- **Hvordan peker jeg Local mot Web‑lab‑klonen?** Web‑lab → Redcross.no‑web → **Bruk som lokalt miljø for RC QA‑agent**. Setter `env_local_url` til `http://localhost:3102` og åpner denne agenten på Local. Endrer **ikke** TestSide.
+- **Vil «Bruk som lokalt miljø» overskrive Test‑URL‑en min?** Nei. Bare `env_local_url` (+ `env_default=local`) skrives.
+- **Local viser :3102, men ingenting svarer der.** Forventet til Web‑lab kan starte klonen (V2). Bytt miljø til **Test** for TestSide, eller sett Local tilbake til `http://localhost:3000` i Innstillinger.
 - **Sendes dataene mine til KI?** Bare det du skriver inn. Hold ekte person-/produksjonsdata og API-nøkler utenfor KI-inndata (se banneret).
 - **Hvor er tidligere resultater?** I **Runs**-fanen.
 - **Hvor finner jeg denne veiledningen i appen?** README Viewer → `docs/red-cross-qa-help.no.md` (også `.md` / `.es.md`).

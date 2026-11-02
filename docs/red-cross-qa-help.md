@@ -8,10 +8,10 @@ It is **mock-first**: every tab works offline with realistic sample data, so you
 
 ## Quick start
 1. Open **Settings** once and confirm (then **Save**):
-   - **Local URL** → usually `http://localhost:3000`
+   - **Local URL** → usually `http://localhost:3000` (WLWAI itself), or `http://localhost:3102` when pointed at the **Web Lab** Redcross clone
    - **Test URL** → `https://next.lunix.cloud/testside`
    - **Enonic XP admin URL** → `https://rodekors-xp8dev.enonic.cloud/admin`
-2. Pick an **Environment** (top right): `Local` or `Test`. The header chip **🎯** shows the live target from Settings.
+2. Pick an **Environment** (top right): `Local` or `Test`. The header chip **🎯** shows the live target from Settings. On open, the agent also applies saved `env_default` / `execution_mode` from Settings.
 3. Pick an **Execution Mode**: **Generate scripts & reports** or **Execute directly**.
 4. Open the tab you need. URL fields (Performance / Accessibility / Designsystemet) sync from Settings when you change environment; other tabs send that same `base_url` to the backend when generating scripts.
 5. Review the result; findings can be pushed to **Azure DevOps** and rolled up into a **Sprint Report**.
@@ -20,7 +20,8 @@ It is **mock-first**: every tab works offline with realistic sample data, so you
 Defaults and one-click chips:
 - ❤️‍🩹 **rodekors.no** — production (explicit preset only).
 - 🧪 **https://next.lunix.cloud/testside** — published TestSide (NextJS + Enonic XP + GraphQL). Default **Test** BASE_URL.
-- 💻 **localhost:3000** — local / **Local** BASE_URL.
+- 💻 **localhost:3000** — default **Local** BASE_URL (WLWAI frontend).
+- 🧪💻 **localhost:3102** — planned **Web Lab** Redcross.no clone (set via Web Lab → **Use as local env**).
 
 **Enonic XP admin (Content Studio):** `https://rodekors-xp8dev.enonic.cloud/admin` — configured under **Settings → Enonic XP admin URL**. This is the CMS console, **not** the public Test BASE_URL used by Playwright / Lighthouse / axe / k6.
 
@@ -36,6 +37,17 @@ Settings are loaded once when the agent opens and shared with all tabs (`setting
 - Changing **Local / Test** in the header updates the 🎯 chip and re-syncs URL inputs on Performance, Accessibility and Designsystemet.
 - After **Save** in Settings, the cache refreshes so every tab sees the new URLs immediately.
 - Generators (Playwright, Cypress, Postman, k6, Loadster, Forms QA, …) receive `base_url` from the frontend and embed that host in scripts — they no longer hardcode `test.rodekors.no`.
+
+### Web Lab (Redcross.no web) ↔ this agent
+Sidebar → **Web Lab** → **Redcross.no web** is the workspace for a **local clone** of rodekors.no (still V0 for clone/install/start). It is **not** another QA agent.
+
+**Use as local env for RC QA Agent** (on that page) does this and nothing else:
+
+1. `POST /api/red-cross-qa/settings` with `{ env_local_url: "http://localhost:3102", env_default: "local" }` only
+2. Leaves **`env_test_url`** (TestSide) and **`enonic_admin_url`** unchanged
+3. Invalidates the Settings cache and opens this agent on **Local** (🎯 → `:3102`)
+
+The clone server does not need to be running yet (start/health arrive in Web Lab V2); suites against `:3102` will fail until it is. Full plan: `docs/web-lab-plan.md` §7. Contract smoke: `python -m backend.tests.smoke_web_lab_rcqa` from the repo root.
 
 ## The tabs at a glance
 | Tab | What it does |
@@ -86,6 +98,9 @@ Paste a work item or fetch a sprint, turn findings into work items, preview the 
 - **What about `test.rodekors.no`?** Replaced as the default Test URL by **`https://next.lunix.cloud/testside`**. Enonic admin is at **`https://rodekors-xp8dev.enonic.cloud/admin`**.
 - **I changed Settings but a tab still shows an old URL.** Click **Save** in Settings, then switch Local ↔ Test once (or reload the page). The header 🎯 chip should match Settings.
 - **Can I still override the URL on Performance / Accessibility?** Yes — type or pick a preset. The next environment / Settings sync will restore the Settings BASE_URL.
+- **How do I point Local at the Web Lab clone?** Web Lab → Redcross.no web → **Use as local env for RC QA Agent**. That sets `env_local_url` to `http://localhost:3102` and opens this agent on Local. It does **not** change TestSide.
+- **Will “Use as local env” overwrite my Test URL?** No. Only `env_local_url` (+ `env_default=local`) is written.
+- **Local shows :3102 but nothing answers there.** Expected until Web Lab can start the clone (V2). Switch Environment to **Test** for TestSide, or set Local back to `http://localhost:3000` in Settings.
 - **Is my data sent to AI?** Only what you type in. Keep real personal / production data and API keys out of AI inputs (see the banner).
 - **Where are past results?** The **Runs** tab.
 - **Where is this guide in the app?** README Viewer → `docs/red-cross-qa-help.md` (also `.es.md` / `.no.md`).
