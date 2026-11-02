@@ -62,7 +62,7 @@ const HOFFMAN_POINTS = [
 // Paraphrased reading notes of the public essay (not a verbatim reprint).
 const AMODEI_POINTS = [
   { id: 'a1', badge: 'view' },
-  { id: 'a2', badge: 'view' },
+  { id: 'a2', badge: 'contested', counterpoint: true },
   { id: 'a3', badge: 'contested', counterpoint: true },
   { id: 'a4', badge: 'technique' },
   { id: 'a5', badge: 'view' },

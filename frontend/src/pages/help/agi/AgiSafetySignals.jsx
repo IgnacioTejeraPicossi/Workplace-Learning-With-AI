@@ -46,6 +46,17 @@ const SIGNALS = [
     ],
   },
   {
+    id: 'cruxResearch',
+    badge: 'trend',
+    contested: true,
+    sources: [
+      { label: 'CRUX (materials)', url: 'https://cruxevals.com/crux/can-ai-agents-conduct-research' },
+      { label: 'arXiv:2607.27191', url: 'https://arxiv.org/abs/2607.27191' },
+      { label: 'DOI', url: 'https://doi.org/10.48550/arxiv.2607.27191' },
+      { label: 'Peter Kirgis', url: 'https://peterkirgis.github.io/research/open-ended-ai-research' },
+    ],
+  },
+  {
     id: 'huggingface',
     badge: 'incident',
     sources: [
