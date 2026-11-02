@@ -9,7 +9,7 @@ Covers: Phase A (Jira -> Azure DevOps rename, Sev/Kat, Sprint Report, Fundy)
 import asyncio
 from backend.services.red_cross_qa import (
     generate_test_plan, get_ado_bundle_preview, generate_sprint_report,
-    run_forms_qa, get_settings,
+    run_forms_qa, get_settings, save_settings, DEFAULT_SETTINGS,
     run_dpia_check, verify_definition_of_done, run_resilience_check,
     generate_uat_support, analyze_risk_matrix,
     run_accessibility_check, run_content_migration_audit,
@@ -43,6 +43,29 @@ async def main():
     assert "current_sprint" in settings, "current_sprint missing"
     assert "jira_project" not in settings, "jira_project should be gone"
     print("[OK] settings shape")
+
+    # Web Lab V1-RCQA contract: partial save updates env_local_url only;
+    # response must be full merge (preserve env_test_url / enonic_admin_url).
+    prev_local = settings.get("env_local_url")
+    prev_test = settings.get("env_test_url") or DEFAULT_SETTINGS["env_test_url"]
+    prev_admin = settings.get("enonic_admin_url") or DEFAULT_SETTINGS["enonic_admin_url"]
+    probe_local = "http://localhost:3102"
+    partial = await save_settings({
+        "env_local_url": probe_local,
+        "env_default": "local",
+    })
+    assert partial.get("status") == "ok", f"partial save failed: {partial}"
+    merged = partial["settings"]
+    assert (merged.get("env_local_url") or "").rstrip("/") == probe_local.rstrip("/"), \
+        f"env_local_url not applied: {merged.get('env_local_url')}"
+    assert (merged.get("env_test_url") or "").rstrip("/") == prev_test.rstrip("/"), \
+        f"env_test_url was overwritten: {merged.get('env_test_url')}"
+    assert (merged.get("enonic_admin_url") or "").rstrip("/") == prev_admin.rstrip("/"), \
+        f"enonic_admin_url was overwritten: {merged.get('enonic_admin_url')}"
+    # Restore prior Local URL so the smoke does not leave Settings on :3102.
+    if prev_local:
+        await save_settings({"env_local_url": prev_local})
+    print("[OK] settings partial save preserves TestSide + Enonic (Web Lab contract)")
 
     plan = await generate_test_plan(
         "ADO-123 demo", "AC1: works", "", "medium", "test", "en"

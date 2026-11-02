@@ -1,5 +1,6 @@
 import React from 'react';
 import WebLabPage from './_WebLabPage';
+import ConnectToQaAgent from './components/ConnectToQaAgent';
 import { RCQA_DEFAULT_SETTINGS } from '../red-cross-qa/settingsApi';
 
 /** Planned clone URL for Redcross.no (Web Lab port map — see docs/web-lab-plan.md). */
@@ -14,18 +15,22 @@ export const REDCROSS_PLANNED_LOCAL_PORT = '3102';
  * understand the relationship (Web Lab = the actual web pages; RC QA
  * Agent = the QA testing patterns).
  *
- * V1 contract (docs/web-lab-plan.md §7): "Use as local env" must set
- * RCQA `env_local_url` → http://localhost:3102, keep `env_test_url`
- * (TestSide) + `enonic_admin_url`, invalidate settingsApi cache, open
- * RCQA with Environment = Local. Do NOT write env_test_url.
+ * V1 contract (docs/web-lab-plan.md §7): ConnectToQaAgent sets
+ * RCQA `env_local_url` → http://localhost:3102, keeps `env_test_url`
+ * (TestSide) + `enonic_admin_url`, invalidates settingsApi cache, then
+ * opens RCQA with Environment = Local. Does NOT write env_test_url.
  *
  * URL defaults below are imported from RCQA settingsApi so the placeholder
- * stays aligned with the agent Settings runtime (no live fetch in V0).
+ * stays aligned with the agent Settings runtime.
  *
  * `onNavigate` prop comes from App.jsx and switches the active section
- * to "red-cross-web-qa" when the user clicks the cross-link button.
+ * to "red-cross-web-qa" when the user clicks the cross-link / connect.
  */
 export default function RedcrossNoWeb({ onNavigate }) {
+  const openRcqa = () => {
+    if (onNavigate) onNavigate('red-cross-web-qa');
+  };
+
   const urlContext = {
     titleKey: 'webLab.redcrossNo.urlMapTitle',
     hintKey: 'webLab.redcrossNo.urlMapHint',
@@ -66,7 +71,14 @@ export default function RedcrossNoWeb({ onNavigate }) {
       urlContext={urlContext}
       relatedAgentKey="webLab.redcrossNo.relatedAgent"
       relatedAgentHintKey="webLab.redcrossNo.relatedAgentHint"
-      onOpenRelatedAgent={onNavigate ? () => onNavigate('red-cross-web-qa') : undefined}
+      onOpenRelatedAgent={onNavigate ? openRcqa : undefined}
+      relatedAgentExtra={(
+        <ConnectToQaAgent
+          localUrl={REDCROSS_PLANNED_LOCAL_URL}
+          onSuccess={openRcqa}
+          accentColor="#b91c1c"
+        />
+      )}
     />
   );
 }

@@ -202,10 +202,12 @@ frontend/src/web-lab/
 │   ├── GitRepoPanel.jsx     [V1] · clone / pull buttons + last_pulled_at
 │   ├── RuntimePanel.jsx     [V2] · install / start / stop + health pill
 │   ├── LogsPanel.jsx        [V2] · tail logs with auto-scroll
-│   ├── ConnectToQaAgent.jsx [V1] · "Use as local env for RC QA Agent" button
+│   ├── ConnectToQaAgent.jsx [shipped early] · "Use as local env" (Settings-only; clone optional)
 │   └── CompareWithProd.jsx  [V3] · HTML/screenshot/a11y diff panel
 └── api/webLabApi.js         [V1] · fetch client
 ```
+
+`ConnectToQaAgent.jsx` is wired on the Redcross V0 page: it POSTs the §7 partial payload, invalidates `settingsApi` cache, verifies `env_local_url`, then navigates to RCQA. Backend `save_settings` returns the same full merge as `get_settings` so TestSide / Enonic stay visible in the response.
 
 ### "Use as local env for RC QA Agent" flow (V1 key feature) — **contract**
 

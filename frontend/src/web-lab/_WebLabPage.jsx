@@ -37,6 +37,7 @@ export default function WebLabPage({
   relatedAgentKey,         // optional — only Redcross.no uses this
   relatedAgentHintKey,     // optional
   onOpenRelatedAgent,      // optional click handler (sets active section)
+  relatedAgentExtra,       // optional React node (e.g. ConnectToQaAgent)
 }) {
   const { t } = useTranslation();
 
@@ -131,10 +132,11 @@ export default function WebLabPage({
             {t(relatedAgentHintKey)}
           </p>
           {onOpenRelatedAgent && (
-            <button onClick={onOpenRelatedAgent} style={styles.relatedBtn}>
+            <button type="button" onClick={onOpenRelatedAgent} style={styles.relatedBtn}>
               → {t(relatedAgentKey)}
             </button>
           )}
+          {relatedAgentExtra}
         </div>
       )}
 

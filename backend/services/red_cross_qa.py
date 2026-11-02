@@ -6554,13 +6554,23 @@ async def get_settings() -> Dict[str, Any]:
 
 
 async def save_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
-    safe = {k: v for k, v in payload.items() if k in DEFAULT_SETTINGS}
+    """Partial update via Mongo $set. Response matches get_settings (full merge).
+
+    Writers such as Web Lab "Use as local env" may send only env_local_url /
+    env_default; env_test_url and enonic_admin_url must remain whatever is
+    already stored (or defaults). Returning DEFAULT ∪ payload alone would
+    incorrectly look like other keys were reset.
+    """
+    safe = {
+        k: v for k, v in payload.items()
+        if k in DEFAULT_SETTINGS and v is not None
+    }
     try:
         await red_cross_qa_settings_collection.update_one(
             {"_singleton": "main"},
             {"$set": {**safe, "_singleton": "main", "updated_at": _now()}},
             upsert=True,
         )
-        return {"status": "ok", "settings": {**DEFAULT_SETTINGS, **safe}}
+        return await get_settings()
     except Exception as e:
         return {"status": "error", "message": f"Could not save settings: {e}"}

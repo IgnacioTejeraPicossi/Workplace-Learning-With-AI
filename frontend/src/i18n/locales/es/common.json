@@ -1252,7 +1252,13 @@
       "enonicAdminUrlNote": "CMS Content Studio. No es la BASE_URL pública de Playwright / Lighthouse / axe.",
       "docsHint": "Docs: docs/web-lab-plan.md §7 · docs/red-cross-qa-help.es.md (también .md / .no.md en el Visor de README)",
       "relatedAgent": "Relacionado: Cruz Roja Web QA Agent",
-      "relatedAgentHint": "Los patrones de QA testing para rodekors.no viven en el módulo existente «Cruz Roja Web QA Agent». Cuando el Web Lab sirva un clon local, «Usar como entorno local» fijará env_local_url de Ajustes RCQA a http://localhost:3102 (Entorno = Local) y dejará intactos env_test_url (https://next.lunix.cloud/testside) y la URL admin de Enonic."
+      "relatedAgentHint": "Los patrones de QA testing para rodekors.no viven en el módulo existente «Cruz Roja Web QA Agent». Cuando el Web Lab sirva un clon local, «Usar como entorno local» fijará env_local_url de Ajustes RCQA a http://localhost:3102 (Entorno = Local) y dejará intactos env_test_url (https://next.lunix.cloud/testside) y la URL admin de Enonic.",
+      "btnUseAsLocalEnv": "Usar como entorno local para RC QA Agent",
+      "useAsLocalEnvHint": "Solo escribe env_local_url (+ env_default=local) en Ajustes RCQA y abre el agente. El clon en :3102 no tiene que estar en marcha aún (start/health en V2); las suites fallarán contra ese host hasta que lo esté.",
+      "useAsLocalEnvWorking": "Actualizando Ajustes RCQA…",
+      "useAsLocalEnvSuccess": "RCQA Local apunta a la URL local prevista. TestSide y admin Enonic preservados. Abriendo el agente…",
+      "useAsLocalEnvError": "No se pudieron actualizar los Ajustes RCQA",
+      "useAsLocalEnvVerifyFail": "env_local_url no coincide tras guardar (esperado {{expected}}, obtenido {{got}})"
     }
   },
   "selfSimReality": {
