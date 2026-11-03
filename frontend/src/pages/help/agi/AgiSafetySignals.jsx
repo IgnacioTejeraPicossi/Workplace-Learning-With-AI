@@ -57,6 +57,17 @@ const SIGNALS = [
     ],
   },
   {
+    id: 'researchArena',
+    badge: 'trend',
+    contested: true,
+    sources: [
+      { label: 'arXiv:2605.19156', url: 'https://arxiv.org/abs/2605.19156' },
+      { label: 'HTML paper', url: 'https://arxiv.org/html/2605.19156' },
+      { label: 'PDF', url: 'https://arxiv.org/pdf/2605.19156v1' },
+      { label: 'DOI', url: 'https://doi.org/10.48550/arxiv.2605.19156' },
+    ],
+  },
+  {
     id: 'huggingface',
     badge: 'incident',
     sources: [
