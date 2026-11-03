@@ -166,18 +166,26 @@ Summarize this video transcript into 5 key points for learning purposes:
 """ 
 
 CLASSIFY_UNKNOWN_INTENT = """
-You are an assistant helping classify user input in a workplace learning platform.
+You are an assistant helping classify user input in the "Workplace Learning With AI" (WLWAI) platform.
 
 The user said: "{user_input}"
 
 1. What are they likely trying to do?
-2. Is this related to an existing module: 
-   [AI Concepts, Micro-lessons, Video Lessons, Recommendations, Simulations, Career Coach, Skills Forecast, Certifications, Web Search]?
-3. If not a match, suggest a possible new feature name (short and descriptive).
-4. Confidence level (High, Medium, Low)
+2. Does this match an existing WLWAI module? If yes, set `module_match` to the exact canonical slug from this list:
+   - Learning Modules: `ai-concepts`, `micro-lessons`, `video-lessons`, `simulations`, `recommendation`, `certifications`, `ai-career-coach`, `skills-forecast`, `web-search`, `team-dynamics`, `ai-learning`, `babel-library`, `knowledge-map`
+   - Repository & Document Analyzers: `repo-analyzer`, `agent-cursor-ai`, `learning-repo`, `documents-analyzer`, `learning-document`, `agentic-rag`, `agentic-rag-document`
+   - J-messages (Fiskeridirektoratet): `j-messages-analyzer`, `j-messages-pre-analyzer`, `j-messages-library`, `j-messages-pairs`
+   - Enterprise Architecture: `ea-home`, `process-designer`, `catalog-manager`
+   - Item Agents: `agentops-studio`, `ai-compliance-agent`, `ai-productivity-agent`, `agi-progress`, `red-cross-web-qa`, `humanizing-ai`
+   - Future Item Agents: `ea-second-brain`, `sales-assistant`, `personal-attention-agent`, `telco-ops-agent`, `grc-agent`, `council-agent`, `ops-efficiency-agent`, `atm-vv-test-copilot`, `self-sim-reality-agent`, `self-correcting-loop`, `andres-robot`
+   - Language Agents: `japanese-sensei`, `chinese-teacher`, `korean-teacher`, `english-mentor`, `norwegian-mentor`, `spanish-teacher`
+   - Web Lab: `web-lab-redcross-no`, `web-lab-item-no`
+   - Standalone & Help/Dev: `robomind-clinic`, `cybersecurity`, `agent-theory-docs`, `presentation-agent`, `ai-study-buddy`, `readme-viewer`, `security`, `run-test`, `api-config`, `future-app`, `idea-log`, `feature-roadmap`, `cloud-install`
+3. If not a match to any module above, set `module_match` to null and suggest a possible new feature name in `new_feature` (short and descriptive).
+4. Confidence level (`High`, `Medium`, `Low`).
 5. Ask ONE follow-up question to clarify the intent, if needed.
 
-Respond as a JSON object with keys: intent, module_match, new_feature, confidence, follow_up_question
+Respond ONLY as a JSON object with keys: intent, module_match, new_feature, confidence, follow_up_question
 """ 
 
 GENERATE_SCAFFOLD_PROMPT = """

@@ -122,9 +122,101 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'API Config': 'api-config',
     'configure api': 'api-config',
     'api configuration': 'api-config',
+    // Modern WLWAI modules & agents
+    'red cross': 'red-cross-web-qa',
+    'red cross web qa': 'red-cross-web-qa',
+    'red cross web qa agent': 'red-cross-web-qa',
+    'cruz roja': 'red-cross-web-qa',
+    'røde kors': 'red-cross-web-qa',
+    'agi progress': 'agi-progress',
+    'agi progress hub': 'agi-progress',
+    'agi tracker': 'agi-progress',
+    'homo sapiens vs ai': 'agi-progress',
+    'web lab': 'web-lab-redcross-no',
+    'redcross.no web': 'web-lab-redcross-no',
+    'item.no web': 'web-lab-item-no',
+    'robomind clinic': 'robomind-clinic',
+    'robomind': 'robomind-clinic',
+    'j-messages': 'j-messages-analyzer',
+    'j-messages analyzer': 'j-messages-analyzer',
+    'j-meldinger': 'j-messages-analyzer',
+    'j-messages library': 'j-messages-library',
+    'j-messages pairs': 'j-messages-pairs',
+    'cybersecurity': 'cybersecurity',
+    'security center': 'security',
+    'security': 'security',
+    'agentops studio': 'agentops-studio',
+    'agentops': 'agentops-studio',
+    'ai compliance agent': 'ai-compliance-agent',
+    'compliance agent': 'ai-compliance-agent',
+    'ai productivity agent': 'ai-productivity-agent',
+    'productivity agent': 'ai-productivity-agent',
+    'humanizing ai': 'humanizing-ai',
+    'self-simulating reality': 'self-sim-reality-agent',
+    'self-simulating reality agent': 'self-sim-reality-agent',
+    'self-correcting loop': 'self-correcting-loop',
+    'andres robot': 'andres-robot',
+    'andrés the robot': 'andres-robot',
+    'ea second brain': 'ea-second-brain',
+    'sales assistant': 'sales-assistant',
+    'personal attention agent': 'personal-attention-agent',
+    'telco ops agent': 'telco-ops-agent',
+    'grc agent': 'grc-agent',
+    'council agent': 'council-agent',
+    'ops efficiency agent': 'ops-efficiency-agent',
+    'atm v&v test copilot': 'atm-vv-test-copilot',
+    'japanese sensei': 'japanese-sensei',
+    'chinese teacher': 'chinese-teacher',
+    'korean teacher': 'korean-teacher',
+    'english mentor': 'english-mentor',
+    'norwegian mentor': 'norwegian-mentor',
+    'spanish teacher': 'spanish-teacher',
+    'repo analyzer': 'repo-analyzer',
+    'repository analyzer': 'repo-analyzer',
+    'agent cursor ai': 'agent-cursor-ai',
+    'learning repo': 'learning-repo',
+    'documents analyzer': 'documents-analyzer',
+    'document analyzer': 'documents-analyzer',
+    'learning document': 'learning-document',
+    'agentic rag': 'agentic-rag',
+    'agentic rag document': 'agentic-rag-document',
+    'ea dashboard': 'ea-home',
+    'process designer': 'process-designer',
+    'catalog manager': 'catalog-manager',
+    'map of knowledge': 'knowledge-map',
+    'knowledge map': 'knowledge-map',
+    'team dynamics': 'team-dynamics',
+    'readme viewer': 'readme-viewer',
+    'readme': 'readme-viewer',
+    'presentation agent': 'presentation-agent',
+    'agent theory docs': 'agent-theory-docs',
+    'run test': 'run-test',
+    'cloud install': 'cloud-install',
+    'idea log': 'idea-log',
+    'feature roadmap': 'feature-roadmap',
+    'future app': 'future-app',
   };
 
-  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "ai-career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy", "babel-library", "api-config"];
+  const knownModules = [
+    "dashboard", "ai-concepts", "micro-lessons", "video-lessons", "recommendation",
+    "simulations", "ai-career-coach", "skills-forecast", "certifications", "web-search",
+    "team-dynamics", "ai-learning", "babel-library", "knowledge-map",
+    "repo-analyzer", "agent-cursor-ai", "learning-repo",
+    "documents-analyzer", "learning-document", "agentic-rag", "agentic-rag-document",
+    "j-messages-analyzer", "j-messages-pre-analyzer", "j-messages-library", "j-messages-pairs",
+    "ea-home", "process-designer", "catalog-manager",
+    "agentops-studio", "ai-compliance-agent", "ai-productivity-agent",
+    "agi-progress", "red-cross-web-qa", "humanizing-ai",
+    "ea-second-brain", "sales-assistant", "personal-attention-agent", "telco-ops-agent",
+    "grc-agent", "council-agent", "ops-efficiency-agent", "atm-vv-test-copilot",
+    "self-sim-reality-agent", "self-correcting-loop", "andres-robot",
+    "japanese-sensei", "chinese-teacher", "korean-teacher",
+    "english-mentor", "norwegian-mentor", "spanish-teacher",
+    "web-lab-item-no", "web-lab-redcross-no",
+    "robomind-clinic", "cybersecurity", "agent-theory-docs", "presentation-agent",
+    "ai-study-buddy", "readme-viewer", "security", "run-test", "api-config",
+    "future-app", "idea-log", "feature-roadmap", "cloud-install"
+  ];
 
   const handleSubmit = async (value) => {
     const prompt = value || input; // || transcript;
@@ -228,8 +320,16 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         // Route to nearest module if possible
         if (isKnownModule) {
           setNotification(`We routed you to the closest match: ${res.module}. If this isn't what you wanted, click here to give feedback.`);
-          // Use moduleMap to ensure correct mapping for App routing
-          let mappedModule = moduleMap[res.module] || moduleMap[normalizedModule] || normalizedModule;
+          // Preserve canonical hyphenated slug from knownModules before falling back to moduleMap
+          const canonicalKnown = knownModules.find(
+            (m) => m.toLowerCase().replace(/[-_ ]/g, '') === normalizedModule
+          );
+          let mappedModule =
+            canonicalKnown ||
+            moduleMap[res.module] ||
+            moduleMap[(res.module || '').toLowerCase()] ||
+            moduleMap[normalizedModule] ||
+            res.module;
           console.log(`🎯 Backend routing: calling onRoute with:`, mappedModule, prompt);
           onRoute(mappedModule, prompt);
           setInput("");

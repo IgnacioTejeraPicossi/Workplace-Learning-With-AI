@@ -83,3 +83,14 @@ def test_extract_actions_structured_and_fallback():
     assert "red-cross-web-qa" in targets2
     assert all(t in NAV_TARGET_LABELS for t in targets2)
     assert "red-cross-web-qa" in WLWAI_MODULE_CATALOG
+
+
+def test_commandbar_keyword_classifier_routes_modern_modules():
+    from backend.llm import classify_with_keywords
+
+    assert classify_with_keywords("Open Red Cross Web QA Agent")["module_match"] == "red-cross-web-qa"
+    assert classify_with_keywords("Show AGI Progress Hub")["module_match"] == "agi-progress"
+    assert classify_with_keywords("Quiero abrir Robomind Clinic")["module_match"] == "robomind-clinic"
+    assert classify_with_keywords("Analyze J-meldinger from Fiskeridirektoratet")["module_match"] == "j-messages-analyzer"
+    assert classify_with_keywords("Go to Web Lab Redcross.no web")["module_match"] == "web-lab-redcross-no"
+

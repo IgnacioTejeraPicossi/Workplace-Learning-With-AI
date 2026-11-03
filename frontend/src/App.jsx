@@ -180,12 +180,35 @@ function AppContent() {
     setSection(sectionId);
   };
 
+  // Modules that accept a free-text `query` prop via `activeModule`
+  const QUERY_ACTIVE_MODULES = new Set([
+    'ai-concepts',
+    'micro-lessons',
+    'simulations',
+    'recommendation',
+    'ai-career-coach',
+    'skills-forecast',
+    'certifications',
+    'video-lessons',
+    'presentation-agent',
+    'ai-study-buddy',
+    'ai-learning',
+    'babel-library',
+    'api-config',
+  ]);
+
   const handleRoute = (module, query) => {
     console.log(`🚀 handleRoute called with:`, module, query);
     setUserQuery(query);
-    setActiveModule(module);
     setIsAIFullScreen(false); // Exit full-screen mode when a module is selected
-    console.log(`✅ State updated: activeModule = ${module}, userQuery = ${query}`);
+    if (QUERY_ACTIVE_MODULES.has(module)) {
+      setActiveModule(module);
+    } else {
+      // Modern section-based modules (Red Cross QA, AGI Progress, Web Lab, J-messages, Robomind, etc.)
+      setActiveModule(null);
+      setSection(module);
+    }
+    console.log(`✅ State updated: target = ${module}, userQuery = ${query}`);
   };
 
   const handleAIFullScreen = () => {

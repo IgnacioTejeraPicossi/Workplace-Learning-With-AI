@@ -1091,7 +1091,7 @@ async def call_llm_router(query):
     confidence = classification.get('confidence', 'Low')
     module = classification.get('module_match')
     reason = classification.get('intent')
-    if confidence == 'High' and module:
+    if confidence in ('High', 'Medium') and module:
         return {"module": module, "reason": reason, "confidence": confidence}
     else:
         return {"module": None, "reason": reason, "confidence": confidence} 
@@ -1145,10 +1145,68 @@ def classify_intent(user_input: str) -> dict:
 
 def classify_with_keywords(user_input: str) -> dict:
     """Fallback classification using keyword matching when AI is not available."""
-    input_lower = user_input.lower()
-    
-    # Define keyword mappings for modules
+    input_lower = (user_input or "").lower()
+
+    # 1) First check exact/specific module aliases from the Hologram Guide catalog
+    try:
+        from backend.routers.hologram_agent import NAV_ALIASES, NAV_TARGET_LABELS, _norm, _normalize_target
+        norm_in = _norm(input_lower)
+        for phrase, canonical in NAV_ALIASES:
+            if _norm(phrase) in norm_in:
+                label = NAV_TARGET_LABELS.get(canonical, canonical)
+                return {
+                    "intent": f"User wants to open {label}",
+                    "module_match": canonical,
+                    "new_feature": None,
+                    "confidence": "High",
+                    "follow_up_question": None,
+                }
+    except Exception:
+        pass
+
+    # 2) Broad keyword mappings across WLWAI modules (EN / ES / NO)
     module_keywords = {
+        "red-cross-web-qa": ["red cross", "cruz roja", "røde kors", "rodekors", "enonic", "playwright", "wcag", "designsystemet", "testside"],
+        "agi-progress": ["agi", "progress tracker", "homo sapiens", "istqb", "amodei", "endings", "safety signals"],
+        "web-lab-redcross-no": ["web lab", "laboratorio web", "3102", "local clone", "clon local"],
+        "web-lab-item-no": ["item.no", "3101"],
+        "robomind-clinic": ["robomind", "clinic", "psychopathia", "therapy", "terapia", "alignment"],
+        "j-messages-analyzer": ["j-message", "j-melding", "fiskeridirektoratet", "fishery", "pesca"],
+        "cybersecurity": ["cybersecurity", "ciberseguridad", "nist", "vulnerability", "threat", "owasp"],
+        "security": ["security center", "encryption", "gdpr", "anonymization", "retention", "pii"],
+        "agentops-studio": ["agentops", "n8n", "orchestration", "multi-agent"],
+        "ai-compliance-agent": ["compliance", "cumplimiento", "eu ai act"],
+        "ai-productivity-agent": ["productivity", "productividad"],
+        "humanizing-ai": ["humanizing", "humanizar", "ethics", "wellbeing"],
+        "self-sim-reality-agent": ["self-simulating", "observer patch", "oph", "holographic", "consciousness", "realidad"],
+        "self-correcting-loop": ["self-correcting", "builder judge"],
+        "andres-robot": ["andres", "andrés", "robot", "sandbox"],
+        "ea-second-brain": ["second brain", "portfolio", "enterprise architecture"],
+        "ea-home": ["ea dashboard", "process designer", "catalog manager"],
+        "atm-vv-test-copilot": ["atm", "air traffic", "v&v"],
+        "sales-assistant": ["sales", "crm", "deal"],
+        "personal-attention-agent": ["attention", "focus", "triage"],
+        "telco-ops-agent": ["telco", "telecom", "network ops"],
+        "grc-agent": ["grc", "governance risk"],
+        "council-agent": ["council", "deliberation"],
+        "ops-efficiency-agent": ["ops efficiency", "bottleneck"],
+        "japanese-sensei": ["japanese", "japonés", "japansk", "jlpt", "kanji", "sensei"],
+        "chinese-teacher": ["chinese", "chino", "kinesisk", "mandarin", "hsk"],
+        "korean-teacher": ["korean", "coreano", "koreansk", "topik", "hangul"],
+        "english-mentor": ["english mentor", "inglés", "engelsk"],
+        "norwegian-mentor": ["norwegian mentor", "noruego", "norskprøve", "bokmål"],
+        "spanish-teacher": ["spanish teacher", "español", "spansk", "dele"],
+        "repo-analyzer": ["repository", "repo", "codebase", "cursor ai"],
+        "documents-analyzer": ["document", "documento", "pdf", "docx"],
+        "agentic-rag": ["agentic rag", "rag"],
+        "babel-library": ["babel", "library", "biblioteca", "catalogue"],
+        "knowledge-map": ["knowledge map", "mapa de conocimiento"],
+        "readme-viewer": ["readme", "documentation", "documentación", "help docs"],
+        "ai-study-buddy": ["study buddy", "companion", "asistente de estudio"],
+        "presentation-agent": ["presentation", "presentación", "slides", "diapositivas"],
+        "api-config": ["api config", "openrouter", "api key", "lm studio", "provider"],
+        "run-test": ["run test", "smoke test", "test runner"],
+        "cloud-install": ["cloud install", "aks", "azure", "docker", "kubernetes"],
         "ai-concepts": ["concept", "concepto", "idea", "learn", "aprender", "knowledge", "conocimiento"],
         "micro-lessons": ["micro", "lesson", "lección", "short", "corto", "quick", "rápido"],
         "video-lessons": ["video", "video lesson", "lección de video", "watch", "ver"],
@@ -1157,35 +1215,32 @@ def classify_with_keywords(user_input: str) -> dict:
         "skills-forecast": ["forecast", "predicción", "future", "futuro", "skill", "habilidad"],
         "certifications": ["certification", "certificación", "cert", "study plan", "plan de estudio"],
         "web-search": ["search", "buscar", "web", "internet", "research", "investigar"],
-        "recommendations": ["recommend", "recomendar", "what to learn", "qué aprender", "next", "siguiente"]
+        "recommendation": ["recommend", "recomendar", "what to learn", "qué aprender", "next", "siguiente"],
     }
-    
-    # Find the best module match
+
     best_match = None
     best_score = 0
-    
+
     for module, keywords in module_keywords.items():
-        score = sum(1 for keyword in keywords if keyword in input_lower)
+        score = sum(2 if " " in kw else 1 for kw in keywords if kw in input_lower)
         if score > best_score:
             best_score = score
             best_match = module
-    
-    # Determine confidence based on match quality
+
     if best_score >= 2:
         confidence = "High"
     elif best_score >= 1:
         confidence = "Medium"
     else:
         confidence = "Low"
-    
-    # Generate appropriate response
+
     if best_match and confidence in ["High", "Medium"]:
         return {
             "intent": f"User wants to access {best_match.replace('-', ' ')}",
             "module_match": best_match,
             "new_feature": None,
             "confidence": confidence,
-            "follow_up_question": "Is this what you were looking for?"
+            "follow_up_question": "Is this what you were looking for?",
         }
     else:
         return {
@@ -1193,7 +1248,7 @@ def classify_with_keywords(user_input: str) -> dict:
             "module_match": None,
             "new_feature": "Enhanced Intent Recognition",
             "confidence": "Low",
-            "follow_up_question": "Sorry, I didn't quite understand that. Could you rephrase?"
+            "follow_up_question": "Sorry, I didn't quite understand that. Could you rephrase?",
         } 
 
 def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
