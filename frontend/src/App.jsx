@@ -109,7 +109,11 @@ function AppContent() {
           'future': 'future-app',
           'future-module': 'future-app',
           'hologram': 'future-app',
-          'hologram-portal': 'future-app'
+          'hologram-portal': 'future-app',
+          'repository-analyzer': 'repo-analyzer',
+          'j-messages': 'j-messages-analyzer',
+          'web-lab': 'web-lab-redcross-no',
+          'readme': 'readme-viewer'
         };
         return map[m] || m;
       };
@@ -123,6 +127,8 @@ function AppContent() {
         return;
       }
 
+      // Exit Ask AI full-screen overlay when navigating to any concrete module
+      setIsAIFullScreen(false);
       // Set the section to navigate to the module
       setSection(targetSection);
       setActiveModule(null); // Clear active module to use section navigation

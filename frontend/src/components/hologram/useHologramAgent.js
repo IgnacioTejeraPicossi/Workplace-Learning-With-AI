@@ -86,16 +86,8 @@ export function useHologramAgent({
       }
       const data = await res.json();
       const reply = data?.reply || fallbackReply;
-      setMessages([...next, { role: "assistant", content: reply }]);
-
-      // Optional: handle actions (navigate) if provided
-      if (Array.isArray(data?.actions)) {
-        for (const a of data.actions) {
-          if (a?.type === "NAVIGATE" && a?.target) {
-            window.dispatchEvent(new CustomEvent("navigateToModule", { detail: { module: a.target } }));
-          }
-        }
-      }
+      const actions = Array.isArray(data?.actions) ? data.actions : [];
+      setMessages([...next, { role: "assistant", content: reply, actions }]);
     } catch (e) {
       setMessages([
         ...next,
@@ -106,5 +98,14 @@ export function useHologramAgent({
     }
   };
 
-  return { messages, sendMessage, isLoading, mode, setMode: updateMode };
+  const triggerAction = (action) => {
+    if (!action) return;
+    if (action.type === "NAVIGATE" && action.target) {
+      window.dispatchEvent(
+        new CustomEvent("navigateToModule", { detail: { module: action.target } })
+      );
+    }
+  };
+
+  return { messages, sendMessage, isLoading, mode, setMode: updateMode, triggerAction };
 }

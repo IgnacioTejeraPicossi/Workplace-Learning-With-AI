@@ -36,7 +36,7 @@ export default function HologramAgentChat({ onClose }) {
     defaultValue: "I'm having trouble accessing my AI core. Please try again.",
   });
 
-  const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent({
+  const { messages, sendMessage, isLoading, mode, setMode, triggerAction } = useHologramAgent({
     language: activeLanguage,
     initialGreeting,
     errorReply,
@@ -208,10 +208,35 @@ export default function HologramAgentChat({ onClose }) {
               padding: "6px 10px",
               borderRadius: 12,
               background: m.role === "user" ? "rgba(59,130,246,0.1)" : "rgba(15,23,42,0.06)",
-              color: "#111827"
+              color: "#111827",
+              whiteSpace: "pre-wrap"
             }}>
               {m.content}
             </span>
+            {m.role === "assistant" && Array.isArray(m.actions) && m.actions.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                {m.actions.map((act, idx) => (
+                  <button
+                    key={`${act.target || idx}-${idx}`}
+                    type="button"
+                    onClick={() => triggerAction(act)}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 999,
+                      border: "1px solid rgba(37,99,235,0.35)",
+                      background: "rgba(37,99,235,0.08)",
+                      color: "#1d4ed8",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                    title={act.target}
+                  >
+                    → {act.label || act.target}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         {isLoading && (
