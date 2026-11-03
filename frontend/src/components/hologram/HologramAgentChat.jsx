@@ -17,6 +17,111 @@ function _voiceLanguageFor(lang) {
   return "en-US";
 }
 
+// Strip raw Markdown symbols before handing text to browser TTS so it doesn't
+// read "asterisk asterisk" or "hash hash" out loud.
+function _stripMarkdownForSpeech(text) {
+  return String(text || "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\[(.*?)\]\((.*?)\)/g, "$1")
+    .trim();
+}
+
+// Escape HTML entities before applying inline Markdown formatting.
+function _escapeHtml(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function _formatInlineMarkdown(line) {
+  return _escapeHtml(line)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(
+      /`([^`]+)`/g,
+      '<code style="background:rgba(15,23,42,0.08);padding:1px 5px;border-radius:4px;font-size:0.9em;font-family:ui-monospace,monospace;">$1</code>'
+    );
+}
+
+// Lightweight block + inline Markdown renderer for chat bubbles (no external lib).
+function FormattedChatMessage({ content }) {
+  const lines = String(content || "").split("\n");
+  const elements = [];
+  let listItems = [];
+
+  const flushList = (keyPrefix) => {
+    if (!listItems.length) return;
+    elements.push(
+      <ul
+        key={`ul-${keyPrefix}`}
+        style={{ margin: "4px 0 6px 0", paddingLeft: 18, lineHeight: 1.45 }}
+      >
+        {listItems.map((item, idx) => (
+          <li
+            key={idx}
+            style={{ marginBottom: 3 }}
+            dangerouslySetInnerHTML={{ __html: _formatInlineMarkdown(item) }}
+          />
+        ))}
+      </ul>
+    );
+    listItems = [];
+  };
+
+  lines.forEach((rawLine, idx) => {
+    const line = rawLine.trim();
+    if (!line) {
+      flushList(idx);
+      return;
+    }
+
+    // Headings (#, ##, ###)
+    const headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
+    if (headingMatch) {
+      flushList(idx);
+      const level = headingMatch[1].length;
+      const fontSize = level === 1 ? 15 : level === 2 ? 14 : 13;
+      elements.push(
+        <div
+          key={`h-${idx}`}
+          style={{
+            fontWeight: 700,
+            fontSize,
+            color: "#0f172a",
+            marginTop: elements.length ? 8 : 0,
+            marginBottom: 4,
+          }}
+          dangerouslySetInnerHTML={{ __html: _formatInlineMarkdown(headingMatch[2]) }}
+        />
+      );
+      return;
+    }
+
+    // Bullet or numbered list item
+    const bulletMatch = line.match(/^(?:[-*•]|\d+\.)\s+(.*)$/);
+    if (bulletMatch) {
+      listItems.push(bulletMatch[1]);
+      return;
+    }
+
+    flushList(idx);
+    elements.push(
+      <div
+        key={`p-${idx}`}
+        style={{ marginBottom: 5, lineHeight: 1.45 }}
+        dangerouslySetInnerHTML={{ __html: _formatInlineMarkdown(line) }}
+      />
+    );
+  });
+
+  flushList("end");
+  return <div style={{ fontSize: 13 }}>{elements}</div>;
+}
+
 export default function HologramAgentChat({ onClose }) {
   const { t, i18n } = useTranslation();
   // Detect the active UI locale and pass it down so:
@@ -122,7 +227,9 @@ export default function HologramAgentChat({ onClose }) {
     if (!autoSpeak || muted || !ttsSupported) return;
     if (!messages || messages.length === 0) return;
     const last = messages[messages.length - 1];
-    if (last.role === "assistant" && last.content) speak(last.content);
+    if (last.role === "assistant" && last.content) {
+      speak(_stripMarkdownForSpeech(last.content));
+    }
   }, [messages, autoSpeak, muted, ttsSupported, speak]);
 
   const handleSubmit = (e) => {
@@ -205,13 +312,19 @@ export default function HologramAgentChat({ onClose }) {
           <div key={i} style={{ textAlign: m.role === "user" ? "right" : "left", marginBottom: 8 }}>
             <span style={{
               display: "inline-block",
-              padding: "6px 10px",
+              padding: "8px 11px",
               borderRadius: 12,
               background: m.role === "user" ? "rgba(59,130,246,0.1)" : "rgba(15,23,42,0.06)",
               color: "#111827",
-              whiteSpace: "pre-wrap"
+              textAlign: "left",
+              maxWidth: "100%",
+              boxSizing: "border-box"
             }}>
-              {m.content}
+              {m.role === "assistant" ? (
+                <FormattedChatMessage content={m.content} />
+              ) : (
+                m.content
+              )}
             </span>
             {m.role === "assistant" && Array.isArray(m.actions) && m.actions.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
