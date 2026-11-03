@@ -2557,13 +2557,21 @@ async def get_app_context():
 # in the actual documentation without heavyweight dependencies.
 _HELP_DOCS = [
     "README.md",
+    "docs/andres-robot-help.md",
+    "docs/self-sim-reality-help.md",
+    "docs/red-cross-qa-help.md",
+    "docs/api-config-help.md",
     "docs/ai-study-buddy.md",
     "docs/architecture.md",
     "docs/deployment.md",
     "docs/agents.md",
     "docs/admin-dev.md",
     "docs/n8n.md",
+    "docs/web-lab-plan.md",
     "docs/J-messages_Analyzer.md",
+    "docs/ROBOMIND_CLINIC_README.md",
+    "docs/HUMANIZING_AI_README.md",
+    "docs/EA_SECOND_BRAIN_AGENT.md",
     "docs/MCP_TESTING_GUIDE.md",
     "docs/TESTING.md",
 ]
