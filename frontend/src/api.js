@@ -249,6 +249,9 @@ export async function getAndresProjects() {
 export async function createAndresProject(project) {
   return apiCall("/api/andres/projects", "POST", project);
 }
+export async function proposeAndresProject(topicHint = "") {
+  return apiCall("/api/andres/projects/propose", "POST", { topic_hint: topicHint });
+}
 export async function updateAndresProject(projectId, patch) {
   return apiCall(`/api/andres/projects/${projectId}`, "PATCH", patch);
 }

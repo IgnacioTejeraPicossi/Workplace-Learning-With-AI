@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../ThemeContext";
 import {
-  getAndresProjects, createAndresProject, updateAndresProject, deleteAndresProject,
+  getAndresProjects, createAndresProject, proposeAndresProject,
+  updateAndresProject, deleteAndresProject,
   approveAndresProject, archiveAndresProject,
 } from "../api";
 
@@ -24,6 +25,9 @@ export default function Projects({ onProfileChange }) {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [topicHint, setTopicHint] = useState("");
+  const [proposing, setProposing] = useState(false);
+  const [plantedNotice, setPlantedNotice] = useState("");
   const [archiveFor, setArchiveFor] = useState(null); // project id being archived
   const [closure, setClosure] = useState({ disposition: "cemetery", what_worked: "", what_didnt: "", learned: "", guideline: "", reuse_seed: "" });
   const [err, setErr] = useState("");
@@ -46,6 +50,15 @@ export default function Projects({ onProfileChange }) {
       setTitle(""); setDescription(""); await refresh();
     } catch (e) { /* offline */ }
   };
+  const askAndresPropose = async () => {
+    setProposing(true);
+    try {
+      await proposeAndresProject(topicHint.trim());
+      setTopicHint("");
+      await refresh();
+    } catch (e) { /* offline */ }
+    setProposing(false);
+  };
   const setStatus = async (p, status) => {
     try { await updateAndresProject(p._id, { status }); await refresh(); } catch (e) { /* offline */ }
   };
@@ -62,7 +75,15 @@ export default function Projects({ onProfileChange }) {
   };
   const submitArchive = async () => {
     setErr("");
-    try { await archiveAndresProject(archiveFor, closure); setArchiveFor(null); await refresh(); }
+    setPlantedNotice("");
+    try {
+      const res = await archiveAndresProject(archiveFor, closure);
+      setArchiveFor(null);
+      if (res && res.planted_memory_id) {
+        setPlantedNotice(t("andresRobotModule.projects.compostPlanted"));
+      }
+      await refresh();
+    }
     catch (e) { setErr(e?.message || t("andresRobotModule.projects.archiveFail")); }
   };
 
@@ -89,6 +110,49 @@ export default function Projects({ onProfileChange }) {
           {t("andresRobotModule.projects.intro")}
         </p>
       </div>
+
+      {/* Ask Andrés to propose a bounded project (starts in 'proposed' until approved) */}
+      <div style={{ ...card, borderLeft: `4px solid ${colors.primary}`, display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <strong style={{ color: colors.text, fontSize: 14 }}>
+              🤖 {t("andresRobotModule.projects.proposeTitle")}
+            </strong>
+            <div style={{ fontSize: 12.5, color: colors.textSecondary, marginTop: 2 }}>
+              {t("andresRobotModule.projects.proposeHint")}
+            </div>
+          </div>
+          <button
+            onClick={askAndresPropose}
+            disabled={proposing}
+            style={{
+              background: colors.primary, color: "#fff", border: 0, borderRadius: 8,
+              padding: "9px 16px", fontWeight: 600, fontSize: 13,
+              cursor: proposing ? "wait" : "pointer", opacity: proposing ? 0.7 : 1,
+            }}
+          >
+            {proposing
+              ? t("andresRobotModule.projects.proposing")
+              : t("andresRobotModule.projects.proposeBtn")}
+          </button>
+        </div>
+        <input
+          style={input}
+          value={topicHint}
+          onChange={(e) => setTopicHint(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && !proposing && askAndresPropose()}
+          placeholder={t("andresRobotModule.projects.proposeTopicPlaceholder")}
+        />
+      </div>
+
+      {plantedNotice && (
+        <div style={{
+          ...card, padding: "12px 16px", background: "#f0fdf4",
+          border: "1px solid #bbf7d0", color: "#166534", fontSize: 13, fontWeight: 600,
+        }}>
+          🌱 {plantedNotice}
+        </div>
+      )}
 
       <div style={{ ...card, display: "grid", gap: 8 }}>
         <input style={input} value={title} onChange={(e) => setTitle(e.target.value)}

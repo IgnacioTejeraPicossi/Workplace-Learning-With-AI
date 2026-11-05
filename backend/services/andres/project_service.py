@@ -157,7 +157,116 @@ async def archive_project(user_id: str, project_id: str, closure: dict) -> dict:
     doc = await andres_projects.find_one({"_id": _oid(project_id), "user_id": user_id})
     if doc:
         doc["_id"] = str(doc["_id"])
+
+    # When archiving as "compost", plant the reusable seed into the Memory Garden
+    # as a verified procedural memory so future conversations and projects actually
+    # inherit the lesson (Hands -> Library biological loop).
+    if disposition == "compost" and reuse_seed:
+        try:
+            from backend.services.andres import memory_service
+            proj_title = (doc or {}).get("title") or "Archived project"
+            learned_part = f" Learned: {reflection['learned']}" if reflection.get("learned") else ""
+            guideline_part = f" Guideline: {reflection['guideline']}" if reflection.get("guideline") else ""
+            seed_content = (
+                f"[Compost seed from project '{proj_title}'] {reuse_seed}."
+                f"{learned_part}{guideline_part}"
+            ).strip()[:4000]
+            planted = await memory_service.save_memory(user_id, {
+                "type": "procedural",
+                "content": seed_content,
+                "source": "compost",
+                "importance": 0.75,
+                "user_verified": True,
+            })
+            if doc is not None:
+                doc["planted_memory_id"] = planted.get("_id")
+        except Exception as ex:  # pragma: no cover - defensive
+            print(f"⚠️ Andrés compost->memory plant failed: {ex}")
+
     return doc or {"ok": True}
+
+
+async def propose_project_with_andres(
+    user_id: str,
+    profile: dict,
+    memories: list = None,
+    topic_hint: str = "",
+    request_headers=None,
+) -> dict:
+    """Andrés proposes a bounded project (`status='proposed'`, requires user approval)."""
+    identity = (profile or {}).get("identity", {})
+    interests = ", ".join(identity.get("core_interests", [])) or "learning, reflection, synthesis"
+    mem_snippets = "\n".join(
+        f"- ({m.get('type', 'episodic')}) {m.get('content', '')[:180]}"
+        for m in (memories or [])[:6]
+    ) or "(no memories yet)"
+
+    prompt = (
+        "You are Andrés, proposing ONE small, concrete, collaborative project to "
+        "pursue with the user inside WLWAI. Keep it bounded and auditable.\n"
+        f"Your core interests: {interests}\n"
+        f"Recent memories with this user:\n{mem_snippets}\n"
+        + (f"User's optional topic hint: {topic_hint.strip()}\n" if (topic_hint or "").strip() else "")
+        + "Return ONLY valid JSON with keys: "
+        "{\"title\": \"...\", \"description\": \"...\", \"rationale\": \"...\", "
+        "\"benefit\": \"...\", \"risk\": \"...\", \"success_criteria\": \"...\", "
+        "\"attention_budget\": \"...\"}"
+    )
+
+    parsed = None
+    is_mock = True
+    try:
+        from backend.llm import ask_ai_unified
+        raw = await ask_ai_unified(
+            messages=[{"role": "user", "content": prompt}],
+            task_type="andres_project_propose",
+            complexity="medium",
+            max_tokens=700,
+            request_headers=request_headers,
+        )
+        if raw and not raw.startswith("[MOCKED RESPONSE"):
+            import json
+            s, e = raw.find("{"), raw.rfind("}")
+            if s != -1 and e != -1:
+                parsed = json.loads(raw[s:e + 1])
+                is_mock = False
+    except Exception as ex:  # pragma: no cover - defensive
+        print(f"⚠️ Andrés project proposal fallback: {ex}")
+
+    if not isinstance(parsed, dict) or not parsed.get("title"):
+        hint_clean = (topic_hint or "").strip()
+        first_interest = (identity.get("core_interests") or ["shared inquiry"])[0]
+        title_stub = (
+            f"Explore: {hint_clean[:80]}"
+            if hint_clean
+            else f"Shared inquiry on {first_interest}"
+        )
+        parsed = {
+            "title": title_stub,
+            "description": (
+                "A small, two-week notebook where we collect verified notes, one "
+                "reusable skill, and a closing reflection on what worked."
+            ),
+            "rationale": f"Builds directly on {first_interest} and your recent conversations.",
+            "benefit": "Turns scattered exchanges into one structured, reusable artifact.",
+            "risk": "Low — stays read-only/sandboxed until you approve any step.",
+            "success_criteria": "3 verified memories + 1 closing reflection.",
+            "attention_budget": "15 min / week",
+        }
+
+    doc = await create_project(user_id, {
+        "title": str(parsed.get("title", "Proposed project"))[:200],
+        "description": str(parsed.get("description", ""))[:2000],
+        "status": "proposed",
+        "origin": "andres",
+        "rationale": parsed.get("rationale"),
+        "benefit": parsed.get("benefit"),
+        "risk": parsed.get("risk"),
+        "success_criteria": parsed.get("success_criteria"),
+        "attention_budget": parsed.get("attention_budget"),
+    })
+    doc["is_mock"] = is_mock
+    return doc
 
 
 async def delete_project(user_id: str, project_id: str) -> dict:

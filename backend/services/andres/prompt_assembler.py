@@ -42,7 +42,27 @@ def _projects_block(projects: list) -> str:
     )
 
 
-def assemble_system_prompt(profile: dict, memories: list = None, projects: list = None) -> str:
+def _skills_block(skills: list) -> str:
+    active = [s for s in (skills or []) if s.get("status") == "active"]
+    if not active:
+        return ""
+    lines = [
+        f"- `{s.get('name', 'skill')}`: {s.get('description', '')}".rstrip(": ")
+        for s in active
+    ]
+    return (
+        "[ACTIVE SKILLS (Muscle Memory)]\n"
+        "User-approved pure Python skills in your sandboxed library. Mention or "
+        "recommend one when it fits the user's task:\n" + "\n".join(lines) + "\n\n"
+    )
+
+
+def assemble_system_prompt(
+    profile: dict,
+    memories: list = None,
+    projects: list = None,
+    skills: list = None,
+) -> str:
     identity = profile.get("identity", {})
     disposition = profile.get("simulated_disposition", {})
 
@@ -59,6 +79,7 @@ def assemble_system_prompt(profile: dict, memories: list = None, projects: list 
         f"Core interests: {interests}\n"
         f"Traits (0-100): {traits_str}\n\n"
         f"{_projects_block(projects or [])}"
+        f"{_skills_block(skills or [])}"
         f"{_memories_block(memories or [])}"
         "[SIMULATED DISPOSITION]\n"
         "This is a computational state, NOT proof of feeling. Let it colour tone,"

@@ -191,8 +191,10 @@ export default function AndresRobot() {
   // Memory Garden state
   const [memories, setMemories] = useState([]);
   const [memFilter, setMemFilter] = useState("");
+  const [memSearch, setMemSearch] = useState("");
   const [memLoading, setMemLoading] = useState(false);
   const [newMem, setNewMem] = useState("");
+  const [newMemType, setNewMemType] = useState("semantic");
   const [consolidations, setConsolidations] = useState([]);
   const [consoBusy, setConsoBusy] = useState(false);
 
@@ -282,7 +284,7 @@ export default function AndresRobot() {
     const content = newMem.trim();
     if (!content) return;
     try {
-      await createAndresMemory({ content, type: "semantic", user_verified: true });
+      await createAndresMemory({ content, type: newMemType || "semantic", user_verified: true });
       setNewMem("");
       await loadMemories();
       await loadProfile();
@@ -353,7 +355,16 @@ export default function AndresRobot() {
     setSending(true);
     try {
       const res = await andresChat(text, useWeb, "", image || "");
-      setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock, web: res.web, vision: res.vision }]);
+      setMessages((m) => [...m, {
+        role: "andres",
+        text: res.message,
+        isMock: res.is_mock,
+        web: res.web,
+        scholarly: res.scholarly,
+        vision: res.vision,
+        recalled: res.recalled_memories || [],
+        signals: res.development_signals || null,
+      }]);
       // V6.0: speak the reply through the PC speakers when voice mode is on.
       if (voiceMode && autoSpeak && tts.supported && res.message) tts.speak(res.message);
     } catch (e) {
@@ -730,6 +741,37 @@ export default function AndresRobot() {
                 )}
               </div>
             )}
+            {Array.isArray(m.recalled) && m.recalled.length > 0 && (
+              <div style={{ marginTop: 5, fontSize: 11, color: colors.textSecondary }}>
+                <span style={{ fontWeight: 600, color: colors.primary }}>
+                  🌱 {t("andresRobotModule.conversation.recalledLabel", { count: m.recalled.length })}
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 3 }}>
+                  {m.recalled.map((rm, rIdx) => (
+                    <span
+                      key={rm._id || rIdx}
+                      title={rm.content}
+                      onClick={() => setActiveTab("memory")}
+                      style={{
+                        cursor: "pointer",
+                        padding: "2px 8px",
+                        borderRadius: 999,
+                        border: `1px solid ${colors.border}`,
+                        background: colors.background,
+                        color: colors.text,
+                        fontSize: 10.5,
+                        maxWidth: 260,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {rm.user_verified ? "✓ " : "○ "}[{t(`andresRobotModule.memory.types.${rm.type}`, rm.type)}] {rm.content}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -866,15 +908,34 @@ export default function AndresRobot() {
           ))}
         </div>
 
-        {/* Add a memory by hand */}
-        <div style={{ ...card, display: "flex", gap: 8 }}>
+        {/* Add a memory by hand (with type selector) */}
+        <div style={{ ...card, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <select
+            value={newMemType}
+            onChange={(e) => setNewMemType(e.target.value)}
+            aria-label={t("andresRobotModule.memory.typeLabel")}
+            style={{
+              padding: "10px 10px",
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              background: colors.background,
+              color: colors.text,
+              fontSize: 13,
+            }}
+          >
+            {MEMORY_TYPES.map((ty) => (
+              <option key={ty} value={ty}>
+                {t(`andresRobotModule.memory.types.${ty}`)}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
             value={newMem}
             onChange={(e) => setNewMem(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddMemory()}
             placeholder={t("andresRobotModule.memory.addPlaceholder")}
-            style={{ flex: 1, padding: "10px 12px", borderRadius: 8, border: `1px solid ${colors.border}`, background: colors.background, color: colors.text }}
+            style={{ flex: 1, minWidth: 220, padding: "10px 12px", borderRadius: 8, border: `1px solid ${colors.border}`, background: colors.background, color: colors.text }}
           />
           <button
             onClick={handleAddMemory}
@@ -885,16 +946,33 @@ export default function AndresRobot() {
           </button>
         </div>
 
-        {/* Type filter */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <span style={chip(memFilter === "")} onClick={() => setMemFilter("")}>
-            {t("andresRobotModule.memory.all")}
-          </span>
-          {MEMORY_TYPES.map((ty) => (
-            <span key={ty} style={chip(memFilter === ty)} onClick={() => setMemFilter(ty)}>
-              {t(`andresRobotModule.memory.types.${ty}`)}
+        {/* Type filter + text search */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <span style={chip(memFilter === "")} onClick={() => setMemFilter("")}>
+              {t("andresRobotModule.memory.all")}
             </span>
-          ))}
+            {MEMORY_TYPES.map((ty) => (
+              <span key={ty} style={chip(memFilter === ty)} onClick={() => setMemFilter(ty)}>
+                {t(`andresRobotModule.memory.types.${ty}`)}
+              </span>
+            ))}
+          </div>
+          <input
+            type="text"
+            value={memSearch}
+            onChange={(e) => setMemSearch(e.target.value)}
+            placeholder={t("andresRobotModule.memory.searchPlaceholder")}
+            style={{
+              minWidth: 200,
+              padding: "6px 12px",
+              borderRadius: 999,
+              border: `1px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text,
+              fontSize: 12.5,
+            }}
+          />
         </div>
 
         {/* List */}
@@ -902,13 +980,15 @@ export default function AndresRobot() {
           <div style={{ ...card, textAlign: "center", color: colors.textSecondary }}>
             {t("andresRobotModule.memory.loading")}
           </div>
-        ) : memories.length === 0 ? (
+        ) : memories.filter((m) => !memSearch.trim() || (m.content || "").toLowerCase().includes(memSearch.trim().toLowerCase())).length === 0 ? (
           <div style={{ ...card, textAlign: "center", color: colors.textSecondary, fontStyle: "italic" }}>
             {t("andresRobotModule.memory.empty")}
           </div>
         ) : (
           <div style={{ display: "grid", gap: 10 }}>
-            {memories.map((m) => (
+            {memories
+              .filter((m) => !memSearch.trim() || (m.content || "").toLowerCase().includes(memSearch.trim().toLowerCase()))
+              .map((m) => (
               <div key={m._id} style={{ ...card, padding: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                   <span style={{ background: colors.primaryLight, color: colors.primary, padding: "2px 9px", borderRadius: 999, fontSize: 11 }}>

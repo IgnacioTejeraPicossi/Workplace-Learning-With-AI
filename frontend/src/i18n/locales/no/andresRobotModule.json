@@ -77,6 +77,7 @@
       "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen.",
       "rateLimited": "Du sender meldinger veldig raskt — vent litt og prøv igjen.",
       "tooLong": "Den meldingen er for lang ({{count}} tegn). Hold den under {{max}} — lim inn et kortere utdrag eller oppsummer den først.",
+      "recalledLabel": "Hentet {{count}} minne(r) fra Minnehagen:",
       "web": {
         "toggle": "Web",
         "toggleHint": "La Andrés kjøre et ferskt DuckDuckGo-søk for denne meldingen og svare med siterte kilder.",
@@ -143,7 +144,9 @@
     "memory": {
       "title": "🌱 Minnehage",
       "intro": "Andrés vokser gjennom det han husker. Minner han danner på egen hånd er kandidater til du bekrefter dem — du kan rette, beskytte eller glemme hvilket som helst av dem. Ingenting her regnes som fakta før du sier det.",
+      "typeLabel": "Minnetype",
       "addPlaceholder": "Lær Andrés noe å huske…",
+      "searchPlaceholder": "Filtrer minner etter tekst…",
       "add": "Husk",
       "all": "Alle",
       "types": {
@@ -201,6 +204,12 @@
     "projects": {
       "title": "📌 Prosjekter",
       "intro": "Små ting Andrés forfølger sammen med deg. Aktive prosjekter former hvordan han opptrer i samtalen.",
+      "proposeTitle": "Be Andrés foreslå et prosjekt",
+      "proposeHint": "Andrés utformer et avgrenset prosjekt ut fra interessene og de siste minnene dine. Det starter som Foreslått til du godkjenner det.",
+      "proposeBtn": "Foreslå med Andrés",
+      "proposing": "Utformer forslag…",
+      "proposeTopicPlaceholder": "Valgfritt tema- eller fokustips (f.eks. «automatiserte testnotater», «norsk ordforråd»)…",
+      "compostPlanted": "Kompostfrø plantet i Minnehagen din som et bekreftet prosedyreminne.",
       "titlePlaceholder": "Prosjekttittel…",
       "descPlaceholder": "Hva handler det om?",
       "add": "Legg til prosjekt",

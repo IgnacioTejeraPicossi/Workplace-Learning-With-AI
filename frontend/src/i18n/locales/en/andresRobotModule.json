@@ -77,6 +77,7 @@
       "errorNote": "Something went wrong reaching Andrés. Please try again.",
       "rateLimited": "You are sending messages very fast — please wait a moment and try again.",
       "tooLong": "That message is too long ({{count}} characters). Please keep it under {{max}} — paste a shorter excerpt or summarise it first.",
+      "recalledLabel": "Recalled {{count}} memory(ies) from Memory Garden:",
       "web": {
         "toggle": "Web",
         "toggleHint": "Let Andrés run a fresh DuckDuckGo search for this message and answer with cited sources.",
@@ -143,7 +144,9 @@
     "memory": {
       "title": "🌱 Memory Garden",
       "intro": "Andrés grows through what he remembers. Memories he forms on his own are candidates until you verify them — you can correct, protect or forget any of them. Nothing here is treated as fact until you say so.",
+      "typeLabel": "Memory type",
       "addPlaceholder": "Teach Andrés something to remember…",
+      "searchPlaceholder": "Filter memories by text…",
       "add": "Remember",
       "all": "All",
       "types": {
@@ -201,6 +204,12 @@
     "projects": {
       "title": "📌 Projects",
       "intro": "Small things Andrés is pursuing with you. Active projects shape how he shows up in conversation.",
+      "proposeTitle": "Ask Andrés to propose a project",
+      "proposeHint": "Andrés drafts a bounded project from your core interests and recent memories. It starts as Proposed until you approve it.",
+      "proposeBtn": "Propose with Andrés",
+      "proposing": "Drafting proposal…",
+      "proposeTopicPlaceholder": "Optional topic or focus hint (e.g. 'automated testing notes', 'Norwegian vocabulary')…",
+      "compostPlanted": "Compost seed planted into your Memory Garden as a verified Procedural memory.",
       "titlePlaceholder": "Project title…",
       "descPlaceholder": "What is it about?",
       "add": "Add project",

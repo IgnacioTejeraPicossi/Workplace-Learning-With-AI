@@ -77,6 +77,7 @@
       "errorNote": "Algo falló al contactar con Andrés. Inténtalo de nuevo.",
       "rateLimited": "Estás enviando mensajes muy rápido — espera un momento e inténtalo de nuevo.",
       "tooLong": "Ese mensaje es demasiado largo ({{count}} caracteres). Mantenlo por debajo de {{max}} — pega un fragmento más corto o resúmelo primero.",
+      "recalledLabel": "Recordó {{count}} memoria(s) del Jardín de memoria:",
       "web": {
         "toggle": "Web",
         "toggleHint": "Deja que Andrés haga una búsqueda fresca en DuckDuckGo para este mensaje y responda citando fuentes.",
@@ -143,7 +144,9 @@
     "memory": {
       "title": "🌱 Jardín de memoria",
       "intro": "Andrés crece a través de lo que recuerda. Los recuerdos que forma por su cuenta son candidatos hasta que tú los verificas — puedes corregir, proteger u olvidar cualquiera de ellos. Nada aquí se toma como un hecho hasta que tú lo digas.",
+      "typeLabel": "Tipo de memoria",
       "addPlaceholder": "Enséñale a Andrés algo que recordar…",
+      "searchPlaceholder": "Filtrar recuerdos por texto…",
       "add": "Recordar",
       "all": "Todos",
       "types": {
@@ -201,6 +204,12 @@
     "projects": {
       "title": "📌 Proyectos",
       "intro": "Pequeñas cosas que Andrés persigue contigo. Los proyectos activos moldean cómo aparece en la conversación.",
+      "proposeTitle": "Pedir a Andrés que proponga un proyecto",
+      "proposeHint": "Andrés redacta un proyecto acotado a partir de tus intereses y recuerdos recientes. Empieza como Propuesto hasta que lo apruebes.",
+      "proposeBtn": "Proponer con Andrés",
+      "proposing": "Redactando propuesta…",
+      "proposeTopicPlaceholder": "Pista opcional de tema o enfoque (p. ej. «notas de testing automatizado», «vocabulario noruego»)…",
+      "compostPlanted": "Semilla de compost plantada en tu Jardín de memoria como memoria Procedimental verificada.",
       "titlePlaceholder": "Título del proyecto…",
       "descPlaceholder": "¿De qué trata?",
       "add": "Añadir proyecto",

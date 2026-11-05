@@ -254,16 +254,38 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
     tiers = research_service.get_tiers(profile_doc)
 
     # Research tier 1 (internal): his own biography — recalled memories + active
-    # projects. Gated by the internal tier, which the user can turn off.
-    recalled, projects = [], []
+    # projects + active skills + recent conversation turns (working memory).
+    # Gated by the internal tier, which the user can turn off.
+    recalled, projects, active_skills, recent_turns = [], [], [], []
     if tiers["internal"]:
         recalled = await memory_service.retrieve_relevant(uid, body.message, limit=5)
         try:
             projects = await project_service.list_projects(uid, limit=20)
         except Exception:
             projects = []
-    system_prompt = assemble_system_prompt(profile_doc, memories=recalled, projects=projects)
+        try:
+            all_skills = await skill_service.list_skills(uid, limit=50)
+            active_skills = [s for s in (all_skills or []) if s.get("status") == "active"]
+        except Exception:
+            active_skills = []
+        try:
+            cursor = andres_conversations.find({"user_id": uid}).sort("created_at", -1).limit(4)
+            async for turn in cursor:
+                u_msg = (turn.get("user_message") or "").strip()
+                a_msg = (turn.get("andres_message") or "").strip()
+                if u_msg and a_msg and not turn.get("is_mock"):
+                    recent_turns.append((u_msg[:1200], a_msg[:1200]))
+            recent_turns.reverse()  # chronological order (oldest -> newest)
+        except Exception:
+            recent_turns = []
+
+    system_prompt = assemble_system_prompt(
+        profile_doc, memories=recalled, projects=projects, skills=active_skills
+    )
     messages = [{"role": "system", "content": system_prompt}]
+    for u_prev, a_prev in recent_turns:
+        messages.append({"role": "user", "content": u_prev})
+        messages.append({"role": "assistant", "content": a_prev})
 
     # Research tier 2 (documents): text the user explicitly hands him this turn.
     if body.document and body.document.strip() and tiers["documents"]:
@@ -402,8 +424,19 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         "development_signals": {
             "new_memory_candidates": new_candidates,
             "memories_recalled": len(recalled),
+            "active_skills_known": len(active_skills),
+            "recent_turns_included": len(recent_turns),
             "phase": "v1",
         },
+        "recalled_memories": [
+            {
+                "_id": m.get("_id"),
+                "type": m.get("type", "episodic"),
+                "content": (m.get("content") or "")[:240],
+                "user_verified": bool(m.get("user_verified")),
+            }
+            for m in (recalled or [])
+        ],
         "safety": {"reviewed": True, "risk": "low"},
         "is_mock": is_mock,
         "research_tiers": tiers,
@@ -537,6 +570,29 @@ async def curiosity_update(item_id: str, body: CuriosityPatch, user=Depends(_ver
 async def projects_list(user=Depends(_verify_token)):
     items = await project_service.list_projects(user.get("uid"))
     return {"projects": items, "count": len(items)}
+
+
+class ProjectProposeRequest(BaseModel):
+    topic_hint: str = Field("", max_length=300)
+
+
+@router.post("/projects/propose")
+async def projects_propose(
+    body: ProjectProposeRequest,
+    http_request: Request,
+    user=Depends(_verify_token),
+):
+    """Andrés proposes a bounded project in `proposed` status (requires user approval)."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    memories = await memory_service.list_memories(uid, limit=8)
+    return await project_service.propose_project_with_andres(
+        uid,
+        profile_doc,
+        memories=memories,
+        topic_hint=body.topic_hint,
+        request_headers=http_request.headers,
+    )
 
 
 @router.post("/projects")
