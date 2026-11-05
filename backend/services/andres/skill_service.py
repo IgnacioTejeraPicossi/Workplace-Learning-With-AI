@@ -78,11 +78,40 @@ async def draft_skill(user_id: str, task: str, request_headers=None) -> dict:
             if s != -1 and e != -1:
                 parsed = json.loads(txt[s:e + 1])
                 code = str(parsed.get("code", ""))
+                safety = static_safety_check(code)
+                auto_repaired = False
+                # 1-pass AST self-repair if the first draft violated sandbox rules
+                if not safety["ok"]:
+                    repair_prompt = (
+                        "Your drafted Python skill failed the static AST safety check with "
+                        f"these reasons: {safety['reasons']}.\n"
+                        "Rewrite the function `def skill(x):` so it passes ALL rules: "
+                        "no imports, no names or attributes starting with `_`, no eval/exec/open/getattr/type. "
+                        "Return ONLY JSON: {\"name\": \"...\", \"description\": \"...\", \"code\": \"...\"}.\n\n"
+                        f"[ORIGINAL TASK]\n{task}\n\n[REJECTED CODE]\n{code}"
+                    )
+                    repair_raw = await ask_ai_unified(
+                        messages=[{"role": "user", "content": repair_prompt}],
+                        task_type="andres_skill_draft", complexity="high",
+                        max_tokens=700, request_headers=request_headers,
+                    )
+                    if repair_raw and not repair_raw.startswith("[MOCKED RESPONSE"):
+                        rs, re_idx = repair_raw.find("{"), repair_raw.rfind("}")
+                        if rs != -1 and re_idx != -1:
+                            r_parsed = json.loads(repair_raw[rs:re_idx + 1])
+                            r_code = str(r_parsed.get("code", ""))
+                            r_safety = static_safety_check(r_code)
+                            if r_safety["ok"]:
+                                parsed = r_parsed
+                                code = r_code
+                                safety = r_safety
+                                auto_repaired = True
                 return {
                     "name": str(parsed.get("name", "skill"))[:80],
                     "description": str(parsed.get("description", ""))[:500],
                     "code": code,
-                    "safety": static_safety_check(code),
+                    "safety": safety,
+                    "auto_repaired": auto_repaired,
                     "is_mock": False,
                 }
     except Exception as ex:  # pragma: no cover - defensive

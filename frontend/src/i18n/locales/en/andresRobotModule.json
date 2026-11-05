@@ -78,6 +78,11 @@
       "rateLimited": "You are sending messages very fast — please wait a moment and try again.",
       "tooLong": "That message is too long ({{count}} characters). Please keep it under {{max}} — paste a shorter excerpt or summarise it first.",
       "recalledLabel": "Recalled {{count}} memory(ies) from Memory Garden:",
+      "skillBar": {
+        "label": "Muscle Memory",
+        "inputPlaceholder": "Input for skill (e.g. [1,2,3] or text)…",
+        "runInsert": "Run & insert output"
+      },
       "web": {
         "toggle": "Web",
         "toggleHint": "Let Andrés run a fresh DuckDuckGo search for this message and answer with cited sources.",
@@ -327,6 +332,13 @@
       "proposeTitle": "Propose a skill",
       "taskPlaceholder": "Describe a task for Andrés to draft…",
       "draft": "Draft with AI",
+      "templatesLabel": "Starter templates",
+      "templates": {
+        "wordCount": "Word & frequency summary",
+        "numStats": "Numeric stats summary",
+        "checklist": "Markdown checklist"
+      },
+      "autoRepairedNote": "Auto-repaired in 1 pass after static AST safety check.",
       "namePlaceholder": "Skill name…",
       "descPlaceholder": "What does it do?",
       "safetyNote": "Must define `def skill(x)`. No imports, no dunder/private names, no eval/open. Unsafe code is stored as blocked and can never run.",
@@ -465,7 +477,18 @@
       "web": {
         "name": "Web",
         "desc": "External DuckDuckGo search via the 🌐 toggle. Off by default — the most cautious tier."
+      },
+      "mcp_bridge": {
+        "name": "MCP Nervous System (read-only)",
+        "desc": "Read-only awareness of WLWAI's internal MCP servers and tools (`/api/mcp/manifest`). Off by default; never executes external actions."
       }
+    },
+    "mcpInspector": {
+      "title": "MCP Nervous System Inspector (Read-only)",
+      "activeBadge": "Connected to Andrés' context",
+      "inactiveBadge": "Off in research tiers",
+      "intro": "These are the Model Context Protocol (MCP) servers and tools exposed by WLWAI. When tier 4 (`MCP Nervous System`) is enabled above, Andrés receives this read-only map in conversation so he can explain or design workflows around them — without ever invoking a tool on his own.",
+      "toolsLabel": "tools"
     },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."

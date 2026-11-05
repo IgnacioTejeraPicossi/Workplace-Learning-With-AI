@@ -78,6 +78,11 @@
       "rateLimited": "Estás enviando mensajes muy rápido — espera un momento e inténtalo de nuevo.",
       "tooLong": "Ese mensaje es demasiado largo ({{count}} caracteres). Mantenlo por debajo de {{max}} — pega un fragmento más corto o resúmelo primero.",
       "recalledLabel": "Recordó {{count}} memoria(s) del Jardín de memoria:",
+      "skillBar": {
+        "label": "Memoria muscular",
+        "inputPlaceholder": "Entrada para la skill (p. ej. [1,2,3] o texto)…",
+        "runInsert": "Ejecutar e insertar salida"
+      },
       "web": {
         "toggle": "Web",
         "toggleHint": "Deja que Andrés haga una búsqueda fresca en DuckDuckGo para este mensaje y responda citando fuentes.",
@@ -327,6 +332,13 @@
       "proposeTitle": "Proponer una habilidad",
       "taskPlaceholder": "Describe una tarea para que Andrés la esboce…",
       "draft": "Esbozar con IA",
+      "templatesLabel": "Plantillas base",
+      "templates": {
+        "wordCount": "Resumen de palabras",
+        "numStats": "Estadísticas numéricas",
+        "checklist": "Checklist Markdown"
+      },
+      "autoRepairedNote": "Auto-reparada en 1 pase tras el chequeo estático AST.",
       "namePlaceholder": "Nombre de la habilidad…",
       "descPlaceholder": "¿Qué hace?",
       "safetyNote": "Debe definir `def skill(x)`. Sin imports, sin nombres dunder/privados, sin eval/open. El código inseguro se guarda como bloqueado y nunca se ejecuta.",
@@ -465,7 +477,18 @@
       "web": {
         "name": "Web",
         "desc": "Búsqueda externa en DuckDuckGo vía el toggle 🌐. Apagado por defecto — el nivel más cauto."
+      },
+      "mcp_bridge": {
+        "name": "Sistema Nervioso MCP (solo lectura)",
+        "desc": "Conciencia de solo lectura de los servidores y herramientas MCP internos de WLWAI (`/api/mcp/manifest`). Apagado por defecto; nunca ejecuta acciones externas."
       }
+    },
+    "mcpInspector": {
+      "title": "Inspector del Sistema Nervioso MCP (Solo lectura)",
+      "activeBadge": "Conectado al contexto de Andrés",
+      "inactiveBadge": "Apagado en niveles de investigación",
+      "intro": "Estos son los servidores y herramientas Model Context Protocol (MCP) expuestos por WLWAI. Cuando activas arriba el nivel 4 (`Sistema Nervioso MCP`), Andrés recibe este mapa de solo lectura en la conversación para explicar o diseñar flujos sobre ellos — sin invocar nunca una herramienta por su cuenta.",
+      "toolsLabel": "herramientas"
     },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."

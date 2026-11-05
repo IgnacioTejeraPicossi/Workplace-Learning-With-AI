@@ -4,7 +4,8 @@ import { useTheme } from "./ThemeContext";
 import {
   getAndresProfile, andresChat,
   getAndresMemories, createAndresMemory, updateAndresMemory, deleteAndresMemory,
-  getAndresResearchTiers, setAndresResearchTiers,
+  getAndresResearchTiers, setAndresResearchTiers, getAndresMcpStatus,
+  getAndresSkills, runAndresSkill,
   proposeAndresConsolidation, listAndresConsolidations, actAndresConsolidation,
 } from "./api";
 import { useSpeechCapture } from "./components/hologram/useSpeechCapture";
@@ -166,6 +167,12 @@ export default function AndresRobot() {
   const [inputError, setInputError] = useState("");
   const [useWeb, setUseWeb] = useState(false);
   const [tiers, setTiers] = useState(null);
+  const [mcpStatus, setMcpStatus] = useState(null);
+  // Active skills available as "Muscle Memory" inside Conversation
+  const [activeSkills, setActiveSkills] = useState([]);
+  const [selectedSkillId, setSelectedSkillId] = useState("");
+  const [skillChatInput, setSkillChatInput] = useState("");
+  const [skillChatBusy, setSkillChatBusy] = useState(false);
   // V6.2 — one attached picture for the next turn (base64 data URL) + a preview.
   const [attachedImage, setAttachedImage] = useState(null);
   const [imageBusy, setImageBusy] = useState(false);
@@ -231,16 +238,59 @@ export default function AndresRobot() {
   };
 
   const loadTiers = useCallback(async () => {
-    try { const r = await getAndresResearchTiers(); setTiers(r.tiers); } catch (e) { /* offline */ }
+    try {
+      const [r, mcp] = await Promise.all([
+        getAndresResearchTiers(),
+        getAndresMcpStatus().catch(() => null),
+      ]);
+      setTiers(r.tiers);
+      if (mcp) setMcpStatus(mcp);
+    } catch (e) { /* offline */ }
   }, []);
   const toggleTier = async (key) => {
     if (!tiers) return;
     const next = { ...tiers, [key]: !tiers[key] };
     setTiers(next);
-    try { const r = await setAndresResearchTiers({ [key]: next[key] }); setTiers(r.tiers); } catch (e) { loadTiers(); }
+    try {
+      const r = await setAndresResearchTiers({ [key]: next[key] });
+      setTiers(r.tiers);
+      if (key === "mcp_bridge") {
+        setMcpStatus((prev) => prev ? { ...prev, enabled: Boolean(r.tiers?.mcp_bridge) } : prev);
+      }
+    } catch (e) { loadTiers(); }
+  };
+
+  const loadActiveSkillsForChat = useCallback(async () => {
+    try {
+      const r = await getAndresSkills();
+      const act = (r.skills || []).filter((s) => s.status === "active");
+      setActiveSkills(act);
+      if (act.length > 0 && !selectedSkillId) {
+        setSelectedSkillId(act[0]._id);
+      }
+    } catch (e) {
+      setActiveSkills([]);
+    }
+  }, [selectedSkillId]);
+
+  const handleRunSkillInChat = async () => {
+    const sk = activeSkills.find((s) => s._id === selectedSkillId) || activeSkills[0];
+    if (!sk || skillChatBusy) return;
+    setSkillChatBusy(true);
+    let parsedInput = skillChatInput;
+    try { parsedInput = JSON.parse(skillChatInput); } catch (_) { /* keep raw string */ }
+    try {
+      const res = await runAndresSkill(sk._id, parsedInput);
+      const outStr = res.ok ? JSON.stringify(res.output) : `Error: ${res.error}`;
+      const prefix = input.trim() ? `${input.trim()}\n` : "";
+      setInput(`${prefix}[Skill \`${sk.name}\` output: ${outStr}] `);
+      setSkillChatInput("");
+    } catch (e) { /* offline */ }
+    setSkillChatBusy(false);
   };
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
+  useEffect(() => { if (activeTab === "conversation") loadActiveSkillsForChat(); }, [activeTab, loadActiveSkillsForChat]);
   useEffect(() => { if (activeTab === "memory") { loadMemories(); loadConsolidations(); } }, [activeTab, loadMemories, loadConsolidations]);
   useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
@@ -794,6 +844,51 @@ export default function AndresRobot() {
           </button>
         </div>
       )}
+      {/* Muscle Memory bar — run an approved active skill in the sandbox and drop its output into the chat */}
+      {activeSkills.length > 0 && (
+        <div style={{ ...card, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: colors.text }}>
+            💪 {t("andresRobotModule.conversation.skillBar.label")}:
+          </span>
+          <select
+            value={selectedSkillId}
+            onChange={(e) => setSelectedSkillId(e.target.value)}
+            style={{
+              padding: "6px 10px", borderRadius: 8, border: `1px solid ${colors.border}`,
+              background: colors.background, color: colors.text, fontSize: 12.5, fontFamily: "monospace",
+            }}
+          >
+            {activeSkills.map((sk) => (
+              <option key={sk._id} value={sk._id}>{sk.name}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={skillChatInput}
+            onChange={(e) => setSkillChatInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleRunSkillInChat()}
+            placeholder={t("andresRobotModule.conversation.skillBar.inputPlaceholder")}
+            style={{
+              flex: 1, minWidth: 160, padding: "6px 10px", borderRadius: 8,
+              border: `1px solid ${colors.border}`, background: colors.background,
+              color: colors.text, fontSize: 12.5, fontFamily: "monospace",
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleRunSkillInChat}
+            disabled={skillChatBusy}
+            style={{
+              background: colors.primaryLight, color: colors.primary,
+              border: `1px solid ${colors.primary}`, borderRadius: 8,
+              padding: "6px 12px", fontSize: 12, fontWeight: 600,
+              cursor: skillChatBusy ? "wait" : "pointer",
+            }}
+          >
+            {skillChatBusy ? "…" : t("andresRobotModule.conversation.skillBar.runInsert")}
+          </button>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <span
           onClick={() => setUseWeb((w) => !w)}
@@ -1033,7 +1128,7 @@ export default function AndresRobot() {
   );
 
   const renderSafety = () => {
-    const tierKeys = ["internal", "documents", "web"];
+    const tierKeys = ["internal", "documents", "web", "mcp_bridge"];
     return (
     <div style={{ display: "grid", gap: 16 }}>
       <div style={{ ...card, color: colors.text, lineHeight: 1.7 }}>
@@ -1050,7 +1145,7 @@ export default function AndresRobot() {
         </p>
       </div>
 
-      {/* Research tiers — internal < documents < web */}
+      {/* Research tiers — internal < documents < web < mcp_bridge */}
       <div style={{ ...card, color: colors.text }}>
         <h3 style={{ marginTop: 0 }}>{t("andresRobotModule.tiers.title")}</h3>
         <p style={{ fontSize: 13, color: colors.textSecondary }}>{t("andresRobotModule.tiers.intro")}</p>
@@ -1082,6 +1177,55 @@ export default function AndresRobot() {
         <p style={{ fontSize: 12, color: colors.textSecondary, fontStyle: "italic", marginTop: 10 }}>
           {t("andresRobotModule.tiers.note")}
         </p>
+      </div>
+
+      {/* MCP Nervous System Inspector (Read-only catalog) */}
+      <div style={{ ...card, borderLeft: `4px solid ${colors.primary}`, color: colors.text }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <h3 style={{ margin: 0 }}>⚡ {t("andresRobotModule.mcpInspector.title")}</h3>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999,
+            background: tiers?.mcp_bridge ? "#dcfce7" : colors.background,
+            color: tiers?.mcp_bridge ? "#166534" : colors.textSecondary,
+            border: `1px solid ${tiers?.mcp_bridge ? "#86efac" : colors.border}`,
+          }}>
+            {tiers?.mcp_bridge
+              ? t("andresRobotModule.mcpInspector.activeBadge")
+              : t("andresRobotModule.mcpInspector.inactiveBadge")}
+          </span>
+        </div>
+        <p style={{ fontSize: 13, color: colors.textSecondary, margin: "6px 0 12px", lineHeight: 1.55 }}>
+          {t("andresRobotModule.mcpInspector.intro")}
+        </p>
+        {mcpStatus?.servers?.length > 0 && (
+          <div style={{ display: "grid", gap: 10 }}>
+            {mcpStatus.servers.map((srv) => (
+              <div key={srv.id} style={{ padding: 12, borderRadius: 8, background: colors.background, border: `1px solid ${colors.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: 13.5, fontFamily: "monospace", color: colors.text }}>
+                    {srv.name} ({srv.id})
+                  </strong>
+                  <span style={{ fontSize: 11, color: colors.textSecondary }}>
+                    v{srv.version} · {srv.tool_count} {t("andresRobotModule.mcpInspector.toolsLabel")}
+                  </span>
+                </div>
+                <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
+                  {(srv.tools || []).map((tool) => (
+                    <div key={tool.name} style={{ fontSize: 12, color: colors.text, lineHeight: 1.45 }}>
+                      <code style={{ background: colors.cardBackground, padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
+                        {tool.name}
+                      </code>{" "}
+                      <span style={{ fontSize: 11, color: colors.primary, fontFamily: "monospace" }}>
+                        [{tool.method} {tool.path}]
+                      </span>{" "}
+                      <span style={{ color: colors.textSecondary }}>— {tool.description}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
     );

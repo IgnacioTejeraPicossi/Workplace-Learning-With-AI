@@ -55,6 +55,7 @@ class ResearchTiers(BaseModel):
     internal: Optional[bool] = None
     documents: Optional[bool] = None
     web: Optional[bool] = None
+    mcp_bridge: Optional[bool] = None
 
 
 class CatalogItem(BaseModel):
@@ -245,6 +246,19 @@ async def research_suggest(body: ResearchSuggestRequest, http_request: Request,
     )
 
 
+@router.get("/research/mcp-status")
+async def research_mcp_status(user=Depends(_verify_token)):
+    """Read-only inspection of WLWAI's internal MCP nervous system + the user's
+    `mcp_bridge` consent tier."""
+    profile_doc = await get_or_create_profile(user.get("uid"))
+    tiers = research_service.get_tiers(profile_doc)
+    catalog = research_service.inspect_mcp_nervous_system()
+    return {
+        "enabled": bool(tiers.get("mcp_bridge")),
+        **catalog,
+    }
+
+
 @router.post("/chat")
 async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_token)):
     """One conversational turn with Andrés."""
@@ -283,6 +297,13 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         profile_doc, memories=recalled, projects=projects, skills=active_skills
     )
     messages = [{"role": "system", "content": system_prompt}]
+    # Research tier 4 (MCP Nervous System — read-only catalog): only when user
+    # explicitly enabled `mcp_bridge` in Safety.
+    if tiers.get("mcp_bridge"):
+        mcp_info = research_service.inspect_mcp_nervous_system()
+        mcp_block = research_service.mcp_prompt_block(mcp_info)
+        if mcp_block:
+            messages.append({"role": "system", "content": mcp_block})
     for u_prev, a_prev in recent_turns:
         messages.append({"role": "user", "content": u_prev})
         messages.append({"role": "assistant", "content": a_prev})

@@ -17,7 +17,12 @@ import re
 
 from backend.db import andres_profiles
 
-DEFAULT_TIERS = {"internal": True, "documents": True, "web": False}
+DEFAULT_TIERS = {
+    "internal": True,
+    "documents": True,
+    "web": False,
+    "mcp_bridge": False,  # Tier 4 (Nervous System): read-only awareness of WLWAI MCP tools
+}
 
 
 # ---------------------------------------------------------------------------
@@ -209,3 +214,73 @@ async def set_tiers(user_id: str, patch: dict) -> dict:
         await andres_profiles.update_one({"user_id": user_id}, {"$set": updates})
     doc = await andres_profiles.find_one({"user_id": user_id})
     return get_tiers(doc or {})
+
+
+def inspect_mcp_nervous_system() -> dict:
+    """Read-only inspection of WLWAI's internal MCP servers and tools.
+
+    Never executes a tool — only reads the manifest definitions so Andrés (and
+    the user in the Safety tab) can see what 'nerves' exist in the platform.
+    """
+    servers = []
+    try:
+        from backend.routers.agentops import (
+            j_messages_manifest,
+            compliance_manifest,
+            productivity_manifest,
+        )
+        raw_servers = [
+            ("j-messages", j_messages_manifest()),
+            ("compliance", compliance_manifest()),
+            ("productivity", productivity_manifest()),
+        ]
+        for srv_id, mf in raw_servers:
+            tools = []
+            for t in (mf or {}).get("tools", []):
+                invoke = t.get("invoke") or {}
+                tools.append({
+                    "name": t.get("name", ""),
+                    "description": (t.get("description") or "")[:240],
+                    "method": invoke.get("method", "POST"),
+                    "path": invoke.get("path", ""),
+                })
+            servers.append({
+                "id": srv_id,
+                "name": (mf or {}).get("name", srv_id),
+                "version": (mf or {}).get("version", "1.0.0"),
+                "tool_count": len(tools),
+                "tools": tools,
+            })
+    except Exception as ex:  # pragma: no cover - defensive
+        print(f"⚠️ Andrés MCP nervous-system inspect fallback: {ex}")
+
+    total_tools = sum(s["tool_count"] for s in servers)
+    return {
+        "mode": "read_only_catalog",
+        "manifest_endpoint": "/api/mcp/manifest",
+        "bridge_script": "backend/mcp_bridge_server.py",
+        "server_count": len(servers),
+        "tool_count": total_tools,
+        "servers": servers,
+    }
+
+
+def mcp_prompt_block(mcp_info: dict) -> str:
+    """Format the read-only MCP catalog for injection into Andrés' chat turn when
+    the user has enabled the `mcp_bridge` research tier."""
+    if not mcp_info or not mcp_info.get("servers"):
+        return ""
+    lines = [
+        "[MCP NERVOUS SYSTEM — tier 4 (read-only WLWAI MCP tool catalog, consent-enabled)]",
+        "You have read-only awareness of these MCP servers and tools exposed by WLWAI "
+        f"(manifest: `{mcp_info.get('manifest_endpoint')}`, STDIO bridge: `{mcp_info.get('bridge_script')}`). "
+        "You can explain them, design workflows around them, or help the user test them, "
+        "but you never invoke external endpoints on your own without explicit human action:",
+    ]
+    for srv in mcp_info.get("servers", []):
+        tool_summaries = ", ".join(
+            f"`{t['name']}` ({t['method']} {t['path']})" for t in srv.get("tools", [])
+        )
+        lines.append(f"- Server `{srv['id']}` ({srv['name']}): {tool_summaries}")
+    return "\n".join(lines) + "\n\n"
+

@@ -27,9 +27,52 @@ export default function Skills({ onProfileChange }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [code, setCode] = useState("");
+  const [autoRepaired, setAutoRepaired] = useState(false);
   const [busy, setBusy] = useState(false);
   const [runInputs, setRunInputs] = useState({});   // skillId -> raw JSON string
   const [runResults, setRunResults] = useState({});  // skillId -> result
+
+  const STARTER_TEMPLATES = [
+    {
+      key: "wordCount",
+      name: "word_frequency_summary",
+      desc: "Count total words, unique words, and top 5 longest words in a string.",
+      code:
+        "def skill(x):\n" +
+        "    words = [w.strip('.,!?;:()[]\"\\'') for w in str(x or '').split()]\n" +
+        "    words = [w.lower() for w in words if w]\n" +
+        "    longest = sorted(set(words), key=lambda w: (-len(w), w))[:5]\n" +
+        "    return {'total_words': len(words), 'unique_words': len(set(words)), 'longest': longest}\n",
+    },
+    {
+      key: "numStats",
+      name: "numeric_stats_summary",
+      desc: "Compute count, sum, min, max, and mean for a list of numbers.",
+      code:
+        "def skill(x):\n" +
+        "    nums = [float(v) for v in (x if isinstance(x, list) else [x]) if isinstance(v, (int, float))]\n" +
+        "    if not nums:\n" +
+        "        return {'count': 0}\n" +
+        "    return {'count': len(nums), 'sum': round(sum(nums), 4), 'min': min(nums), 'max': max(nums), 'mean': round(sum(nums) / len(nums), 4)}\n",
+    },
+    {
+      key: "checklist",
+      name: "markdown_checklist",
+      desc: "Turn a list of strings (or newline-separated text) into a Markdown checklist.",
+      code:
+        "def skill(x):\n" +
+        "    items = x if isinstance(x, list) else str(x or '').splitlines()\n" +
+        "    clean = [str(i).strip() for i in items if str(i).strip()]\n" +
+        "    return '\\n'.join('- [ ] ' + i for i in clean)\n",
+    },
+  ];
+
+  const applyTemplate = (tpl) => {
+    setAutoRepaired(false);
+    setName(tpl.name);
+    setDescription(tpl.desc);
+    setCode(tpl.code);
+  };
 
   const load = useCallback(async () => {
     try {
@@ -47,11 +90,13 @@ export default function Skills({ onProfileChange }) {
   const draft = async () => {
     if (!task.trim()) return;
     setBusy(true);
+    setAutoRepaired(false);
     try {
       const d = await draftAndresSkill(task.trim());
       setName(d.name || "skill");
       setDescription(d.description || "");
       setCode(d.code || "");
+      setAutoRepaired(Boolean(d.auto_repaired));
     } catch (e) { /* offline */ }
     setBusy(false);
   };
@@ -59,6 +104,7 @@ export default function Skills({ onProfileChange }) {
   const propose = async () => {
     if (!code.trim()) return;
     setBusy(true);
+    setAutoRepaired(false);
     try {
       await proposeAndresSkill({ name: name.trim() || "skill", description: description.trim(), code });
       setName(""); setDescription(""); setCode(""); setTask("");
@@ -129,6 +175,38 @@ export default function Skills({ onProfileChange }) {
             {busy ? "…" : t("andresRobotModule.skills.draft")}
           </button>
         </div>
+        {/* Starter templates */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 11.5, color: colors.textSecondary }}>
+            💪 {t("andresRobotModule.skills.templatesLabel")}:
+          </span>
+          {STARTER_TEMPLATES.map((tpl) => (
+            <button
+              key={tpl.key}
+              type="button"
+              onClick={() => applyTemplate(tpl)}
+              style={{
+                background: colors.background,
+                border: `1px solid ${colors.border}`,
+                color: colors.text,
+                borderRadius: 999,
+                padding: "3px 10px",
+                fontSize: 11.5,
+                cursor: "pointer",
+              }}
+            >
+              {t(`andresRobotModule.skills.templates.${tpl.key}`, tpl.name)}
+            </button>
+          ))}
+        </div>
+        {autoRepaired && (
+          <div style={{
+            padding: "6px 10px", borderRadius: 8, background: "#eff6ff",
+            border: "1px solid #bfdbfe", color: "#1e40af", fontSize: 12,
+          }}>
+            🔧 {t("andresRobotModule.skills.autoRepairedNote")}
+          </div>
+        )}
         <input style={input} value={name} onChange={(e) => setName(e.target.value)}
                placeholder={t("andresRobotModule.skills.namePlaceholder")} />
         <input style={input} value={description} onChange={(e) => setDescription(e.target.value)}

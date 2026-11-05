@@ -78,6 +78,11 @@
       "rateLimited": "Du sender meldinger veldig raskt — vent litt og prøv igjen.",
       "tooLong": "Den meldingen er for lang ({{count}} tegn). Hold den under {{max}} — lim inn et kortere utdrag eller oppsummer den først.",
       "recalledLabel": "Hentet {{count}} minne(r) fra Minnehagen:",
+      "skillBar": {
+        "label": "Muskelminne",
+        "inputPlaceholder": "Inndata til ferdighet (f.eks. [1,2,3] eller tekst)…",
+        "runInsert": "Kjør og sett inn utdata"
+      },
       "web": {
         "toggle": "Web",
         "toggleHint": "La Andrés kjøre et ferskt DuckDuckGo-søk for denne meldingen og svare med siterte kilder.",
@@ -327,6 +332,13 @@
       "proposeTitle": "Foreslå en ferdighet",
       "taskPlaceholder": "Beskriv en oppgave Andrés skal skissere…",
       "draft": "Skisser med KI",
+      "templatesLabel": "Startmaler",
+      "templates": {
+        "wordCount": "Ordtelling og frekvens",
+        "numStats": "Numerisk statistikk",
+        "checklist": "Markdown-sjekkliste"
+      },
+      "autoRepairedNote": "Auto-reparert i 1 runde etter statisk AST-sikkerhetssjekk.",
       "namePlaceholder": "Ferdighetsnavn…",
       "descPlaceholder": "Hva gjør den?",
       "safetyNote": "Må definere `def skill(x)`. Ingen import, ingen dunder/private navn, ingen eval/open. Usikker kode lagres som blokkert og kan aldri kjøre.",
@@ -465,7 +477,18 @@
       "web": {
         "name": "Nett",
         "desc": "Eksternt DuckDuckGo-søk via 🌐-bryteren. Av som standard — det mest forsiktige nivået."
+      },
+      "mcp_bridge": {
+        "name": "MCP-nervesystem (skrivebeskyttet)",
+        "desc": "Skrivebeskyttet oversikt over WLWAIs interne MCP-servere og verktøy (`/api/mcp/manifest`). Av som standard; utfører aldri eksterne handlinger."
       }
+    },
+    "mcpInspector": {
+      "title": "MCP-nervesystem-inspektør (Skrivebeskyttet)",
+      "activeBadge": "Koblet til Andrés' kontekst",
+      "inactiveBadge": "Av i forskningsnivåer",
+      "intro": "Dette er Model Context Protocol (MCP)-serverne og verktøyene som eksponeres av WLWAI. Når nivå 4 (`MCP-nervesystem`) er slått på ovenfor, får Andrés dette skrivebeskyttede kartet i samtalen slik at han kan forklare eller utforme arbeidsflyter rundt dem — uten noen gang å kalle et verktøy på egen hånd.",
+      "toolsLabel": "verktøy"
     },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
