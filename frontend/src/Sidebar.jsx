@@ -186,9 +186,9 @@ const getNavItems = (t) => [
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
     { key: "readme-viewer", label: t('sidebar.readmeViewer'), icon: "doc" },
+    { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" },
     { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
-    { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
-    { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" }
+    { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" }
   ]},
   
   // Grupo 3: Herramientas de desarrollo (fondo azul)
