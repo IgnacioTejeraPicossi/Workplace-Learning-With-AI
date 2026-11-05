@@ -393,6 +393,13 @@ export default function AndresRobot() {
       { label: t("andresRobotModule.home.autonomy"), value: `${profile?.autonomy_level ?? 2}` },
       { label: t("andresRobotModule.home.conversations"), value: `${c.conversations ?? 0}` },
     ];
+    const stackLayers = [
+      { key: "llm", icon: "🧠", tab: "conversation" },
+      { key: "rag", icon: "📚", tab: "memory" },
+      { key: "mcp", icon: "⚡", tab: "safety", isFuture: true },
+      { key: "skills", icon: "💪", tab: "skills" },
+      { key: "agent", icon: "🦾", tab: "projects" },
+    ];
     return (
       <div style={{ display: "grid", gap: 16 }}>
         <div style={card}>
@@ -423,6 +430,106 @@ export default function AndresRobot() {
             </div>
           </div>
         )}
+
+        {/* Architectural & Future Inspiration — AI Stack Explained Like a Human Body */}
+        <div style={{ ...card, display: "grid", gap: 14 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <strong style={{ fontSize: 16, color: colors.text }}>
+                🧬 {t("andresRobotModule.home.stackInspiration.title")}
+              </strong>
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999,
+                background: colors.primaryLight, color: colors.primary,
+              }}>
+                {t("andresRobotModule.home.stackInspiration.badge")}
+              </span>
+            </div>
+            <p style={{ margin: "6px 0 0", fontSize: 13, color: colors.textSecondary, lineHeight: 1.55 }}>
+              {t("andresRobotModule.home.stackInspiration.subtitle")}
+            </p>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 16,
+            alignItems: "start",
+          }}>
+            {/* Visual poster */}
+            <div style={{
+              borderRadius: 12, overflow: "hidden", border: `1px solid ${colors.border}`,
+              background: "#fff", textAlign: "center",
+            }}>
+              <img
+                src="/images/andres-ai-stack-body.png"
+                alt={t("andresRobotModule.home.stackInspiration.imageAlt")}
+                style={{ width: "100%", maxWidth: 460, height: "auto", display: "block", margin: "0 auto" }}
+              />
+              <div style={{
+                padding: "8px 12px", fontSize: 11.5, color: colors.textSecondary,
+                borderTop: `1px solid ${colors.border}`, background: colors.background,
+              }}>
+                {t("andresRobotModule.home.stackInspiration.imageCaption")}
+              </div>
+            </div>
+
+            {/* 5 anatomical layers mapped to Andrés */}
+            <div style={{ display: "grid", gap: 10 }}>
+              {stackLayers.map((layer, idx) => (
+                <div
+                  key={layer.key}
+                  style={{
+                    padding: "11px 14px",
+                    borderRadius: 10,
+                    border: `1px solid ${layer.isFuture ? colors.primary : colors.border}`,
+                    background: layer.isFuture ? `${colors.primary}0d` : colors.background,
+                    display: "grid",
+                    gap: 4,
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontWeight: 700, fontSize: 13.5, color: colors.text }}>
+                      {idx + 1}. {layer.icon} {t(`andresRobotModule.home.stackInspiration.layers.${layer.key}.title`)}
+                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {layer.isFuture && (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                          padding: "2px 7px", borderRadius: 999,
+                          background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a",
+                        }}>
+                          {t("andresRobotModule.home.stackInspiration.futureTag")}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab(layer.tab)}
+                        style={{
+                          ...linkBtn(colors),
+                          fontSize: 11.5,
+                          padding: "2px 8px",
+                          borderRadius: 6,
+                          border: `1px solid ${colors.border}`,
+                          background: colors.cardBackground,
+                        }}
+                      >
+                        → {t(`andresRobotModule.tabs.${layer.tab}`)}
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 1.5 }}>
+                    {t(`andresRobotModule.home.stackInspiration.layers.${layer.key}.role`)}
+                  </div>
+                  <div style={{ fontSize: 12, color: colors.text, lineHeight: 1.5 }}>
+                    <strong>{t("andresRobotModule.home.stackInspiration.inAndresLabel")}:</strong>{" "}
+                    {t(`andresRobotModule.home.stackInspiration.layers.${layer.key}.andres`)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   };

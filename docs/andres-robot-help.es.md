@@ -63,6 +63,18 @@ breve nombra su **disposición** simulada actual (curiosidad, calidez, etc.) —
 funcionales, no sentimientos. Es la forma más rápida de ver, de un vistazo, cuánta biografía ha
 acumulado.
 
+### 🧬 Tu stack de IA, explicado como un cuerpo humano (Arquitectura e inspiración futura)
+
+Debajo de los contadores en **Inicio**, Andrés muestra un mapa visual (`/images/andres-ai-stack-body.png`) que compara las cinco capas de un agente de IA con el cuerpo humano — enlazando cada capa con la pestaña donde vive hoy o con su evolución futura:
+
+| Capa | Analogía del cuerpo humano | Cómo se traduce en Andrés |
+|------|----------------------------|---------------------------|
+| **1. LLM** | 🧠 **El Cerebro** — comprende, escribe y razona, pero solo sabe lo que aprendió en el entrenamiento | Stack LLM unificado (API Config) + constitución ética inmutable de Andrés + identidad versionada (**Conversación**) |
+| **2. RAG** | 📚 **Cerebro + Biblioteca** — consulta tus documentos antes de responder para fundamentarse en tus datos | **Jardín de memoria** (recuerdos episódicos y semánticos verificados) + **Fuentes de conocimiento** (~55 fuentes) + niveles de investigación |
+| **3. MCP** | ⚡ **El Sistema Nervioso** — un conector estándar hacia apps, APIs, archivos y bases de datos | **Horizonte futuro**: hoy las habilidades de Andrés corren aisladas en sandbox sin red ni acceso a la app; un puente MCP con consentimiento explícito es el futuro sistema nervioso natural para conectar con herramientas de WLWAI (**Seguridad**) |
+| **4. Skills** | 💪 **Memoria Muscular** — conocimiento práctico para tareas repetitivas que se carga cuando hace falta | Pestaña **Habilidades**: funciones puras `def skill(x)` con chequeo estático de seguridad, activas solo tras tu aprobación |
+| **5. Agente de IA** | 🦾 **Cerebro + Manos** — planifica pasos por sí mismo y usa herramientas para actuar, no solo responder | **Proyectos**, **Laboratorio de desarrollo** y **Evolución** — donde propone metas, consolidaciones y mejoras siempre bajo aprobación humana |
+
 ---
 
 ## La pestaña Conversación

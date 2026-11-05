@@ -62,6 +62,18 @@ conversations, plus his **autonomy level** (see Evolution). A short line names h
 simulated **disposition** (curiosity, warmth, etc.) — again, functional signals, not feelings.
 It's the quickest way to see, at a glance, how much of a biography he has accumulated.
 
+### 🧬 Your AI Stack, Explained Like a Human Body (Architecture & Future Inspiration)
+
+Below the counters on **Home**, Andrés includes an visual architectural map (`/images/andres-ai-stack-body.png`) that compares the five layers of an AI agent stack to the human body — linking each layer to the tab where it lives today or to his future roadmap:
+
+| Layer | Human-body analogy | How it maps to Andrés |
+|-------|--------------------|-----------------------|
+| **1. LLM** | 🧠 **The Brain** — understands, writes, and reasons, but only knows what it learned in training | Unified LLM stack (API Config) + Andrés' immutable ethical constitution + versioned identity (**Conversation**) |
+| **2. RAG** | 📚 **Brain + Library** — looks up your documents before answering and grounds answers in your own data | **Memory Garden** (verified episodic & semantic memories) + **Knowledge Sources** (~55 curated sources) + research tiers |
+| **3. MCP** | ⚡ **The Nervous System** — one standard plug connecting AI to apps, APIs, files, and databases | **Future horizon**: today Andrés' skills are sandbox-isolated with no network/app access; a consent-gated MCP bridge is the natural future nervous system to connect him safely to selected WLWAI tools (**Safety**) |
+| **4. Skills** | 💪 **Muscle Memory** — saved know-how for repeat tasks, loaded only when needed | **Skills** tab: pure `def skill(x)` functions that pass static safety checks and activate only after your approval |
+| **5. AI Agent** | 🦾 **Brain + Hands** — plans steps independently and uses tools to act, not just answer | **Projects**, **Development Lab**, and **Evolution** — where he proposes goals, memory consolidations, and growth steps under human approval |
+
 ---
 
 ## The Conversation tab

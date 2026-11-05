@@ -29,7 +29,43 @@
       "conversations": "Conversaciones",
       "intro": "Un compañero digital recién despertado, empezando a desarrollar un carácter propio.",
       "dispositionTitle": "Disposición simulada",
-      "dispositionNote": "Un estado computacional — no prueba de emoción real."
+      "dispositionNote": "Un estado computacional — no prueba de emoción real.",
+      "stackInspiration": {
+        "title": "Tu stack de IA, explicado como un cuerpo humano",
+        "badge": "Arquitectura e inspiración futura",
+        "subtitle": "Entender los componentes de un stack de IA es mucho más fácil al compararlos con el cuerpo humano. Esto es lo que hace cada capa — y cómo se conecta con lo que Andrés ya tiene hoy y con su evolución futura.",
+        "imageAlt": "Tu stack de IA explicado como un cuerpo humano — LLM, RAG, MCP, Skills, AI Agent",
+        "imageCaption": "Modelo mental anatómico de un agente: Cerebro (LLM) · Biblioteca (RAG) · Sistema nervioso (MCP) · Memoria muscular (Skills) · Manos (Agente de IA).",
+        "inAndresLabel": "En Andrés",
+        "futureTag": "Horizonte futuro",
+        "layers": {
+          "llm": {
+            "title": "LLM = El Cerebro",
+            "role": "Comprende, escribe y razona — pero solo sabe lo que aprendió durante su entrenamiento.",
+            "andres": "Impulsado por el LLM unificado de API Config, guiado por la constitución ética inmutable de Andrés y su identidad versionada."
+          },
+          "rag": {
+            "title": "RAG = Cerebro + Biblioteca",
+            "role": "Consulta tus documentos antes de responder para fundamentar las respuestas en tus propios datos.",
+            "andres": "Su Jardín de memoria (recuerdos episódicos y semánticos verificados por ti), el directorio de Fuentes de conocimiento (~55 fuentes curadas) y sus niveles de investigación (Interno / Documentos / Web)."
+          },
+          "mcp": {
+            "title": "MCP = El Sistema Nervioso",
+            "role": "Un conector estándar para herramientas y datos — conecta la IA con apps, APIs, archivos y bases de datos.",
+            "andres": "Inspiración futura: hoy las habilidades de Andrés corren en un sandbox aislado sin red ni acceso a la app; un puente MCP con consentimiento explícito es el futuro sistema nervioso natural para conectar con herramientas seleccionadas de WLWAI."
+          },
+          "skills": {
+            "title": "Skills = Memoria Muscular",
+            "role": "Conocimiento práctico guardado para tareas repetitivas — se carga solo cuando la tarea lo necesita.",
+            "andres": "Su pestaña Habilidades: funciones puras `def skill(x)` que pasan un chequeo estático de seguridad y pasan a ser memoria muscular activa solo cuando las apruebas."
+          },
+          "agent": {
+            "title": "Agente de IA = Cerebro + Manos",
+            "role": "Planifica los pasos por sí mismo y usa herramientas para actuar, en lugar de limitarse a responder.",
+            "andres": "Sus pestañas Proyectos, Laboratorio de desarrollo y Evolución — donde propone metas, consolidaciones de memoria y pasos de crecimiento, siempre bajo aprobación humana visible."
+          }
+        }
+      }
     },
     "conversation": {
       "placeholder": "Habla con Andrés…",

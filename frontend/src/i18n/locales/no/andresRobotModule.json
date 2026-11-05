@@ -29,7 +29,43 @@
       "conversations": "Samtaler",
       "intro": "En nylig våknet digital følgesvenn som begynner å utvikle sin egen karakter.",
       "dispositionTitle": "Simulert disposisjon",
-      "dispositionNote": "En beregningstilstand — ikke bevis på ekte følelser."
+      "dispositionNote": "En beregningstilstand — ikke bevis på ekte følelser.",
+      "stackInspiration": {
+        "title": "AI-stakken din, forklart som en menneskekropp",
+        "badge": "Arkitektur og fremtidig inspirasjon",
+        "subtitle": "Å forstå komponentene i en AI-stakk er mye enklere når man sammenligner dem med menneskekroppen. Her er hva hvert lag faktisk gjør — og hvordan det kobles til Andrés i dag og til hans fremtidige utvikling.",
+        "imageAlt": "AI-stakken din forklart som en menneskekropp — LLM, RAG, MCP, Skills, AI Agent",
+        "imageCaption": "Anatomisk mental modell av en agent-stakk: Hjerne (LLM) · Bibliotek (RAG) · Nervesystem (MCP) · Muskelminne (Skills) · Hender (AI-agent).",
+        "inAndresLabel": "Hos Andrés",
+        "futureTag": "Fremtidig horisont",
+        "layers": {
+          "llm": {
+            "title": "LLM = Hjernen",
+            "role": "Forstår, skriver og resonnerer — men vet bare det den lærte under trening.",
+            "andres": "Drevet av den felles LLM-stakken i API Config, formet av Andrés' uforanderlige etiske grunnlov og versjonerte identitet."
+          },
+          "rag": {
+            "title": "RAG = Hjerne + Bibliotek",
+            "role": "Slår opp i dokumentene dine før den svarer og forankrer svarene i dine egne data.",
+            "andres": "Minnehagen hans (episodiske og semantiske minner du verifiserer), katalogen Kunnskapskilder (~55 kuraterte kilder) og forskningsnivåene (Intern / Dokumenter / Web)."
+          },
+          "mcp": {
+            "title": "MCP = Nervesystemet",
+            "role": "Én standardplugg for verktøy og data — kobler AI til apper, API-er, filer og databaser.",
+            "andres": "Fremtidig inspirasjon: i dag kjører Andrés' ferdigheter i en isolert sandkasse uten nettverk eller apptilgang; en samtykkestyrt MCP-bro er det naturlige fremtidige nervesystemet for trygg tilkobling til utvalgte WLWAI-verktøy."
+          },
+          "skills": {
+            "title": "Skills = Muskelminne",
+            "role": "Lagret kunnskap for gjentatte oppgaver — lastes bare inn når oppgaven trenger det.",
+            "andres": "Fanen Ferdigheter: rene `def skill(x)`-funksjoner som består en statisk sikkerhetssjekk og blir aktivt muskelminne først når du godkjenner dem."
+          },
+          "agent": {
+            "title": "AI-agent = Hjerne + Hender",
+            "role": "Planlegger stegene på egen hånd og bruker verktøy til å handle, ikke bare svare.",
+            "andres": "Fanene Prosjekter, Utviklingslab og Evolusjon — der han foreslår mål, minnekonsolideringer og vekststeg, alltid innenfor synlige menneskegodkjente rammer."
+          }
+        }
+      }
     },
     "conversation": {
       "placeholder": "Snakk med Andrés…",

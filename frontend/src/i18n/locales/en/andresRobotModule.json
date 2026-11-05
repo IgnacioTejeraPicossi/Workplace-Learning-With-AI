@@ -29,7 +29,43 @@
       "conversations": "Conversations",
       "intro": "A newly awakened digital companion, beginning to grow a character of his own.",
       "dispositionTitle": "Simulated disposition",
-      "dispositionNote": "A computational state — not proof of real emotion."
+      "dispositionNote": "A computational state — not proof of real emotion.",
+      "stackInspiration": {
+        "title": "Your AI Stack, Explained Like a Human Body",
+        "badge": "Architecture & Future Inspiration",
+        "subtitle": "Understanding how an AI agent works is much easier when compared to the human body. Here is what each layer of the AI stack does — and how it maps to Andrés today and to his future evolution.",
+        "imageAlt": "Your AI Stack, Explained Like a Human Body — LLM, RAG, MCP, Skills, AI Agent",
+        "imageCaption": "Anatomical mental model of an agentic stack: Brain (LLM) · Library (RAG) · Nervous System (MCP) · Muscle Memory (Skills) · Hands (AI Agent).",
+        "inAndresLabel": "In Andrés",
+        "futureTag": "Future horizon",
+        "layers": {
+          "llm": {
+            "title": "LLM = The Brain",
+            "role": "Understands, writes, and reasons — but only knows what it learned during training.",
+            "andres": "Powered by the unified LLM stack configured in API Config, shaped by Andrés' immutable ethical constitution and versioned identity."
+          },
+          "rag": {
+            "title": "RAG = Brain + Library",
+            "role": "Looks up your documents before answering and grounds answers in your own data.",
+            "andres": "His Memory Garden (episodic & semantic memories you verify), Knowledge Sources directory (~55 curated sources), and research tiers (Internal / Documents / Web)."
+          },
+          "mcp": {
+            "title": "MCP = The Nervous System",
+            "role": "One standard plug for tools and data — connects AI to apps, APIs, files, and databases.",
+            "andres": "Future inspiration: today Andrés' skills run in an isolated sandbox with no network or app access; a consent-gated MCP bridge is the natural future nervous system to let him safely touch selected WLWAI tools."
+          },
+          "skills": {
+            "title": "Skills = Muscle Memory",
+            "role": "Saved know-how for repeat tasks — loads only when a task needs it.",
+            "andres": "His Skills tab: pure `def skill(x)` functions that pass static safety checks and only become active muscle memory once you approve them."
+          },
+          "agent": {
+            "title": "AI Agent = Brain + Hands",
+            "role": "Plans the steps on its own and uses tools to take action, rather than just answering.",
+            "andres": "His Projects, Development Lab, and Evolution tabs — where he proposes goals, memory consolidations, and growth steps, always within visible human-approved boundaries."
+          }
+        }
+      }
     },
     "conversation": {
       "placeholder": "Talk with Andrés…",

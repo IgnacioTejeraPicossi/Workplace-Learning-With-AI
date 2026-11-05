@@ -61,6 +61,18 @@ samtaler, samt hans **autonominivå** (se Evolusjon). En kort linje navngir hans
 simulerte **tilstand** (nysgjerrighet, varme osv.) — igjen funksjonelle signaler, ikke følelser.
 Det er den raskeste måten å se, med ett blikk, hvor mye biografi han har samlet.
 
+### 🧬 AI-stakken din, forklart som en menneskekropp (Arkitektur og fremtidig inspirasjon)
+
+Under tellerne på **Hjem** viser Andrés et visuelt arkitekturkart (`/images/andres-ai-stack-body.png`) som sammenligner de fem lagene i en AI-agent-stakk med menneskekroppen — og kobler hvert lag til fanen der det bor i dag eller til hans fremtidige veikart:
+
+| Lag | Menneskekropp-analogi | Hvordan det kobles til Andrés |
+|-----|-----------------------|-------------------------------|
+| **1. LLM** | 🧠 **Hjernen** — forstår, skriver og resonnerer, men vet bare det den lærte under trening | Felles LLM-stakk (API Config) + Andrés' uforanderlige etiske grunnlov + versjonert identitet (**Samtale**) |
+| **2. RAG** | 📚 **Hjerne + Bibliotek** — slår opp i dokumentene dine før den svarer og forankrer svarene i egne data | **Minnehage** (verifiserte episodiske og semantiske minner) + **Kunnskapskilder** (~55 kilder) + forskningsnivåer |
+| **3. MCP** | ⚡ **Nervesystemet** — én standardplugg som kobler AI til apper, API-er, filer og databaser | **Fremtidig horisont**: i dag kjører Andrés' ferdigheter isolert i sandkasse uten nett/apptilgang; en samtykkestyrt MCP-bro er det naturlige fremtidige nervesystemet mot utvalgte WLWAI-verktøy (**Sikkerhet**) |
+| **4. Skills** | 💪 **Muskelminne** — lagret kunnskap for gjentatte oppgaver som lastes inn ved behov | Fanen **Ferdigheter**: rene `def skill(x)`-funksjoner med statisk sikkerhetssjekk, aktive først etter din godkjenning |
+| **5. AI-agent** | 🦾 **Hjerne + Hender** — planlegger steg på egen hånd og bruker verktøy til å handle, ikke bare svare | **Prosjekter**, **Utviklingslab** og **Evolusjon** — der han foreslår mål, konsolideringer og vekststeg under menneskelig godkjenning |
+
 ---
 
 ## Samtale-fanen
