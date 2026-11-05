@@ -95,7 +95,13 @@ Habla por texto, voz y un avatar 3D opcional, y puede mirar **una imagen por men
 (percepción limitada con consentimiento por turno, condicionada por el nivel de
 investigación "Documentos"). Todo lo que recuerda o cambia es **propuesto → revisado →
 aprobado por ti**.
-**Guía de usuario:** [docs/andres-robot-help.md](docs/andres-robot-help.md).
+- **Stack anatómico de IA y conexión entre órganos (noviembre 2026):** **Inicio** incluye el mapa visual **"Tu stack de IA, explicado como un cuerpo humano"** (`/images/andres-ai-stack-body.png`) conectando las 5 capas (**1. LLM = Cerebro**, **2. RAG = Cerebro + Biblioteca**, **3. MCP = Sistema Nervioso**, **4. Skills = Memoria Muscular**, **5. Agente de IA = Cerebro + Manos**):
+  1. **Cerebro (`Conversación`):** memoria de trabajo multi-turno (últimos 4 turnos) + conciencia de `[ACTIVE SKILLS]` en el prompt + chips clicables `🌱 Recuerdos recuperados` bajo cada respuesta.
+  2. **Biblioteca (`Jardín de memoria`):** selector de los 7 tipos de memoria al añadir recuerdos manuales + filtro de búsqueda por texto.
+  3. **Sistema Nervioso (`Seguridad`):** 4.º nivel `Sistema Nervioso MCP (solo lectura)` (apagado por defecto) + **⚡ Inspector del Sistema Nervioso MCP** (`GET /api/andres/research/mcp-status`) con los 3 servidores y 7 herramientas MCP de WLWAI.
+  4. **Memoria Muscular (`Habilidades` + `Conversación`):** auto-reparación AST en 1 pase al esbozar con IA, 3 plantillas base y barra **💪 Memoria muscular** en Conversación para ejecutar skills aprobadas e insertar su salida.
+  5. **Manos (`Proyectos`):** botón **🤖 Pedir a Andrés que proponga un proyecto** (`POST /api/andres/projects/propose`) + bucle biológico **♻️ Compost → Jardín de memoria** (archivar como Compost planta su `reuse_seed` como memoria `Procedimental` verificada).
+**Guía de usuario:** [docs/andres-robot-help.es.md](docs/andres-robot-help.es.md) (también `.md` / `.no.md`, y primera opción en **Help → Readme**).
 
 ### Agentes de idiomas — voz nativa clonada + conversación hablada (julio 2026)
 

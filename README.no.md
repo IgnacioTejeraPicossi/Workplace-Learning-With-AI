@@ -94,7 +94,13 @@ språkmodell — uttrykkelig **ikke** en påstand om bevissthet. Han snakker via
 og en valgfri 3D-avatar, og kan se på **ett bilde per melding** (begrenset persepsjon med
 samtykke per runde, styrt av forskningsnivået «Dokumenter»). Alt han husker eller endrer er
 **foreslått → gjennomgått → godkjent av deg**.
-**Brukerveiledning:** [docs/andres-robot-help.md](docs/andres-robot-help.md).
+- **Anatomisk AI-stakk og kobling mellom organene (november 2026):** **Hjem** inkluderer det visuelle kartet **«AI-stakken din, forklart som en menneskekropp»** (`/images/andres-ai-stack-body.png`) som kobler alle 5 lag (**1. LLM = Hjernen**, **2. RAG = Hjerne + Bibliotek**, **3. MCP = Nervesystemet**, **4. Skills = Muskelminne**, **5. AI-agent = Hjerne + Hender**):
+  1. **Hjerne (`Samtale`):** flertrinns arbeidsminne (siste 4 runder) + `[ACTIVE SKILLS]` i systemprompten + klikkbare `🌱 Hentede minner`-brikker under hvert svar.
+  2. **Bibliotek (`Minnehage`):** velger for alle 7 minnetyper ved manuell innlegging + tekstsøkefilter.
+  3. **Nervesystem (`Sikkerhet`):** 4. nivå `MCP-nervesystem (skrivebeskyttet)` (av som standard) + **⚡ MCP-nervesystem-inspektør** (`GET /api/andres/research/mcp-status`) som viser WLWAIs 3 interne MCP-servere og 7 verktøy.
+  4. **Muskelminne (`Ferdigheter` + `Samtale`):** 1-rundes AST-selvreparasjon ved KI-skissering, 3 startmaler og **💪 Muskelminne**-felt i Samtale for å kjøre godkjente ferdigheter og sette inn utdata.
+  5. **Hender (`Prosjekter`):** **🤖 Be Andrés foreslå et prosjekt** (`POST /api/andres/projects/propose`) + **♻️ Kompost → Minnehage**-sløyfe (arkivering som Kompost planter `reuse_seed` som et bekreftet `Prosedyre`-minne).
+**Brukerveiledning:** [docs/andres-robot-help.no.md](docs/andres-robot-help.no.md) (også `.md` / `.es.md`, og første valg under **Help → Readme**).
 
 ### Språkagenter — innfødt klonet stemme + muntlig samtale (juli 2026)
 

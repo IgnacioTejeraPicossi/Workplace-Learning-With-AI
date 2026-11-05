@@ -92,6 +92,17 @@ Aquí hablas con Andrés. Admite cuatro canales, que puedes combinar:
   emociones**.
 - **Imagen (🖼️)** — muéstrale **una foto** junto a tu mensaje para que pueda mirar parte de
   tu mundo visual. Ver la sección siguiente.
+- **Memoria de trabajo multi-turno y conciencia de Skills activas** — cuando el nivel **Interno**
+  está activado, Andrés recibe los **últimos 4 turnos de conversación** como contexto reciente
+  más la lista de tus **habilidades activas aprobadas** (`[ACTIVE SKILLS]`), manteniendo el hilo
+  entre repreguntas y sabiendo qué herramientas de memoria muscular tienes disponibles.
+- **Chips 🌱 Recuerdos recuperados** — debajo de cada respuesta aparecen chips clicables que
+  muestran qué recuerdos de tu **Jardín de Memoria** se usaron en ese turno (`✓` verificado vs
+  `○` candidato). Pulsa cualquiera para ir directo al jardín.
+- **Barra 💪 Memoria muscular (Skills activas en el chat)** — cuando tienes al menos una
+  habilidad aprobada (`Activa`), aparece una barra sobre el cuadro de texto para elegir la
+  skill, pasarle una entrada, ejecutarla en el sandbox aislado e insertar su salida directamente
+  en tu mensaje.
 
 ### Mostrarle una foto a Andrés
 
@@ -118,7 +129,11 @@ Andrés recuerda entre conversaciones, pero en **tus** términos:
   candidatos son sugerencias, no hechos.
 - En el Jardín de Memoria puedes **verificar** una memoria (marcarla como cierta),
   **protegerla** u **olvidarla**. También puedes **añadir memorias a mano** — esas se dan por
-  fiables de inmediato.
+  fiables de inmediato, y puedes elegir cualquiera de los **7 tipos de memoria** (*Episódica,
+  Semántica, Relacional, Creativa, Procedimental, Reflexiva, De trabajo*) en el selector junto
+  al cuadro de texto.
+- Un **filtro de búsqueda por texto** (`Filtrar recuerdos por texto…`) te permite buscar
+  rápidamente dentro de tus memorias junto a las píldoras de tipo.
 - Las memorias tienen tipos (episódica, semántica, relacional, creativa, etc.) e importancia.
   Las relevantes se recuperan automáticamente para dar continuidad a sus respuestas.
 - **La recuperación es por significado, no solo por palabras.** Con un proveedor de IA
@@ -138,16 +153,21 @@ Nada se toma como cierto hasta que lo verificas, y todo puede eliminarse.
 
 ## Seguridad y Niveles de Investigación
 
-Andrés solo usa lo que le permites. Tres niveles, de menos a más expuesto:
+Andrés solo usa lo que le permites. Cuatro niveles, de menos a más expuesto:
 
 | Nivel | Qué significa | Por defecto |
 |-------|---------------|-------------|
-| **Interno** | Su propia biografía — memorias guardadas y proyectos activos | Activado |
-| **Documentos** | Texto (e imágenes) que le das **en este turno** | Activado |
-| **Web** | Una búsqueda fresca en DuckDuckGo **y** fuentes de investigación abiertas (ver abajo), solo cuando pulsas 🌐 en un mensaje | Apagado |
+| **1. Interno** | Su propia biografía — memorias guardadas, proyectos activos, habilidades activas y turnos recientes | Activado |
+| **2. Documentos** | Texto (e imágenes) que le das **en este turno** | Activado |
+| **3. Web** | Una búsqueda fresca en DuckDuckGo **y** fuentes de investigación abiertas (ver abajo), solo cuando pulsas 🌐 en un mensaje | Apagado |
+| **4. Sistema Nervioso MCP (solo lectura)** | Conciencia de solo lectura de los servidores y herramientas MCP internos de WLWAI (`/api/mcp/manifest`) — nunca ejecuta acciones externas | Apagado |
 
 Apaga cualquier nivel y sencillamente no usará esa fuente — y lo dirá con honestidad en vez
-de buscar en silencio. El nivel más expuesto (Web) está apagado por defecto.
+de buscar en silencio. Los niveles externos/sistema (**Web** y **Sistema Nervioso MCP**) están apagados por defecto.
+
+### ⚡ Inspector del Sistema Nervioso MCP (Solo lectura)
+
+Debajo de los interruptores en **Seguridad**, el **Inspector del Sistema Nervioso MCP** (`GET /api/andres/research/mcp-status`) muestra en vivo el catálogo de solo lectura de los 3 servidores MCP internos de WLWAI (`wlwai-j-messages-mcp`, `ai-compliance-agent`, `ai-productivity-agent`) y sus 7 herramientas. Al activar el nivel 4, Andrés recibe este mapa en la conversación para explicarte las herramientas o diseñar flujos con ellas — sin invocar nunca un endpoint por su cuenta.
 
 ---
 
@@ -246,16 +266,22 @@ identidad; es un lugar para pequeños experimentos honestos.
 
 ### 🧰 Habilidades
 
-Pequeños fragmentos de código que Andrés puede **proponer**. Cada habilidad pasa un **control de
-seguridad estricto** y se ejecuta en un **entorno aislado (sandbox)**, y solo se ejecuta
-**tras tu aprobación**. El código inseguro se bloquea y nunca puede aprobarse. Así gana
-capacidades pequeñas y reales sin poder jamás ejecutar código arbitrario en tu máquina.
+Pequeños fragmentos de código (`def skill(x)`) que Andrés puede **proponer**. Cada habilidad pasa un **control de
+seguridad estático AST estricto** y se ejecuta en un **subproceso aislado (sandbox)**, y solo cuenta como activa
+**tras tu aprobación**:
+
+- **Auto-reparación AST en 1 pase:** cuando pulsas **Esbozar con IA** y el primer borrador del modelo incumple una regla del sandbox (p. ej. un `import` o variable `_privada`), Andrés ejecuta automáticamente un pase de autocorrección con los motivos exactos de rechazo (`🔧 Auto-reparada en 1 pase`).
+- **Plantillas base:** tres chips de inicio rápido (*Resumen de palabras*, *Estadísticas numéricas*, *Checklist Markdown*) rellenan código `def skill(x)` seguro listo para probar y aprobar.
+- **Uso en Conversación:** las habilidades activas aprobadas aparecen en la barra **💪 Memoria muscular** dentro de **Conversación**, donde puedes ejecutarlas e insertar su resultado en el turno.
 
 ### 📌 Proyectos
 
 Pequeñas metas en curso. Puede proponer una, pero un proyecto propuesto solo pasa a **activo
 cuando tú lo apruebas**, y cerrar uno exige una breve reflexión — así su "iniciativa" siempre
-queda bajo tu revisión, y su historia registra por qué empezó y terminó un proyecto.
+queda bajo tu revisión, y su historia registra por qué empezó y terminó un proyecto:
+
+- **🤖 Pedir a Andrés que proponga un proyecto (`POST /api/andres/projects/propose`):** dale una pista opcional de tema (o déjala vacía) y Andrés redactará un proyecto acotado en estado **Propuesto** — con justificación, beneficio, riesgo, criterio de éxito y presupuesto de atención — listo para aprobar con un clic.
+- **♻️ Bucle biológico Compost → Jardín de Memoria:** al archivar un proyecto como **Compost** con una semilla reutilizable (`reuse_seed`), esa semilla (junto con lo aprendido) se planta automáticamente en tu **Jardín de Memoria** como una memoria **Procedimental verificada**, alimentando futuras conversaciones y proyectos.
 
 ### 🧬 Evolución e Identidad
 

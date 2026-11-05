@@ -91,6 +91,16 @@ This is where you talk with Andrés. It supports four channels, which you can mi
   states, not emotions**.
 - **Image (🖼️)** — show him **one picture** with your message so he can look at part of
   your visual world. See the next section.
+- **Multi-turn working memory & active-skill awareness** — when the **Internal** tier is on,
+  Andrés receives the **last 4 conversation turns** as short-term context plus the list of your
+  **approved active skills** (`[ACTIVE SKILLS]`), so he keeps the thread across follow-up
+  questions and knows what muscle-memory tools you have approved.
+- **🌱 Recalled memories chips** — below each reply, clickable chips show which memories from
+  your **Memory Garden** were recalled for that turn (`✓` verified vs `○` candidate). Click any
+  chip to jump straight to the garden.
+- **💪 Muscle Memory bar (Active Skills in chat)** — once you have at least one approved active
+  skill, a bar appears above the message input so you can pick the skill, pass an input, run it
+  in the isolated sandbox, and insert the output directly into your message.
 
 ### Showing Andrés a picture
 
@@ -116,7 +126,11 @@ Andrés remembers across conversations, but on **your** terms:
 - After a real exchange he may store an **unverified candidate memory**. Candidates are
   suggestions, not facts.
 - In the Memory Garden you can **verify** a memory (mark it true), **protect** it, or
-  **forget** it. You can also **add memories by hand** — those are trusted immediately.
+  **forget** it. You can also **add memories by hand** — those are trusted immediately, and
+  you can pick any of the **7 memory types** (*Episodic, Semantic, Relational, Creative,
+  Procedural, Reflective, Working*) from the selector next to the input.
+- A **text search filter** (`Filter memories by text…`) lets you quickly search inside your
+  memories alongside the type pills.
 - Memories have types (episodic, semantic, relational, creative, and so on) and an
   importance. Relevant ones are recalled automatically to give his replies continuity.
 - **Recall is by meaning, not just keywords.** When an AI provider is configured, each
@@ -135,16 +149,21 @@ Nothing is treated as true until you verify it, and anything can be removed.
 
 ## Safety & Research Tiers
 
-Andrés only draws on what you allow. Three tiers, from least to most exposed:
+Andrés only draws on what you allow. Four tiers, from least to most exposed:
 
 | Tier | What it means | Default |
 |------|---------------|---------|
-| **Internal** | His own biography — stored memories and active projects | On |
-| **Documents** | Text (and images) you give him **this turn** | On |
-| **Web** | A fresh DuckDuckGo search **and** open research sources (see below), only when you press 🌐 on a message | Off |
+| **1. Internal** | His own biography — stored memories, active projects, active skills, and recent turns | On |
+| **2. Documents** | Text (and images) you give him **this turn** | On |
+| **3. Web** | A fresh DuckDuckGo search **and** open research sources (see below), only when you press 🌐 on a message | Off |
+| **4. MCP Nervous System (read-only)** | Read-only awareness of WLWAI's internal MCP servers and tools (`/api/mcp/manifest`) — never executes external actions | Off |
 
 Turn any tier off and he simply won't use that source — and he'll say so honestly rather
-than searching silently. The most exposed tier (Web) is off by default.
+than searching silently. The external/system tiers (**Web** and **MCP Nervous System**) are off by default.
+
+### ⚡ MCP Nervous System Inspector (Read-only)
+
+Below the tier toggles on **Safety**, the **MCP Nervous System Inspector** (`GET /api/andres/research/mcp-status`) displays the live read-only catalog of WLWAI's internal MCP servers (`wlwai-j-messages-mcp`, `ai-compliance-agent`, `ai-productivity-agent`) and their 7 tools. When tier 4 is enabled, Andrés receives this map in conversation so he can explain the tools or help you design workflows around them — without ever invoking an endpoint on his own.
 
 ---
 
@@ -240,16 +259,21 @@ it's a place for small, honest experiments.
 
 ### 🧰 Skills
 
-Small pieces of code Andrés can **propose**. Every skill passes a **strict safety check** and
-runs in an **isolated sandbox**, and only ever runs **after you approve it**. Unsafe code is
-blocked and can never be approved. This lets him gain small, real capabilities without ever
-being able to run arbitrary code on your machine.
+Small pieces of code (`def skill(x)`) Andrés can **propose**. Every skill passes a **strict static AST safety check** and
+runs in an **isolated subprocess sandbox**, and only ever counts as active **after you approve it**:
+
+- **1-pass AST self-repair:** when you click **Draft with AI** and the model's first draft violates a sandbox rule (e.g. an import or a `_private` variable), Andrés automatically runs one self-correction pass using the exact AST rejection reasons (`🔧 Auto-repaired in 1 pass`).
+- **Starter templates:** three one-click starter chips (*Word & frequency summary*, *Numeric stats summary*, *Markdown checklist*) prefill safe, working `def skill(x)` code so you can test and approve muscle memory immediately.
+- **Use in Conversation:** approved active skills appear in the **💪 Muscle Memory** bar inside **Conversation**, where you can run them on any input and insert the result into your chat turn.
 
 ### 📌 Projects
 
 Small ongoing goals. He can propose one, but a proposed project only becomes **active when you
 approve it**, and closing one requires a short reflection — so his "initiative" always stays
-under your review, and his history records why a project started and ended.
+under your review, and his history records why a project started and ended:
+
+- **🤖 Ask Andrés to propose a project (`POST /api/andres/projects/propose`):** give an optional topic hint (or leave it blank) and Andrés drafts a bounded project in **Proposed** status — complete with rationale, benefit, risk, success criteria, and attention budget — ready for you to approve with one click.
+- **♻️ Compost → Memory Garden loop:** when you archive a project as **Compost** with a reusable seed (`reuse_seed`), that seed (plus what was learned) is automatically planted into your **Memory Garden** as a verified **Procedural** memory so future conversations and projects inherit the lesson.
 
 ### 🧬 Evolution & Identity
 

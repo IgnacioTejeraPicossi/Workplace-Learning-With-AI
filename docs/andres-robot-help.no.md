@@ -89,6 +89,16 @@ Her snakker du med Andrés. Den støtter fire kanaler som du kan kombinere:
   han gjør: 🟦 i ro, 🟢 lytter, 🔵 snakker. Igjen: **funksjonelle tilstander, ikke følelser**.
 - **Bilde (🖼️)** — vis ham **ett bilde** sammen med meldingen din, så han kan se en del av
   din visuelle verden. Se neste avsnitt.
+- **Flertrinns arbeidsminne og bevissthet om aktive ferdigheter** — når **Internt**-nivået er på,
+  mottar Andrés de **siste 4 samtalerundene** som korttidskontekst pluss listen over dine
+  **godkjente aktive ferdigheter** (`[ACTIVE SKILLS]`), slik at han holder tråden gjennom
+  oppfølgingsspørsmål og vet hvilket muskelminne du har godkjent.
+- **🌱 Hentede minne-brikker** — under hvert svar viser klikkbare brikker hvilke minner fra
+  **Minnehagen** som ble brukt i den runden (`✓` bekreftet vs `○` kandidat). Klikk for å gå
+  rett til hagen.
+- **💪 Muskelminne-felt (Aktive ferdigheter i samtalen)** — når du har minst én godkjent aktiv
+  ferdighet, vises et felt over meldingsboksen der du kan velge ferdigheten, gi inndata, kjøre
+  den i sandkassen og sette utdataene rett inn i meldingen din.
 
 ### Å vise Andrés et bilde
 
@@ -114,7 +124,10 @@ Andrés husker på tvers av samtaler, men på **dine** premisser:
   forslag, ikke fakta.
 - I Minnehagen kan du **verifisere** et minne (merke det som sant), **beskytte** det eller
   **glemme** det. Du kan også **legge til minner for hånd** — de regnes som pålitelige med en
-  gang.
+  gang, og du kan velge hvilken som helst av de **7 minnetypene** (*Episodisk, Semantisk,
+  Relasjonell, Kreativ, Prosedyre, Reflekterende, Arbeids*) i velgeren ved siden av tekstfeltet.
+- Et **tekstsøkefilter** (`Filtrer minner etter tekst…`) lar deg raskt søke i minnene dine ved
+  siden av typebrikkene.
 - Minner har typer (episodisk, semantisk, relasjonelt, kreativt osv.) og en viktighet. De
   relevante hentes automatisk fram for å gi svarene hans sammenheng.
 - **Gjenkalling skjer etter mening, ikke bare nøkkelord.** Med en AI-leverandør konfigurert
@@ -133,16 +146,21 @@ Ingenting regnes som sant før du verifiserer det, og alt kan fjernes.
 
 ## Sikkerhet og forskningsnivåer
 
-Andrés trekker bare på det du tillater. Tre nivåer, fra minst til mest eksponert:
+Andrés trekker bare på det du tillater. Fire nivåer, fra minst til mest eksponert:
 
 | Nivå | Hva det betyr | Standard |
 |------|---------------|----------|
-| **Internt** | Hans egen biografi — lagrede minner og aktive prosjekter | På |
-| **Dokumenter** | Tekst (og bilder) du gir ham **denne runden** | På |
-| **Nett** | Et ferskt DuckDuckGo-søk **og** åpne forskningskilder (se under), kun når du trykker 🌐 på en melding | Av |
+| **1. Internt** | Hans egen biografi — lagrede minner, aktive prosjekter, aktive ferdigheter og siste runder | På |
+| **2. Dokumenter** | Tekst (og bilder) du gir ham **denne runden** | På |
+| **3. Nett** | Et ferskt DuckDuckGo-søk **og** åpne forskningskilder (se under), kun når du trykker 🌐 på en melding | Av |
+| **4. MCP-nervesystem (skrivebeskyttet)** | Skrivebeskyttet oversikt over WLWAIs interne MCP-servere og verktøy (`/api/mcp/manifest`) — utfører aldri eksterne handlinger | Av |
 
 Slå av et nivå, så bruker han rett og slett ikke den kilden — og sier det ærlig i stedet for
-å søke i stillhet. Det mest eksponerte nivået (Nett) er av som standard.
+å søke i stillhet. De eksterne/systemiske nivåene (**Nett** og **MCP-nervesystem**) er av som standard.
+
+### ⚡ MCP-nervesystem-inspektør (Skrivebeskyttet)
+
+Under bryterne på **Sikkerhet** viser **MCP-nervesystem-inspektøren** (`GET /api/andres/research/mcp-status`) den levende skrivebeskyttede katalogen over WLWAIs 3 interne MCP-servere (`wlwai-j-messages-mcp`, `ai-compliance-agent`, `ai-productivity-agent`) og deres 7 verktøy. Når nivå 4 er slått på, får Andrés dette kartet i samtalen slik at han kan forklare verktøyene eller hjelpe deg å utforme arbeidsflyter rundt dem — uten noen gang å kalle et endepunkt på egen hånd.
 
 ---
 
@@ -240,16 +258,21 @@ det er et sted for små, ærlige eksperimenter.
 
 ### 🧰 Ferdigheter
 
-Små kodebiter Andrés kan **foreslå**. Hver ferdighet passerer en **streng sikkerhetskontroll** og
-kjøres i en **isolert sandkasse**, og kjøres bare **etter at du har godkjent den**. Usikker kode
-blokkeres og kan aldri godkjennes. Slik får han små, ekte evner uten noensinne å kunne kjøre
-vilkårlig kode på maskinen din.
+Små kodebiter (`def skill(x)`) Andrés kan **foreslå**. Hver ferdighet passerer en **streng statisk AST-sikkerhetskontroll** og
+kjøres i en **isolert underprosess-sandkasse**, og regnes bare som aktiv **etter at du har godkjent den**:
+
+- **1-rundes AST-selvreparasjon:** når du klikker **Skisser med KI** og modellens første utkast bryter en sandkasseregel (f.eks. en `import` eller `_privat` variabel), kjører Andrés automatisk én selvreparasjonsrunde med de nøyaktige AST-avvisningsårsakene (`🔧 Auto-reparert i 1 runde`).
+- **Startmaler:** tre ett-klikks startbrikker (*Ordtelling og frekvens*, *Numerisk statistikk*, *Markdown-sjekkliste*) fyller ut trygg `def skill(x)`-kode klar til testing og godkjenning.
+- **Bruk i Samtale:** godkjente aktive ferdigheter vises i **💪 Muskelminne**-feltet inne i **Samtale**, der du kan kjøre dem og sette resultatet rett inn i samtalen.
 
 ### 📌 Prosjekter
 
 Små pågående mål. Han kan foreslå ett, men et foreslått prosjekt blir bare **aktivt når du
 godkjenner det**, og å avslutte ett krever en kort refleksjon — så «initiativet» hans holdes
-alltid under din gjennomgang, og historien hans registrerer hvorfor et prosjekt startet og sluttet.
+alltid under din gjennomgang, og historien hans registrerer hvorfor et prosjekt startet og sluttet:
+
+- **🤖 Be Andrés foreslå et prosjekt (`POST /api/andres/projects/propose`):** oppgi et valgfritt tematips (eller la feltet stå tomt), så skisserer Andrés et avgrenset prosjekt i status **Foreslått** — med begrunnelse, fordel, risiko, suksesskriterium og oppmerksomhetsbudsjett — klart til å godkjennes med ett klikk.
+- **♻️ Kompost → Minnehage-sløyfe:** når du arkiverer et prosjekt som **Kompost** med et gjenbrukbart frø (`reuse_seed`), plantes frøet (sammen med det som ble lært) automatisk i **Minnehagen** som et bekreftet **Prosedyre**-minne til nytte for fremtidige samtaler og prosjekter.
 
 ### 🧬 Evolusjon og identitet
 

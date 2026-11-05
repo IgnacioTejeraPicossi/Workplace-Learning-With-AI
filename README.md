@@ -94,7 +94,13 @@ language model — explicitly **not** a claim of consciousness. It talks by text
 and an optional 3D avatar, and can look at **one image per message** (limited perception
 with per-turn consent, gated by the Documents research tier). Everything he remembers or
 changes is **proposed → reviewed → approved by you**.
-**User guide:** [docs/andres-robot-help.md](docs/andres-robot-help.md).
+- **Anatomical AI Stack & Cross-Organ Wiring (November 2026):** **Home** includes the visual **"Your AI Stack, Explained Like a Human Body"** card (`/images/andres-ai-stack-body.png`) mapping all 5 layers (**1. LLM = Brain**, **2. RAG = Brain + Library**, **3. MCP = Nervous System**, **4. Skills = Muscle Memory**, **5. AI Agent = Brain + Hands**) to Andrés' tabs:
+  1. **Brain (`Conversation`):** multi-turn working memory (last 4 turns) + `[ACTIVE SKILLS]` awareness in the system prompt + clickable `🌱 Recalled memories` chips under each reply.
+  2. **Library (`Memory Garden`):** 7-type selector when adding manual memories + instant text search filter.
+  3. **Nervous System (`Safety`):** 4th consent tier `MCP Nervous System (read-only)` (off by default) + live **⚡ MCP Nervous System Inspector** (`GET /api/andres/research/mcp-status`) surfacing WLWAI's 3 internal MCP servers and 7 tools.
+  4. **Muscle Memory (`Skills` + `Conversation`):** 1-pass AST self-repair when drafting skills, 3 starter templates, and a **💪 Muscle Memory** bar in Conversation to run approved skills in the sandbox and insert their output into chat.
+  5. **Hands (`Projects`):** **🤖 Ask Andrés to propose a project** (`POST /api/andres/projects/propose`) + automatic **♻️ Compost → Memory Garden** planting (archiving a project as Compost plants its `reuse_seed` as a verified `Procedural` memory).
+**User guide:** [docs/andres-robot-help.md](docs/andres-robot-help.md) (also `.es.md` / `.no.md`, and first entry under **Help → Readme**).
 
 ### Language Agents — native cloned voice + spoken conversation (July 2026)
 
