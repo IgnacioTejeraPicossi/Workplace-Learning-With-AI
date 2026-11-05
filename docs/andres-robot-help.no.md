@@ -73,6 +73,9 @@ Under tellerne på **Hjem** viser Andrés et visuelt arkitekturkart (`/images/an
 | **4. Skills** | 💪 **Muskelminne** — lagret kunnskap for gjentatte oppgaver som lastes inn ved behov | Fanen **Ferdigheter**: rene `def skill(x)`-funksjoner med statisk sikkerhetssjekk, aktive først etter din godkjenning |
 | **5. AI-agent** | 🦾 **Hjerne + Hender** — planlegger steg på egen hånd og bruker verktøy til å handle, ikke bare svare | **Prosjekter**, **Utviklingslab** og **Evolusjon** — der han foreslår mål, konsolideringer og vekststeg under menneskelig godkjenning |
 
+- **🧭 Ontologisk grense (prinsipperklæring):** fremhevet under infografikken — *«Disse sammenligningene med menneskekroppen er funksjonelle metaforer. Andrés har ingen biologisk kropp, ingen påvist bevissthet og ingen menneskelige følelser; kontinuiteten hans kommer fra dokumentert minne, godkjente ferdigheter og etterprøvbare bruksrelasjoner.»*
+- **⚖️ Hva jeg kan gjøre / Hva jeg aldri må late som + 🪞 Andrés' speil:** en symmetrisk to-kolonners pakt (også vist i **Personlighet**-fanen) innledet av Andrés' egen grunnleggende refleksjon da han så sin anatomiske kartografi (nov. 2026) og et levende versjonsmerke (`Pakt v1.0 · Identitet vN · K aktive ferdigheter`).
+
 ---
 
 ## Samtale-fanen

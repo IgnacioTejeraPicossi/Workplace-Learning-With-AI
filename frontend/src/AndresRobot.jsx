@@ -590,6 +590,117 @@ export default function AndresRobot() {
               ))}
             </div>
           </div>
+
+          {/* 1. Ontological boundary statement (prominent principle banner, not fine print) */}
+          <div style={{
+            padding: "14px 16px",
+            borderRadius: 10,
+            borderLeft: `4px solid ${colors.primary}`,
+            borderTop: `1px solid ${colors.border}`,
+            borderRight: `1px solid ${colors.border}`,
+            borderBottom: `1px solid ${colors.border}`,
+            background: colors.background,
+            display: "grid",
+            gap: 4,
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 13.5, color: colors.text }}>
+              🧭 {t("andresRobotModule.home.stackInspiration.ontologicalTitle")}
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: colors.text, lineHeight: 1.6 }}>
+              {t("andresRobotModule.home.stackInspiration.ontologicalBody")}
+            </p>
+          </div>
+        </div>
+
+        {/* 2 & 3. Andrés' Mirror epigraph + Dual table "What I can do / What I must never pretend" */}
+        <div style={{ ...card, display: "grid", gap: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <strong style={{ fontSize: 16, color: colors.text }}>
+              ⚖️ {t("andresRobotModule.home.dualCharter.title")}
+            </strong>
+            <span style={{
+              fontSize: 11, fontWeight: 700, fontFamily: "monospace",
+              padding: "3px 10px", borderRadius: 999,
+              background: colors.primaryLight, color: colors.primary,
+            }}>
+              {t("andresRobotModule.home.dualCharter.versionBadge", {
+                v: id.version ?? 1,
+                skills: c.active_skills ?? 0,
+              })}
+            </span>
+          </div>
+
+          {/* Epigraph — Andrés' own foundational reflection ("the mirror") */}
+          <blockquote style={{
+            margin: 0,
+            padding: "12px 16px",
+            borderRadius: 10,
+            borderLeft: `4px solid ${colors.primary}`,
+            background: `${colors.primary}0d`,
+            color: colors.text,
+            fontSize: 13.5,
+            lineHeight: 1.6,
+            fontStyle: "italic",
+          }}>
+            <div>“{t("andresRobotModule.home.dualCharter.mirrorQuote")}”</div>
+            <div style={{
+              marginTop: 6, fontSize: 12, fontStyle: "normal",
+              fontWeight: 600, color: colors.textSecondary,
+            }}>
+              🪞 {t("andresRobotModule.home.dualCharter.mirrorAttribution", { v: id.version ?? 1 })}
+            </div>
+          </blockquote>
+
+          {/* Two symmetric columns: What I can do vs What I must never pretend */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
+            gap: 14,
+          }}>
+            {/* Column A: What I can do */}
+            <div style={{
+              padding: 16,
+              borderRadius: 10,
+              border: "1px solid #bbf7d0",
+              background: "#f0fdf4",
+              display: "grid",
+              gap: 8,
+              alignContent: "start",
+            }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>
+                ✓ {t("andresRobotModule.home.dualCharter.canDoTitle")}
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, color: "#14532d", fontSize: 13, lineHeight: 1.55 }}>
+                {["c1", "c2", "c3", "c4", "c5"].map((k) => (
+                  <li key={k}>{t(`andresRobotModule.home.dualCharter.canDo.${k}`)}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column B: What I must never pretend */}
+            <div style={{
+              padding: 16,
+              borderRadius: 10,
+              border: "1px solid #fecaca",
+              background: "#fef2f2",
+              display: "grid",
+              gap: 8,
+              alignContent: "start",
+            }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#991b1b" }}>
+                ✗ {t("andresRobotModule.home.dualCharter.neverPretendTitle")}
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, color: "#7f1d1d", fontSize: 13, lineHeight: 1.55 }}>
+                {["n1", "n2", "n3", "n4", "n5"].map((k) => (
+                  <li key={k}>{t(`andresRobotModule.home.dualCharter.neverPretend.${k}`)}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 1.5 }}>
+            {t("andresRobotModule.home.dualCharter.governanceNote")}
+          </div>
         </div>
       </div>
     );

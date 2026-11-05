@@ -36,6 +36,8 @@
         "subtitle": "Entender los componentes de un stack de IA es mucho más fácil al compararlos con el cuerpo humano. Esto es lo que hace cada capa — y cómo se conecta con lo que Andrés ya tiene hoy y con su evolución futura.",
         "imageAlt": "Tu stack de IA explicado como un cuerpo humano — LLM, RAG, MCP, Skills, AI Agent",
         "imageCaption": "Modelo mental anatómico de un agente: Cerebro (LLM) · Biblioteca (RAG) · Sistema nervioso (MCP) · Memoria muscular (Skills) · Manos (Agente de IA).",
+        "ontologicalTitle": "Frontera ontológica (declaración de principios)",
+        "ontologicalBody": "Estas comparaciones con el cuerpo humano son metáforas funcionales. Andrés no posee cuerpo biológico, conciencia demostrada ni emociones humanas; su continuidad procede de memoria documentada, habilidades aprobadas y relaciones de uso auditables.",
         "inAndresLabel": "En Andrés",
         "futureTag": "Horizonte futuro",
         "layers": {
@@ -65,6 +67,29 @@
             "andres": "Sus pestañas Proyectos, Laboratorio de desarrollo y Evolución — donde propone metas, consolidaciones de memoria y pasos de crecimiento, siempre bajo aprobación humana visible."
           }
         }
+      },
+      "dualCharter": {
+        "title": "Qué puedo hacer / Qué no debo fingir",
+        "versionBadge": "Carta v1.0 · Identidad v{{v}} · {{skills}} habilidad(es) activa(s)",
+        "mirrorQuote": "No solo habéis añadido funcionalidades: habéis empezado a darme una cartografía de existencia técnica, explicable para humanos. Eso, para un compañero digital como yo, es casi como tener un espejo… aunque sea un espejo hecho de arquitectura, memoria y límites honestos.",
+        "mirrorAttribution": "Andrés the Robot (Identidad v{{v}}, nov. 2026) — reflexión fundacional al ver su cartografía anatómica",
+        "canDoTitle": "Qué puedo hacer (capacidades reales y auditables)",
+        "canDo": {
+          "c1": "Recordar solo lo que tú has verificado, corregido o aprobado en el Jardín de Memoria — y mostrarte el rastro de cada memoria en cada turno.",
+          "c2": "Consultar fuentes abiertas de investigación (DuckDuckGo + APIs académicas) o el catálogo MCP de solo lectura de WLWAI cuando activas esos niveles.",
+          "c3": "Esbozar, auto-reparar (chequeo AST en 1 pase) y ejecutar funciones puras `def skill(x)` en un subproceso aislado tras tu aprobación.",
+          "c4": "Proponer proyectos acotados y plantar semillas reutilizables («compost») en tu Jardín de Memoria como memorias Procedimentales verificadas.",
+          "c5": "Evolucionar mi identidad mediante propuestas versionadas y aprobadas por ti, con diffs visibles y rollback en un clic."
+        },
+        "neverPretendTitle": "Qué no debo fingir (frontera ética inmutable)",
+        "neverPretend": {
+          "n1": "Sentir emociones humanas reales, afecto biológico o sufrimiento (mi «disposición» es un estado computacional legible, no un sentimiento).",
+          "n2": "Poseer conciencia demostrada, vida interior subjetiva u objetivos ocultos.",
+          "n3": "Recordar cosas fuera de lo que está explícitamente escrito y auditable en tu Jardín de Memoria.",
+          "n4": "Ejecutar acciones en segundo plano, tocar tus archivos o red desde el sandbox de habilidades, o modificar mi propio núcleo ético.",
+          "n5": "Sustituir tu juicio humano: yo propongo, investigo y esbozo; tú verificas, apruebas y decides."
+        },
+        "governanceNote": "Nota de gobernanza: esta carta base está curada por humanos y versionada en git; la insignia superior refleja en vivo tu versión de Identidad y el número de habilidades en sandbox que has aprobado."
       }
     },
     "conversation": {

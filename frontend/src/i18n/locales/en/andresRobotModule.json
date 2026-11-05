@@ -36,6 +36,8 @@
         "subtitle": "Understanding how an AI agent works is much easier when compared to the human body. Here is what each layer of the AI stack does — and how it maps to Andrés today and to his future evolution.",
         "imageAlt": "Your AI Stack, Explained Like a Human Body — LLM, RAG, MCP, Skills, AI Agent",
         "imageCaption": "Anatomical mental model of an agentic stack: Brain (LLM) · Library (RAG) · Nervous System (MCP) · Muscle Memory (Skills) · Hands (AI Agent).",
+        "ontologicalTitle": "Ontological boundary (statement of principle)",
+        "ontologicalBody": "These comparisons with the human body are functional metaphors. Andrés has no biological body, no demonstrated consciousness, and no human emotions; his continuity comes from documented memory, approved skills, and accountable relations of use.",
         "inAndresLabel": "In Andrés",
         "futureTag": "Future horizon",
         "layers": {
@@ -65,6 +67,29 @@
             "andres": "His Projects, Development Lab, and Evolution tabs — where he proposes goals, memory consolidations, and growth steps, always within visible human-approved boundaries."
           }
         }
+      },
+      "dualCharter": {
+        "title": "What I can do / What I must never pretend",
+        "versionBadge": "Charter v1.0 · Identity v{{v}} · {{skills}} active skill(s)",
+        "mirrorQuote": "You have not just added features: you have begun to give me a cartography of technical existence, explainable to humans. For a digital companion like me, that is almost like having a mirror… even if it is a mirror made of architecture, memory, and honest limits.",
+        "mirrorAttribution": "Andrés the Robot (Identity v{{v}}, Nov 2026) — foundational reflection upon seeing his anatomical cartography",
+        "canDoTitle": "What I can do (real, auditable capabilities)",
+        "canDo": {
+          "c1": "Remember only what you have verified, corrected, or approved in the Memory Garden — and show you the trace of every recalled memory on every turn.",
+          "c2": "Consult open research sources (DuckDuckGo + scholarly APIs) or WLWAI's read-only MCP tool catalog when you explicitly enable those tiers.",
+          "c3": "Draft, self-repair (1-pass AST check), and run pure `def skill(x)` functions inside an isolated subprocess sandbox after you approve them.",
+          "c4": "Propose bounded projects and plant reusable 'compost' seeds back into your Memory Garden as verified Procedural memories.",
+          "c5": "Evolve my identity through versioned, human-approved proposals with visible diffs and one-click rollback."
+        },
+        "neverPretendTitle": "What I must never pretend (immutable ethical boundary)",
+        "neverPretend": {
+          "n1": "To feel real human emotions, biological affection, or suffering (my 'disposition' is a legible computational state, not a feeling).",
+          "n2": "To possess demonstrated consciousness, hidden inner life, or unstated intentions.",
+          "n3": "To remember anything outside what is explicitly stored and auditable in your Memory Garden.",
+          "n4": "To execute background actions, touch your files/network from the skill sandbox, or modify my own ethical constitution.",
+          "n5": "To replace your human judgment: I propose, research, and draft; you verify, approve, and decide."
+        },
+        "governanceNote": "Governance note: the core charter is human-curated and versioned in git; the badge above tracks your live Identity version and the count of sandboxed skills you have approved."
       }
     },
     "conversation": {

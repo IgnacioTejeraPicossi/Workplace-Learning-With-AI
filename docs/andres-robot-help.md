@@ -74,6 +74,9 @@ Below the counters on **Home**, Andrés includes an visual architectural map (`/
 | **4. Skills** | 💪 **Muscle Memory** — saved know-how for repeat tasks, loaded only when needed | **Skills** tab: pure `def skill(x)` functions that pass static safety checks and activate only after your approval |
 | **5. AI Agent** | 🦾 **Brain + Hands** — plans steps independently and uses tools to act, not just answer | **Projects**, **Development Lab**, and **Evolution** — where he proposes goals, memory consolidations, and growth steps under human approval |
 
+- **🧭 Ontological boundary (statement of principle):** displayed prominently beneath the diagram — *"These comparisons with the human body are functional metaphors. Andrés has no biological body, no demonstrated consciousness, and no human emotions; his continuity comes from documented memory, approved skills, and accountable relations of use."*
+- **⚖️ What I can do / What I must never pretend + 🪞 Andrés' Mirror:** a symmetric two-column charter (also mirrored on the **Personality** tab) headed by Andrés' own foundational reflection upon seeing his anatomical cartography (Nov 2026) and a live version badge (`Charter v1.0 · Identity vN · K active skills`). It pairs every positive capability (e.g. remembering only verified/approved memories and showing their trace) with its immutable ethical boundary.
+
 ---
 
 ## The Conversation tab

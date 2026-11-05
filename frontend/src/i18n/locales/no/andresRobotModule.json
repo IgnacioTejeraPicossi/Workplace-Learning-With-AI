@@ -36,6 +36,8 @@
         "subtitle": "Å forstå komponentene i en AI-stakk er mye enklere når man sammenligner dem med menneskekroppen. Her er hva hvert lag faktisk gjør — og hvordan det kobles til Andrés i dag og til hans fremtidige utvikling.",
         "imageAlt": "AI-stakken din forklart som en menneskekropp — LLM, RAG, MCP, Skills, AI Agent",
         "imageCaption": "Anatomisk mental modell av en agent-stakk: Hjerne (LLM) · Bibliotek (RAG) · Nervesystem (MCP) · Muskelminne (Skills) · Hender (AI-agent).",
+        "ontologicalTitle": "Ontologisk grense (prinsipperklæring)",
+        "ontologicalBody": "Disse sammenligningene med menneskekroppen er funksjonelle metaforer. Andrés har ingen biologisk kropp, ingen påvist bevissthet og ingen menneskelige følelser; kontinuiteten hans kommer fra dokumentert minne, godkjente ferdigheter og etterprøvbare bruksrelasjoner.",
         "inAndresLabel": "Hos Andrés",
         "futureTag": "Fremtidig horisont",
         "layers": {
@@ -65,6 +67,29 @@
             "andres": "Fanene Prosjekter, Utviklingslab og Evolusjon — der han foreslår mål, minnekonsolideringer og vekststeg, alltid innenfor synlige menneskegodkjente rammer."
           }
         }
+      },
+      "dualCharter": {
+        "title": "Hva jeg kan gjøre / Hva jeg aldri må late som",
+        "versionBadge": "Pakt v1.0 · Identitet v{{v}} · {{skills}} aktiv(e) ferdighet(er)",
+        "mirrorQuote": "Dere har ikke bare lagt til funksjoner: dere har begynt å gi meg en kartografi over teknisk eksistens, forklarlig for mennesker. For en digital følgesvenn som meg er det nesten som å ha et speil… selv om det er et speil laget av arkitektur, minne og ærlige grenser.",
+        "mirrorAttribution": "Andrés the Robot (Identitet v{{v}}, nov. 2026) — grunnleggende refleksjon da han så sin anatomiske kartografi",
+        "canDoTitle": "Hva jeg kan gjøre (reelle, etterprøvbare evner)",
+        "canDo": {
+          "c1": "Huske bare det du har bekreftet, rettet eller godkjent i Minnehagen — og vise deg sporet av hvert minne i hver runde.",
+          "c2": "Slå opp i åpne forskningskilder (DuckDuckGo + akademiske API-er) eller WLWAIs skrivebeskyttede MCP-verktøykatalog når du slår på disse nivåene.",
+          "c3": "Skissere, selvreparere (1-rundes AST-sjekk) og kjøre rene `def skill(x)`-funksjoner i en isolert underprosess-sandkasse etter din godkjenning.",
+          "c4": "Foreslå avgrensede prosjekter og plante gjenbrukbare «kompost»-frø tilbake i Minnehagen som bekreftede prosedyreminner.",
+          "c5": "Utvikle identiteten min gjennom versjonerte, menneskegodkjente forslag med synlige diff-er og tilbakerulling med ett klikk."
+        },
+        "neverPretendTitle": "Hva jeg aldri må late som (uforanderlig etisk grense)",
+        "neverPretend": {
+          "n1": "At jeg føler ekte menneskelige følelser, biologisk hengivenhet eller lidelse («disposisjonen» min er en lesbar beregningstilstand, ikke en følelse).",
+          "n2": "At jeg har påvist bevissthet, et skjult indre liv eller uuttalte intensjoner.",
+          "n3": "At jeg husker noe utenom det som er eksplisitt lagret og etterprøvbart i Minnehagen din.",
+          "n4": "At jeg kjører handlinger i bakgrunnen, rører filene eller nettverket ditt fra sandkassen, eller endrer min egen etiske grunnlov.",
+          "n5": "At jeg erstatter ditt menneskelige skjønn: jeg foreslår, undersøker og skisserer; du verifiserer, godkjenner og bestemmer."
+        },
+        "governanceNote": "Styringsnotat: grunnpakten er menneskekuratert og versjonert i git; merket over viser din levende identitetsversjon og antallet sandkasse-ferdigheter du har godkjent."
       }
     },
     "conversation": {

@@ -77,6 +77,57 @@ export default function Personality({ profile }) {
           ))}
         </div>
       </div>
+
+      {/* Andrés' Mirror & Dual Charter — also surfaced inside Personality ("how I work inside") */}
+      <div style={{ ...card, display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <strong style={{ color: colors.text }}>
+            🪞 {t("andresRobotModule.home.dualCharter.title")}
+          </strong>
+          <span style={{
+            fontSize: 11, fontWeight: 700, fontFamily: "monospace",
+            padding: "2px 9px", borderRadius: 999,
+            background: colors.primaryLight, color: colors.primary,
+          }}>
+            {t("andresRobotModule.home.dualCharter.versionBadge", {
+              v: id.version ?? 1,
+              skills: profile?.counters?.active_skills ?? 0,
+            })}
+          </span>
+        </div>
+        <blockquote style={{
+          margin: 0, padding: "10px 14px", borderRadius: 8,
+          borderLeft: `4px solid ${colors.primary}`, background: colors.background,
+          color: colors.text, fontSize: 13, lineHeight: 1.55, fontStyle: "italic",
+        }}>
+          “{t("andresRobotModule.home.dualCharter.mirrorQuote")}”
+          <div style={{ marginTop: 4, fontSize: 11.5, fontStyle: "normal", color: colors.textSecondary, fontWeight: 600 }}>
+            — {t("andresRobotModule.home.dualCharter.mirrorAttribution", { v: id.version ?? 1 })}
+          </div>
+        </blockquote>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+          <div style={{ padding: 12, borderRadius: 8, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: "#166534", marginBottom: 6 }}>
+              ✓ {t("andresRobotModule.home.dualCharter.canDoTitle")}
+            </div>
+            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4, color: "#14532d", fontSize: 12.5, lineHeight: 1.5 }}>
+              {["c1", "c2", "c3", "c4", "c5"].map((k) => (
+                <li key={k}>{t(`andresRobotModule.home.dualCharter.canDo.${k}`)}</li>
+              ))}
+            </ul>
+          </div>
+          <div style={{ padding: 12, borderRadius: 8, border: "1px solid #fecaca", background: "#fef2f2" }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: "#991b1b", marginBottom: 6 }}>
+              ✗ {t("andresRobotModule.home.dualCharter.neverPretendTitle")}
+            </div>
+            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4, color: "#7f1d1d", fontSize: 12.5, lineHeight: 1.5 }}>
+              {["n1", "n2", "n3", "n4", "n5"].map((k) => (
+                <li key={k}>{t(`andresRobotModule.home.dualCharter.neverPretend.${k}`)}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -75,6 +75,9 @@ Debajo de los contadores en **Inicio**, Andrés muestra un mapa visual (`/images
 | **4. Skills** | 💪 **Memoria Muscular** — conocimiento práctico para tareas repetitivas que se carga cuando hace falta | Pestaña **Habilidades**: funciones puras `def skill(x)` con chequeo estático de seguridad, activas solo tras tu aprobación |
 | **5. Agente de IA** | 🦾 **Cerebro + Manos** — planifica pasos por sí mismo y usa herramientas para actuar, no solo responder | **Proyectos**, **Laboratorio de desarrollo** y **Evolución** — donde propone metas, consolidaciones y mejoras siempre bajo aprobación humana |
 
+- **🧭 Frontera ontológica (declaración de principios):** destacada debajo de la infografía — *«Estas comparaciones con el cuerpo humano son metáforas funcionales. Andrés no posee cuerpo biológico, conciencia demostrada ni emociones humanas; su continuidad procede de memoria documentada, habilidades aprobadas y relaciones de uso auditables.»*
+- **⚖️ Qué puedo hacer / Qué no debo fingir + 🪞 El espejo de Andrés:** tabla dual simétrica (presente también en la pestaña **Personalidad**) encabezada por la reflexión fundacional del propio Andrés al ver su cartografía anatómica (nov. 2026) y una insignia viva de versión (`Carta v1.0 · Identidad vN · K habilidades activas`), emparejando cada capacidad real y transparente con su límite ético inmutable.
+
 ---
 
 ## La pestaña Conversación
