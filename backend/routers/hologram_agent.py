@@ -112,10 +112,10 @@ WLWAI_MODULE_CATALOG = """
 10. Standalone & Developer / Help Modules
    - `robomind-clinic` — Robomind Clinic (Psychopathia Machinalis: diagnostic screening, therapy protocols & post-therapy alignment metrics for AI pathologies)
    - `cybersecurity` — Cybersecurity Module (10 sub-tabs: Dashboard, Agent Security, Threat Library, Tools & Frameworks, Posture & Risk NIST CSF 2.0, Vulnerabilities scanner, Secure Coding Coach, Compliance Tracker, Incident Drills, Knowledge Base)
+   - `readme-viewer` — README Viewer (first entry under Help: section-aware bilingual EN/ES/NO markdown documentation reader with Mermaid diagrams)
    - `agent-theory-docs` — Agent Theory Docs (foundational AI agent architecture documentation)
    - `presentation-agent` — Presentation Agent (generate slide decks & speaker notes)
    - `ai-study-buddy` — AI Study Buddy / Companion (grounded Q&A assistant over WLWAI documentation)
-   - `readme-viewer` — README Viewer (section-aware bilingual EN/ES/NO markdown documentation reader with Mermaid diagrams)
    - `security` — Security Center (6 local security & privacy sub-modules: AES-GCM 256 encryption, data retention, Your Data export, PII anonymization, security score, real-time monitoring)
    - `run-test` — Run Test (in-app automated test runner & smoke checks)
    - `api-config` — API Config (select LLM provider: OpenAI, OpenRouter with free-model fallback, Anthropic, Google Gemini, ItemAI / LM Studio local on port 1234, and test API keys)
