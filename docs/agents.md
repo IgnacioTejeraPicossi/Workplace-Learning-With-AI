@@ -110,7 +110,7 @@ Backend endpoints:
 - `GET /api/cursor-readme/learning-module/{module_id}`
 
 Rules:
-- Preserve upload limits and failure handling.
+- Preserve upload limits and failure handling.Test
 - Keep “learning module conversion” stable; it is used by the learning system.
 
 ### E) MCP testing via Postman / Claude
