@@ -16,14 +16,26 @@ from backend.services.andres import connected_skills as cs
 from backend.services.andres.prompt_assembler import assemble_system_prompt
 
 
-def test_registry_lists_enonic_with_availability():
+def test_registry_lists_experts_with_availability():
     skills = cs.list_connected()
     ids = [s["id"] for s in skills]
-    assert "enonic-red-cross" in ids
-    erc = next(s for s in skills if s["id"] == "enonic-red-cross")
-    assert erc["health"]["available"] is True        # backing service imports
-    assert erc["name"] and erc["domain"] and erc["description"]
-    assert isinstance(erc.get("suggested_use"), list) and erc["suggested_use"]
+    assert "enonic-red-cross" in ids and "agi-progress" in ids
+    for sk in skills:
+        assert sk["health"]["available"] is True     # backing services import
+        assert sk["name"] and sk["domain"] and sk["description"]
+        assert isinstance(sk.get("suggested_use"), list) and sk["suggested_use"]
+
+
+@pytest.mark.asyncio
+async def test_consult_agi_progress_expert():
+    res = await cs.consult("agi-progress", "Who wins at exploratory testing, human or AI?", "en")
+    assert res["skill_id"] == "agi-progress"
+    assert "AGI" in res["skill_name"]
+    ans = res["answer"]
+    assert set(("short_answer", "sections", "evidence_status", "is_mock")).issubset(ans.keys())
+    # every section carries one of the AGI expert's own evidence levels
+    allowed = {"workshop-verdict", "principle", "tracker", "scenario", "benefit", "guidance", "unsupported"}
+    assert all(s["level"] in allowed for s in ans["sections"])
 
 
 @pytest.mark.asyncio

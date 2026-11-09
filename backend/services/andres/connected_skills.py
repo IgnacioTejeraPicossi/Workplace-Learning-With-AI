@@ -49,6 +49,25 @@ CONNECTED_SKILLS: List[Dict[str, Any]] = [
         "evidence_aware": True,   # the expert returns evidence-tagged, cited answers
         "agent_route": "enonic-red-cross",
     },
+    {
+        "id": "agi-progress",
+        "name": "AGI Progress Hub Expert",
+        "icon": "🧠",
+        "domain": ("AGI progress & the 'Homo Sapiens vs. AI in Testing' workshop — when AI leads, "
+                   "when humans lead, and when a human+AI pairing wins; progress tracker, possible "
+                   "futures and benefits"),
+        "description": ("A grounded expert on the AGI Progress Hub's curated content. Andrés consults "
+                        "it for the human-vs-AI testing verdicts and the Hub's framing — it answers "
+                        "with cited sources and evidence levels, and keeps an honest counterpoint."),
+        "suggested_use": [
+            "Who has the edge on a testing activity today — human, AI, or a pairing — and why",
+            "Framing the human-vs-AI question honestly (verdicts are a snapshot, not dogma)",
+            "What the AGI Progress Tracker / possible endings / benefits sections are for",
+            "Applying the human-vs-AI split to a real testing effort",
+        ],
+        "evidence_aware": True,
+        "agent_route": "agi-progress",
+    },
 ]
 
 
@@ -60,6 +79,14 @@ def _availability(skill_id: str) -> Dict[str, Any]:
             h = erc.health()
             return {"available": True, "llm_available": bool(h.get("llm_available")),
                     "kb_chunks": h.get("kb_chunks"), "test_cases": h.get("test_cases_seeded")}
+        except Exception:
+            return {"available": False, "llm_available": False}
+    if skill_id == "agi-progress":
+        try:
+            from backend.services import agi_consult as agi
+            h = agi.health()
+            return {"available": True, "llm_available": bool(h.get("llm_available")),
+                    "kb_chunks": h.get("kb_chunks")}
         except Exception:
             return {"available": False, "llm_available": False}
     return {"available": False, "llm_available": False}
@@ -88,25 +115,31 @@ async def consult(skill_id: str, question: str,
     if not question:
         raise HTTPException(status_code=400, detail="Empty question")
 
-    if skill_id == "enonic-red-cross":
-        try:
+    try:
+        if skill_id == "enonic-red-cross":
             from backend.services import enonic_red_cross as erc
             answer = await erc.answer(question, lang)
-        except Exception as ex:  # pragma: no cover - defensive
-            raise HTTPException(status_code=502,
-                                detail=f"Connected skill '{skill_id}' failed: {ex}")
-        return {
-            "skill_id": skill_id,
-            "skill_name": skill["name"],
-            "question": question,
-            "lang": lang,
-            "answer": answer,   # short_answer, sections[], evidence_status, sources_consulted, is_mock…
-            "attribution": (f"Consulted via Andrés' connected skill «{skill['name']}». "
-                            "This knowledge belongs to that specialized agent, not to Andrés, "
-                            "and keeps its own evidence tags and sources."),
-        }
+        elif skill_id == "agi-progress":
+            from backend.services import agi_consult as agi
+            answer = await agi.answer(question, lang)
+        else:
+            raise HTTPException(status_code=400, detail="No handler for this connected skill")
+    except HTTPException:
+        raise
+    except Exception as ex:  # pragma: no cover - defensive
+        raise HTTPException(status_code=502,
+                            detail=f"Connected skill '{skill_id}' failed: {ex}")
 
-    raise HTTPException(status_code=400, detail="No handler for this connected skill")
+    return {
+        "skill_id": skill_id,
+        "skill_name": skill["name"],
+        "question": question,
+        "lang": lang,
+        "answer": answer,   # short_answer, sections[], evidence_status, sources_consulted, is_mock…
+        "attribution": (f"Consulted via Andrés' connected skill «{skill['name']}». "
+                        "This knowledge belongs to that specialized agent, not to Andrés, "
+                        "and keeps its own evidence tags and sources."),
+    }
 
 
 def prompt_block() -> str:

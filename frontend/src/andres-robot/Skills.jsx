@@ -10,8 +10,13 @@ import {
 const toSkillLang = (lng) => (lng === "es" ? "es" : lng === "no" ? "no" : "en");
 // Evidence-level colors for the Enonic Red Cross expert's tagged answers.
 const EVIDENCE_COLORS = {
+  // Enonic Red Cross expert levels
   "platform-doc": "#1d4ed8", "project-fact": "#047857", "project-observation": "#b45309",
   "test-recipe": "#6d28d9", "guidance": "#475569", "unsupported": "#b91c1c",
+  // AGI Progress Hub expert levels
+  "workshop-verdict": "#be185d", principle: "#1d4ed8", tracker: "#047857",
+  scenario: "#b45309", benefit: "#6d28d9",
+  // evidence_status
   supported: "#047857", partial: "#b45309", insufficient: "#b91c1c",
 };
 
