@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.46.0] - 2026-11-09
+
+### New Item Agent — Enonic 'Red Cross' (grounded project-knowledge & testing assistant, V1)
+
+A new agent in **Item Agents**, placed directly below **Humanizing AI**. It helps the
+team (and newcomers) understand the Norwegian Red Cross **Enonic XP 8 / Content Studio 6**
+installation and prepare, explain and troubleshoot its tests. The existing **Red Cross Web
+QA Agent** remains the test *execution/reporting* workspace; this agent provides *knowledge
+and guidance*. Implemented from the ChatGPT handoff plan, right-sized to the app's existing
+agent pattern (self-sim-reality / cyber / EA-brain): a **curated, source-credited knowledge
+base + grounded chat** with offline mock fallback, rather than the full document-ingestion
+pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
+
+- **Backend** — `backend/services/enonic_red_cross.py` (RAG-lite over a 17-chunk curated KB:
+  Enonic platform docs + verified install facts + dated observations + test recipes; plus a
+  24-case Sprint-7 catalog seeded from executed tests as **observations**, not official steps)
+  and `backend/routers/enonic_red_cross.py` at `/api/enonic-red-cross/*`
+  (`/health`, `/knowledge`, `/test-catalog`, `/project-context`, `POST /chat`). Uses the shared
+  `ask_ai_unified` LLM with a trilingual mock fallback (CI-safe). **Epistemic discipline:**
+  every claim tagged `platform-doc | project-fact | project-observation | test-recipe | guidance`;
+  the agent never claims to have opened Content Studio or executed a test, never invents official
+  steps or Azure DevOps ids, and a past "Passed/Active" observation is not a live-status claim.
+- **Frontend** — `frontend/src/enonic-red-cross/EnonicRedCross.jsx` (5 tabs: Overview · Assistant
+  (grounded, cited chat) · Knowledge · Test Catalog (filterable) · Project Context). Full EN/NO/ES
+  i18n (`enonicRedCrossModule.json`). Sidebar + route wired (`enonic-red-cross`).
+- **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
+  retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
+  mock and LLM-parse chat paths). Frontend `npm run build` passes.
+- **Docs** — `docs/enonic-red-cross-agent-plan.md` (improved plan + V2 roadmap).
+
+---
+
 ## [1.45.6] - 2026-10-23
 
 ### API Config — OpenRouter free-model fallback + cross-provider key guard
