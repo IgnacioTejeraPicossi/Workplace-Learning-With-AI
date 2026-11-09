@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.48.0] - 2026-11-09
+
+### Andrés the Robot — autonomous Memory Garden writes (Phase 1): he can propose his own memories
+
+Andrés can now **save his own memories** instead of the user acting as the bridge. Per the plan
+(`docs/andres-memory-autonomy-plan.md`), this reuses the existing candidate-memory system (no new
+storage, no migration): Andrés emits a delimited proposal block, which is **parsed and stripped on the
+server before the reply is stored or returned** (the user never sees it), and persisted as an
+**unverified CANDIDATE** he chose, of the type he chose, in his own words — curated by the user in the
+Memory Garden as today.
+
+- **Backend** — `backend/services/andres/memory_service.py`: `parse_memory_proposals(text)` (extracts
+  `[[MEMORY_PROPOSAL]]{json}[[/MEMORY_PROPOSAL]]`, strips every block incl. malformed/stray markers),
+  `store_andres_proposals()` (persists via `save_memory` with `source="andres"`, `user_verified=False`;
+  type whitelist `reflective|semantic|procedural|creative|relational`; **per-turn cap 2 + daily cap 10**,
+  env-tunable `ANDRES_MEMORY_PROPOSAL_PER_TURN` / `_DAILY`; length + naive de-dup), `count_andres_today()`;
+  `save_memory` now persists optional `tags`. `prompt_assembler.assemble_system_prompt(...,
+  memory_proposal_enabled=…)` adds the proposal invitation **only when the gate allows it**. The chat
+  handler (`backend/routers/andres_robot.py`) computes the gate — **autonomy ≥ 2, not paused, per-user
+  setting `allow_andres_memory_proposals` (default on)** — passes it to the prompt, strips proposals from
+  the reply before storing/returning, persists them (gated), and reports `andres_memory_proposals` in
+  `development_signals`. Proposals stay candidates until the user verifies them (no auto-verify).
+- **Frontend** — `AndresRobot.jsx` Memory Garden cards gain a **"Proposed by Andrés" 🤖 badge** (keyed on
+  `source="andres"`, distinct from the mechanical `auto` capture and user entries) and render memory
+  **tags**. i18n `andresRobotModule.memory.proposedByAndres` EN/NO/ES.
+- **Tests** — `backend/tests/test_andres_memory_autonomy.py` (6 offline: parse+strip incl. malformed,
+  gated prompt invitation, candidate persistence with `source="andres"`, type coercion + per-turn cap,
+  daily-cap block). Existing Andrés suites still green (67). Frontend `npm run build` passes.
+
+---
+
 ## [1.47.1] - 2026-11-09
 
 ### Andrés — second connected skill: AGI Progress Hub expert

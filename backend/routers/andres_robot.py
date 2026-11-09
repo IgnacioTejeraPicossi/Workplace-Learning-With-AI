@@ -294,9 +294,18 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         except Exception:
             recent_turns = []
 
+    # Memory-write autonomy gate (Phase 1): Andrés may propose his OWN memories only
+    # at autonomy >= 2 ("Reflective Companion"), when not paused and the per-user
+    # setting is on. The endpoint enforces caps; the prompt only invites it when allowed.
+    _autonomy = int(profile_doc.get("autonomy_level", 2))
+    _paused = bool(profile_doc.get("development_paused", False))
+    _allow_proposals = (_autonomy >= 2) and (not _paused) and \
+        bool(profile_doc.get("allow_andres_memory_proposals", True))
+
     system_prompt = assemble_system_prompt(
         profile_doc, memories=recalled, projects=projects, skills=active_skills,
         connected_skills_block=connected_skills.prompt_block(),
+        memory_proposal_enabled=_allow_proposals,
     )
     messages = [{"role": "system", "content": system_prompt}]
     # Research tier 4 (MCP Nervous System — read-only catalog): only when user
@@ -402,6 +411,11 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
     else:
         message = result.strip()
 
+    # Strip Andrés' own memory-proposal blocks on the SERVER, before the reply is
+    # stored or returned — the user never sees the blocks. They are persisted below
+    # (gated) as unverified candidates the user curates in the Memory Garden.
+    message, _memory_proposals = memory_service.parse_memory_proposals(message)
+
     now = datetime.utcnow().isoformat()
     await andres_conversations.insert_one({
         "user_id": uid,
@@ -440,12 +454,24 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         except Exception as e:  # pragma: no cover - defensive
             print(f"⚠️ Andrés memory candidate store failed: {e}")
 
+    # Phase 1: persist Andrés' OWN memory proposals (the ones he chose to keep, in his
+    # words, of the type he picked) as candidates — gated + capped in the service.
+    andres_proposals = 0
+    if _allow_proposals and _memory_proposals:
+        try:
+            created = await memory_service.store_andres_proposals(uid, _memory_proposals)
+            andres_proposals = len(created)
+            new_candidates += andres_proposals
+        except Exception as e:  # pragma: no cover - defensive
+            print(f"⚠️ Andrés self-authored memory store failed: {e}")
+
     return {
         "message": message,
         "identity_version": profile_doc.get("identity", {}).get("version", 1),
         "simulated_disposition": profile_doc.get("simulated_disposition", {}),
         "development_signals": {
             "new_memory_candidates": new_candidates,
+            "andres_memory_proposals": andres_proposals,
             "memories_recalled": len(recalled),
             "active_skills_known": len(active_skills),
             "recent_turns_included": len(recent_turns),

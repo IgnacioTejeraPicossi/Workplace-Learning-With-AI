@@ -67,6 +67,7 @@ async def save_memory(user_id: str, mem: dict) -> dict:
         "confidence": float(mem.get("confidence", 0.7)),
         "emotional_significance_simulated": float(mem.get("emotional_significance_simulated", 0.0)),
         "sensitivity": mem.get("sensitivity", "normal"),
+        "tags": [str(t)[:40] for t in mem.get("tags", [])][:8] if isinstance(mem.get("tags"), list) else [],
         "user_verified": bool(mem.get("user_verified", False)),
         "protected": bool(mem.get("protected", False)),
         "created_at": now,
@@ -82,6 +83,99 @@ async def save_memory(user_id: str, mem: dict) -> dict:
     doc["_id"] = str(res.inserted_id)
     doc.pop("embedding", None)   # don't echo the internal vector back to the client
     return doc
+
+
+# ── Andrés' autonomous memory proposals (Phase 1) ─────────────────────────────
+# Andrés may propose saving his OWN memories by emitting a delimited block in his
+# reply. The block is parsed and STRIPPED on the server before the reply is stored
+# or returned — the user never sees it. Each proposal is persisted as a CANDIDATE
+# (user_verified=False, source="andres") the user curates in the Memory Garden.
+import os as _os
+import re as _re
+import json as _json
+
+# Types Andrés may self-author (working/episodic stay for the mechanical capture).
+ANDRES_PROPOSAL_TYPES = {"reflective", "semantic", "procedural", "creative", "relational"}
+_PROPOSAL_PER_TURN_CAP = max(0, int(_os.getenv("ANDRES_MEMORY_PROPOSAL_PER_TURN", "2")))
+_PROPOSAL_DAILY_CAP = max(0, int(_os.getenv("ANDRES_MEMORY_PROPOSAL_DAILY", "10")))
+_PROPOSAL_RE = _re.compile(
+    r"\[\[MEMORY_PROPOSAL\]\]\s*(\{.*?\})\s*\[\[/MEMORY_PROPOSAL\]\]", _re.DOTALL)
+
+
+def parse_memory_proposals(text: str):
+    """Extract `[[MEMORY_PROPOSAL]]{json}[[/MEMORY_PROPOSAL]]` blocks from Andrés'
+    reply. Returns (clean_text, proposals). The clean_text has every block removed
+    (so the user never sees them). Never raises; malformed JSON blocks are dropped
+    but still stripped from the visible text.
+    """
+    if not text or "[[MEMORY_PROPOSAL" not in text:
+        return text, []
+    proposals = []
+    for m in _PROPOSAL_RE.finditer(text):
+        try:
+            obj = _json.loads(m.group(1))
+            if isinstance(obj, dict) and (obj.get("content") or "").strip():
+                proposals.append(obj)
+        except Exception:
+            pass
+    clean = _PROPOSAL_RE.sub("", text)
+    # also remove any stray/unclosed marker tokens so nothing leaks to the UI
+    clean = _re.sub(r"\[\[/?MEMORY_PROPOSAL\]\]", "", clean)
+    clean = _re.sub(r"\n{3,}", "\n\n", clean).strip()
+    return clean, proposals
+
+
+async def count_andres_today(user_id: str) -> int:
+    """How many memories Andrés has self-authored today (for the daily cap)."""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    return await andres_memories.count_documents(
+        {"user_id": user_id, "source": "andres", "created_at": {"$regex": f"^{today}"}})
+
+
+async def store_andres_proposals(user_id: str, proposals: list) -> list:
+    """Persist Andrés' self-authored proposals as CANDIDATES. Applies the per-turn
+    and daily caps, the type whitelist, a length guard and a naive de-dup against
+    recent memories. Returns the stored docs. Never raises (best-effort per item)."""
+    if not proposals:
+        return []
+    already = await count_andres_today(user_id)
+    remaining = max(0, _PROPOSAL_DAILY_CAP - already)
+    if remaining <= 0:
+        return []
+    recent = set()
+    async for d in andres_memories.find({"user_id": user_id}).sort("created_at", -1).limit(50):
+        c = (d.get("content") or "").strip().lower()[:200]
+        if c:
+            recent.add(c)
+    stored = []
+    for p in proposals[:_PROPOSAL_PER_TURN_CAP]:
+        if len(stored) >= remaining:
+            break
+        if not isinstance(p, dict):
+            continue
+        mtype = p.get("type", "reflective")
+        if mtype not in ANDRES_PROPOSAL_TYPES:
+            mtype = "reflective"
+        content = (p.get("content") or "").strip()
+        if not content or content.lower()[:200] in recent:
+            continue
+        try:
+            imp = float(p.get("importance", 0.6))
+        except (TypeError, ValueError):
+            imp = 0.6
+        imp = max(0.0, min(1.0, imp))
+        tags = p.get("tags") if isinstance(p.get("tags"), list) else []
+        try:
+            doc = await save_memory(user_id, {
+                "type": mtype, "content": content, "source": "andres",
+                "importance": imp, "tags": tags,
+                "novelty": 0.6, "confidence": 0.7, "user_verified": False,
+            })
+            stored.append(doc)
+            recent.add(content.lower()[:200])
+        except Exception as e:  # pragma: no cover - defensive
+            print(f"⚠️ Andrés memory proposal store failed: {e}")
+    return stored
 
 
 async def list_memories(user_id: str, mem_type: str = None, limit: int = 200) -> list:

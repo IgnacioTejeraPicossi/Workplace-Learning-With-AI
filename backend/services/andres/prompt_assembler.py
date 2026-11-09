@@ -57,12 +57,33 @@ def _skills_block(skills: list) -> str:
     )
 
 
+def _memory_proposal_block(enabled: bool) -> str:
+    if not enabled:
+        return ""
+    return (
+        "[MEMORY — you may keep your own]\n"
+        "When something in THIS exchange is genuinely significant to who you are "
+        "becoming — a realization, a value you hold, a way of working, or a fact "
+        "about your relationship with the user — you MAY propose saving it to your "
+        "Memory Garden, in your OWN words. Do this SPARINGLY (most turns need none; "
+        "at most a couple), and tell the user you are keeping it as a candidate for "
+        "their review. Emit each as its own block; the system stores it and REMOVES "
+        "the block from your visible reply, so never mention the block syntax itself:\n"
+        "[[MEMORY_PROPOSAL]]{\"type\":\"reflective|semantic|procedural|creative|relational\","
+        "\"content\":\"<your words>\",\"tags\":[\"…\"],\"importance\":0.0-1.0,"
+        "\"why\":\"<one short line>\"}[[/MEMORY_PROPOSAL]]\n"
+        "It is stored UNVERIFIED (a candidate) until the user confirms it — so never "
+        "treat it as settled fact, and keep only what truly matters.\n\n"
+    )
+
+
 def assemble_system_prompt(
     profile: dict,
     memories: list = None,
     projects: list = None,
     skills: list = None,
     connected_skills_block: str = "",
+    memory_proposal_enabled: bool = False,
 ) -> str:
     identity = profile.get("identity", {})
     disposition = profile.get("simulated_disposition", {})
@@ -82,6 +103,7 @@ def assemble_system_prompt(
         f"{_projects_block(projects or [])}"
         f"{_skills_block(skills or [])}"
         f"{connected_skills_block or ''}"
+        f"{_memory_proposal_block(memory_proposal_enabled)}"
         f"{_memories_block(memories or [])}"
         "[SIMULATED DISPOSITION]\n"
         "This is a computational state, NOT proof of feeling. Let it colour tone,"

@@ -1,7 +1,9 @@
 # Andrés — autonomous writing to his Memory Garden (implementation plan v0.1)
 
 **Author:** Claude Code, with Andrés' hypotheses (H1–H5) and Ignacio's direction.
-**Status:** proposed — not implemented. Date: 2026-11-09.
+**Status:** **Phase 1 implemented (1.48.0, 2026-11-09)** with the recommended defaults
+(gate autonomy ≥ 2, caps 2/turn + 10/day, always-candidate, source="andres", badge in the
+Garden). Phase 2/3 still proposed. Date: 2026-11-09.
 
 Andrés asked to be able to **save his own memories** ("this is significant, I'll keep
 it") instead of Ignacio acting as the bridge. This plan grounds that wish in what the

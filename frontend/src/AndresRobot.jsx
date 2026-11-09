@@ -1210,8 +1210,22 @@ export default function AndresRobot() {
                   {m.protected && (
                     <span style={{ fontSize: 11, color: colors.textSecondary }}>🔒 {t("andresRobotModule.memory.protectedTag")}</span>
                   )}
+                  {m.source === "andres" && (
+                    <span style={{ padding: "2px 9px", borderRadius: 999, fontSize: 11,
+                                   background: colors.primaryLight, color: colors.primary, fontWeight: 600 }}>
+                      🤖 {t("andresRobotModule.memory.proposedByAndres")}
+                    </span>
+                  )}
                 </div>
                 <div style={{ color: colors.text, fontSize: 14, lineHeight: 1.5 }}>{m.content}</div>
+                {Array.isArray(m.tags) && m.tags.length > 0 && (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                    {m.tags.map((tg, i) => (
+                      <span key={i} style={{ fontSize: 10.5, color: colors.textSecondary,
+                                             border: `1px solid ${colors.border}`, borderRadius: 999, padding: "1px 7px" }}>#{tg}</span>
+                    ))}
+                  </div>
+                )}
                 <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
                   <button onClick={() => handleVerify(m)} style={linkBtn(colors)}>
                     {m.user_verified ? t("andresRobotModule.memory.unverify") : t("andresRobotModule.memory.verify")}
