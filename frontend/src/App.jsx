@@ -60,6 +60,7 @@ import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import RedCrossWebQAAgent from "./RedCrossWebQAAgent";
 import HumanizingAI from "./HumanizingAI";
+import EnonicRedCross from "./enonic-red-cross/EnonicRedCross";
 import JapaneseSensei from "./components/JapaneseSensei/JapaneseSensei";
 import ChineseTeacher from "./components/ChineseTeacher/ChineseTeacher";
 import KoreanTeacher from "./components/KoreanTeacher/KoreanTeacher";
@@ -578,6 +579,7 @@ function AppContent() {
             {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
             {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent onNavigateSection={setSection} />}
             {!activeModule && section === "humanizing-ai" && <HumanizingAI />}
+            {!activeModule && section === "enonic-red-cross" && <EnonicRedCross />}
             {!activeModule && section === "self-sim-reality-agent" && <SelfSimRealityAgent />}
             {!activeModule && section === "self-correcting-loop" && <SelfCorrectingLoop />}
             {!activeModule && section === "andres-robot" && <AndresRobot />}

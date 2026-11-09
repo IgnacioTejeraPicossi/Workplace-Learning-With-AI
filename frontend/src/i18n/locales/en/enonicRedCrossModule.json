@@ -1,0 +1,109 @@
+{
+  "enonicRedCrossModule": {
+    "title": "Enonic 'Red Cross'",
+    "subtitle": "Project knowledge & testing assistant for the Norwegian Red Cross Enonic XP installation",
+    "badgeMock": "offline / mock",
+    "badgeLive": "grounded",
+    "tabs": {
+      "overview": "Overview",
+      "assistant": "Assistant",
+      "knowledge": "Knowledge",
+      "testCatalog": "Test Catalog",
+      "projectContext": "Project Context"
+    },
+    "evidence": {
+      "platform-doc": "Platform doc",
+      "project-fact": "Project fact",
+      "project-observation": "Observation",
+      "test-recipe": "Test recipe",
+      "guidance": "Guidance",
+      "unsupported": "Unsupported",
+      "supported": "Supported",
+      "partial": "Partial evidence",
+      "insufficient": "Insufficient evidence"
+    },
+    "overview": {
+      "heroTitle": "A grounded copilot for the Red Cross Enonic install",
+      "heroSub": "It explains the Enonic XP 8 / Content Studio 6 platform and answers project-specific questions about the Norwegian Red Cross installation and how to test it — citing sources and clearly separating platform documentation, confirmed project facts, dated observations, test recipes and plain suggestions.",
+      "whatTitle": "What it does",
+      "point1": "Explains the Enonic platform with version-aware documentation links.",
+      "point2": "Answers project questions grounded only in a curated, source-credited knowledge base.",
+      "point3": "Searches the seeded Sprint-7 test cases by id, title, persona and result.",
+      "point4": "Drafts proposed manual test procedures — clearly labelled, with local draft ids, never invented Azure DevOps ids.",
+      "evidenceTitle": "Every claim is tagged by evidence level",
+      "evidenceIntro": "The assistant never presents a speculative or undocumented claim as established fact, and never says it opened Content Studio or executed a test.",
+      "limitsTitle": "What it does not do (yet)",
+      "limits": "It does not edit the CMS, publish, execute tests or write to Azure DevOps. A generated test or defect draft is not an executed test. Document upload/approval ingestion and a live connector are planned for a later version.",
+      "relatedTitle": "Related workspace",
+      "related": "The Red Cross Web QA Agent remains the test execution and reporting workspace. This agent provides knowledge and guidance.",
+      "openAssistant": "Open the Assistant",
+      "disclaimer": "URLs are project context, not a live connection. Observed results are dated and environment-specific, not live status."
+    },
+    "assistant": {
+      "intro": "Ask about the Enonic platform or the Red Cross installation and how to test it.",
+      "placeholder": "e.g. How should I test case 29376? Which content types are deployed? How does the publish flow work?",
+      "send": "Ask",
+      "thinking": "Thinking…",
+      "suggestedTitle": "Try asking",
+      "q1": "Which content types are deployed in the Red Cross install?",
+      "q2": "How should I test case 29376?",
+      "q3": "Why don't newly published pages appear on next.lunix.cloud?",
+      "q4": "How do I publish a content tree in Content Studio?",
+      "shortAnswer": "Answer",
+      "sectionsTitle": "Evidence",
+      "sources": "Sources",
+      "evidenceStatus": "Evidence status",
+      "missingInfo": "Missing information",
+      "nextQuestion": "Suggested next question",
+      "emptyHint": "Your grounded answer will appear here, with cited sources and evidence levels.",
+      "error": "The assistant could not answer right now. Please try again.",
+      "mockNote": "Offline mock response (no LLM configured) — structure is representative; wording is a placeholder."
+    },
+    "knowledge": {
+      "title": "Curated knowledge base",
+      "intro": "The grounded facts the assistant may cite. Each chunk carries an evidence level and its source.",
+      "sources": "Sources",
+      "loading": "Loading knowledge…",
+      "empty": "No knowledge entries."
+    },
+    "testCatalog": {
+      "title": "Test catalog (Sprint 7 — executed)",
+      "intro": "Cases the team has already run, kept as observations. These are not imported official steps or live status — the full Azure DevOps export is still to be imported.",
+      "searchPlaceholder": "Search id, title or note…",
+      "persona": "Persona",
+      "result": "Result",
+      "all": "All",
+      "colId": "ID",
+      "colTitle": "Title",
+      "colPersona": "Persona",
+      "colResult": "Result",
+      "colNote": "Observation",
+      "count": "{{n}} cases",
+      "loading": "Loading catalog…",
+      "empty": "No cases match your filters.",
+      "results": {
+        "pass": "Passed",
+        "fail": "Failed",
+        "partial": "Partial",
+        "blocked": "Blocked"
+      }
+    },
+    "projectContext": {
+      "title": "Project context",
+      "intro": "Environment URLs, architecture and the facts we still need. URLs are context, not an API connection — the assistant has no live session.",
+      "platform": "Platform",
+      "designSystem": "Frontend design system",
+      "environments": "Environments",
+      "contentStudio": "Content Studio (editor)",
+      "publicFrontend": "Public test frontend",
+      "azureDevops": "Azure DevOps",
+      "org": "Organization",
+      "project": "Project",
+      "sprint": "Sprint",
+      "suites": "Suites",
+      "knownUnknowns": "Known unknowns (to collect)",
+      "docsTitle": "Official Enonic documentation",
+      "loading": "Loading context…"
+    }
+  }
+}

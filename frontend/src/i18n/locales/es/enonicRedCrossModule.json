@@ -1,0 +1,109 @@
+{
+  "enonicRedCrossModule": {
+    "title": "Enonic 'Red Cross'",
+    "subtitle": "Asistente de conocimiento y pruebas para la instalación Enonic XP de la Cruz Roja Noruega",
+    "badgeMock": "sin conexión / mock",
+    "badgeLive": "fundamentado",
+    "tabs": {
+      "overview": "Resumen",
+      "assistant": "Asistente",
+      "knowledge": "Conocimiento",
+      "testCatalog": "Catálogo de tests",
+      "projectContext": "Contexto del proyecto"
+    },
+    "evidence": {
+      "platform-doc": "Doc. plataforma",
+      "project-fact": "Hecho del proyecto",
+      "project-observation": "Observación",
+      "test-recipe": "Receta de test",
+      "guidance": "Sugerencia",
+      "unsupported": "Sin respaldo",
+      "supported": "Respaldado",
+      "partial": "Evidencia parcial",
+      "insufficient": "Evidencia insuficiente"
+    },
+    "overview": {
+      "heroTitle": "Un copiloto fundamentado para la instalación Enonic de la Cruz Roja",
+      "heroSub": "Explica la plataforma Enonic XP 8 / Content Studio 6 y responde preguntas específicas sobre la instalación de la Cruz Roja Noruega y cómo probarla — citando fuentes y separando con claridad la documentación de plataforma, los hechos confirmados del proyecto, las observaciones fechadas, las recetas de test y las meras sugerencias.",
+      "whatTitle": "Qué hace",
+      "point1": "Explica la plataforma Enonic con enlaces de documentación conscientes de la versión.",
+      "point2": "Responde preguntas del proyecto fundamentadas solo en una base de conocimiento curada y con fuentes.",
+      "point3": "Busca en los casos de test sembrados del Sprint 7 por id, título, persona y resultado.",
+      "point4": "Redacta procedimientos de test manuales propuestos — claramente etiquetados, con ids de borrador locales, nunca ids de Azure DevOps inventados.",
+      "evidenceTitle": "Cada afirmación se etiqueta por nivel de evidencia",
+      "evidenceIntro": "El asistente nunca presenta una afirmación especulativa o no documentada como hecho establecido, ni dice que abrió Content Studio o ejecutó un test.",
+      "limitsTitle": "Lo que (todavía) no hace",
+      "limits": "No edita el CMS, no publica, no ejecuta tests ni escribe en Azure DevOps. Un borrador de test o defecto generado no es un test ejecutado. La ingesta de documentos (subida/aprobación) y un conector en vivo se planean para una versión posterior.",
+      "relatedTitle": "Espacio relacionado",
+      "related": "El Red Cross Web QA Agent sigue siendo el espacio de ejecución y reporte de tests. Este agente aporta conocimiento y orientación.",
+      "openAssistant": "Abrir el asistente",
+      "disclaimer": "Las URLs son contexto del proyecto, no una conexión en vivo. Los resultados observados son fechados y específicos del entorno, no estado en vivo."
+    },
+    "assistant": {
+      "intro": "Pregunta sobre la plataforma Enonic o la instalación de la Cruz Roja y cómo probarla.",
+      "placeholder": "p. ej. ¿Cómo debo probar el caso 29376? ¿Qué tipos de contenido están desplegados? ¿Cómo funciona el flujo de publicación?",
+      "send": "Preguntar",
+      "thinking": "Pensando…",
+      "suggestedTitle": "Prueba a preguntar",
+      "q1": "¿Qué tipos de contenido están desplegados en la instalación de la Cruz Roja?",
+      "q2": "¿Cómo debo probar el caso 29376?",
+      "q3": "¿Por qué las páginas recién publicadas no aparecen en next.lunix.cloud?",
+      "q4": "¿Cómo publico un árbol de contenido en Content Studio?",
+      "shortAnswer": "Respuesta",
+      "sectionsTitle": "Evidencia",
+      "sources": "Fuentes",
+      "evidenceStatus": "Estado de evidencia",
+      "missingInfo": "Información que falta",
+      "nextQuestion": "Siguiente pregunta sugerida",
+      "emptyHint": "Tu respuesta fundamentada aparecerá aquí, con fuentes citadas y niveles de evidencia.",
+      "error": "El asistente no pudo responder ahora mismo. Inténtalo de nuevo.",
+      "mockNote": "Respuesta mock sin conexión (sin LLM configurado) — la estructura es representativa; el texto es un marcador de posición."
+    },
+    "knowledge": {
+      "title": "Base de conocimiento curada",
+      "intro": "Los hechos fundamentados que el asistente puede citar. Cada fragmento lleva un nivel de evidencia y su fuente.",
+      "sources": "Fuentes",
+      "loading": "Cargando conocimiento…",
+      "empty": "Sin entradas de conocimiento."
+    },
+    "testCatalog": {
+      "title": "Catálogo de tests (Sprint 7 — ejecutados)",
+      "intro": "Casos que el equipo ya ha ejecutado, conservados como observaciones. No son pasos oficiales importados ni estado en vivo — aún falta importar el export completo de Azure DevOps.",
+      "searchPlaceholder": "Buscar id, título o nota…",
+      "persona": "Persona",
+      "result": "Resultado",
+      "all": "Todos",
+      "colId": "ID",
+      "colTitle": "Título",
+      "colPersona": "Persona",
+      "colResult": "Resultado",
+      "colNote": "Observación",
+      "count": "{{n}} casos",
+      "loading": "Cargando catálogo…",
+      "empty": "Ningún caso coincide con los filtros.",
+      "results": {
+        "pass": "Aprobado",
+        "fail": "Fallido",
+        "partial": "Parcial",
+        "blocked": "Bloqueado"
+      }
+    },
+    "projectContext": {
+      "title": "Contexto del proyecto",
+      "intro": "URLs del entorno, arquitectura y los datos que aún necesitamos. Las URLs son contexto, no una conexión API — el asistente no tiene sesión en vivo.",
+      "platform": "Plataforma",
+      "designSystem": "Sistema de diseño frontend",
+      "environments": "Entornos",
+      "contentStudio": "Content Studio (editor)",
+      "publicFrontend": "Frontend público de test",
+      "azureDevops": "Azure DevOps",
+      "org": "Organización",
+      "project": "Proyecto",
+      "sprint": "Sprint",
+      "suites": "Suites",
+      "knownUnknowns": "Incógnitas conocidas (por recopilar)",
+      "docsTitle": "Documentación oficial de Enonic",
+      "loading": "Cargando contexto…"
+    }
+  }
+}

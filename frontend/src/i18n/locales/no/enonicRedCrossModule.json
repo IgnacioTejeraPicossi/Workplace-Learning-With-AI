@@ -1,0 +1,109 @@
+{
+  "enonicRedCrossModule": {
+    "title": "Enonic 'Red Cross'",
+    "subtitle": "Prosjektkunnskap og testassistent for Røde Kors' Enonic XP-installasjon",
+    "badgeMock": "frakoblet / mock",
+    "badgeLive": "forankret",
+    "tabs": {
+      "overview": "Oversikt",
+      "assistant": "Assistent",
+      "knowledge": "Kunnskap",
+      "testCatalog": "Testkatalog",
+      "projectContext": "Prosjektkontekst"
+    },
+    "evidence": {
+      "platform-doc": "Plattformdok",
+      "project-fact": "Prosjektfakta",
+      "project-observation": "Observasjon",
+      "test-recipe": "Testoppskrift",
+      "guidance": "Veiledning",
+      "unsupported": "Ikke underbygd",
+      "supported": "Underbygd",
+      "partial": "Delvis underbygd",
+      "insufficient": "Utilstrekkelig grunnlag"
+    },
+    "overview": {
+      "heroTitle": "En forankret kopilot for Røde Kors' Enonic-installasjon",
+      "heroSub": "Den forklarer Enonic XP 8 / Content Studio 6-plattformen og svarer på prosjektspesifikke spørsmål om Røde Kors-installasjonen og hvordan man tester den — med kildehenvisning og et tydelig skille mellom plattformdokumentasjon, bekreftede prosjektfakta, daterte observasjoner, testoppskrifter og rene forslag.",
+      "whatTitle": "Hva den gjør",
+      "point1": "Forklarer Enonic-plattformen med versjonsbevisste dokumentasjonslenker.",
+      "point2": "Svarer på prosjektspørsmål forankret kun i en kuratert, kildebelagt kunnskapsbase.",
+      "point3": "Søker i de innsådde Sprint 7-testsakene etter id, tittel, persona og resultat.",
+      "point4": "Skisserer forslag til manuelle testprosedyrer — tydelig merket, med lokale utkast-ider, aldri oppdiktede Azure DevOps-ider.",
+      "evidenceTitle": "Hver påstand er merket med evidensnivå",
+      "evidenceIntro": "Assistenten presenterer aldri en spekulativ eller udokumentert påstand som etablert faktum, og sier aldri at den har åpnet Content Studio eller kjørt en test.",
+      "limitsTitle": "Hva den (ennå) ikke gjør",
+      "limits": "Den redigerer ikke CMS-et, publiserer ikke, kjører ikke tester og skriver ikke til Azure DevOps. Et generert test- eller feilutkast er ikke en kjørt test. Dokumentopplasting/godkjenning og en live-kobling er planlagt for en senere versjon.",
+      "relatedTitle": "Relatert arbeidsflate",
+      "related": "Red Cross Web QA Agent er fortsatt arbeidsflaten for testkjøring og rapportering. Denne agenten gir kunnskap og veiledning.",
+      "openAssistant": "Åpne assistenten",
+      "disclaimer": "URL-er er prosjektkontekst, ikke en live-tilkobling. Observerte resultater er daterte og miljøspesifikke, ikke live status."
+    },
+    "assistant": {
+      "intro": "Spør om Enonic-plattformen eller Røde Kors-installasjonen og hvordan man tester den.",
+      "placeholder": "f.eks. Hvordan bør jeg teste sak 29376? Hvilke innholdstyper er utrullet? Hvordan fungerer publiseringsflyten?",
+      "send": "Spør",
+      "thinking": "Tenker…",
+      "suggestedTitle": "Prøv å spørre",
+      "q1": "Hvilke innholdstyper er utrullet i Røde Kors-installasjonen?",
+      "q2": "Hvordan bør jeg teste sak 29376?",
+      "q3": "Hvorfor dukker ikke nylig publiserte sider opp på next.lunix.cloud?",
+      "q4": "Hvordan publiserer jeg en innholdstrestruktur i Content Studio?",
+      "shortAnswer": "Svar",
+      "sectionsTitle": "Evidens",
+      "sources": "Kilder",
+      "evidenceStatus": "Evidensstatus",
+      "missingInfo": "Manglende informasjon",
+      "nextQuestion": "Foreslått neste spørsmål",
+      "emptyHint": "Det forankrede svaret vises her, med siterte kilder og evidensnivåer.",
+      "error": "Assistenten kunne ikke svare akkurat nå. Prøv igjen.",
+      "mockNote": "Frakoblet mock-svar (ingen LLM konfigurert) — strukturen er representativ; ordlyden er en plassholder."
+    },
+    "knowledge": {
+      "title": "Kuratert kunnskapsbase",
+      "intro": "De forankrede fakta assistenten kan sitere. Hver bit har et evidensnivå og sin kilde.",
+      "sources": "Kilder",
+      "loading": "Laster kunnskap…",
+      "empty": "Ingen kunnskapsoppføringer."
+    },
+    "testCatalog": {
+      "title": "Testkatalog (Sprint 7 — kjørt)",
+      "intro": "Saker teamet allerede har kjørt, bevart som observasjoner. Dette er ikke importerte offisielle steg eller live status — hele Azure DevOps-eksporten gjenstår å importere.",
+      "searchPlaceholder": "Søk id, tittel eller notat…",
+      "persona": "Persona",
+      "result": "Resultat",
+      "all": "Alle",
+      "colId": "ID",
+      "colTitle": "Tittel",
+      "colPersona": "Persona",
+      "colResult": "Resultat",
+      "colNote": "Observasjon",
+      "count": "{{n}} saker",
+      "loading": "Laster katalog…",
+      "empty": "Ingen saker matcher filtrene.",
+      "results": {
+        "pass": "Bestått",
+        "fail": "Feilet",
+        "partial": "Delvis",
+        "blocked": "Blokkert"
+      }
+    },
+    "projectContext": {
+      "title": "Prosjektkontekst",
+      "intro": "Miljø-URL-er, arkitektur og fakta vi fortsatt trenger. URL-er er kontekst, ikke en API-tilkobling — assistenten har ingen live-økt.",
+      "platform": "Plattform",
+      "designSystem": "Frontend designsystem",
+      "environments": "Miljøer",
+      "contentStudio": "Content Studio (editor)",
+      "publicFrontend": "Offentlig test-frontend",
+      "azureDevops": "Azure DevOps",
+      "org": "Organisasjon",
+      "project": "Prosjekt",
+      "sprint": "Sprint",
+      "suites": "Suiter",
+      "knownUnknowns": "Kjente ukjente (å samle inn)",
+      "docsTitle": "Offisiell Enonic-dokumentasjon",
+      "loading": "Laster kontekst…"
+    }
+  }
+}

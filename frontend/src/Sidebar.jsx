@@ -135,7 +135,8 @@ const getNavItems = (t) => [
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
     { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart" },
     { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" },
-    { key: "humanizing-ai", label: t('sidebar.humanizingAi'), icon: "humanitas" }
+    { key: "humanizing-ai", label: t('sidebar.humanizingAi'), icon: "humanitas" },
+    { key: "enonic-red-cross", label: t('sidebar.enonicRedCross'), icon: "redcross" }
   ]},
 
   // Nuevo grupo: Future Item Agents (prototipos)
