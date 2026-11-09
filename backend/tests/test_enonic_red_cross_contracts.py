@@ -58,11 +58,15 @@ def test_catalog_seed_and_filters():
     # persona filter works
     red = svc.test_catalog(persona="Redaktør")
     assert red and all(c["persona"] == "Redaktør" for c in red)
-    # sprint support: all seed cases are Sprint 7; filtering an absent sprint is empty
-    assert "7" in svc.sprints()
-    assert len(svc.test_catalog(sprint="7")) == len(cat)
+    # multi-sprint support: Sprint 5 (imported) + Sprint 7 (session) both present
+    assert {"5", "7"}.issubset(set(svc.sprints()))
+    s5, s7 = svc.test_catalog(sprint="5"), svc.test_catalog(sprint="7")
+    assert len(s5) + len(s7) == len(cat)            # every case has a sprint
+    assert len(s5) == 152 and len(s7) == 24         # 68 Redaktør + 84 Sluttbruker; Sprint-7 seed
     assert svc.test_catalog(sprint="999") == []
-    assert all(c["sprint"] == "7" for c in cat)
+    assert all(c["sprint"] == "5" for c in s5)
+    # Sprint-5 imported outcomes: exactly 7 recorded failures (~95% passed)
+    assert len(svc.test_catalog(sprint="5", result="fail")) == 7
 
 
 def test_health_and_accessors():

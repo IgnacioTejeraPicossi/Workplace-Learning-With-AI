@@ -34,8 +34,12 @@ pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
   i18n (`enonicRedCrossModule.json`). Sidebar + route wired (`enonic-red-cross`).
 - **Multi-sprint ready** — catalog cases carry a `sprint` field (default 7); `/test-catalog` takes a
   `sprint` filter and returns the available sprints; the Test Catalog tab shows a sprint dropdown once
-  more than one sprint is present (so adding Sprint 5/6/8 cases needs no code change). **Cross-tab
-  bridge**: clicking a case id in the catalog opens the Assistant pre-asked "How should I test case N?".
+  more than one sprint is present. **Cross-tab bridge**: clicking a case id in the catalog opens the
+  Assistant pre-asked "How should I test case N?". Added a `planned` 🗓️ status for defined-but-not-run
+  cases.
+- **Sprint 5 imported** (152 cases: Redaktør 68 + Sluttbruker 84, from the Azure DevOps Test Plan
+  outcomes transcribed from screenshots — recorded Passed/Failed, 7 failures ≈ 95% passed, framed as
+  dated observations not live status). Catalog now holds 176 cases across Sprint 5 + 7.
 - **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
   retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
   mock and LLM-parse chat paths). Frontend `npm run build` passes.
