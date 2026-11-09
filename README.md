@@ -34,6 +34,7 @@
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
 | **QA & Test Automation** | Red Cross Web QA Agent (20 tabs / 50 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator**, **DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix**, **k6 + Loadster dual load-testing**, **Storybook + Postman + GraphQL introspection** (Phase F), **NVDA + WAVE** accessibility (Phase G), **Phase H · Pack 2 — Sikkerhet og personvern workbench** (backend-driven, persistent, status preserved across re-scans, structured DPIA), **Phase H · Pack 3 — 5 workflow extensions** (📥 Markdown export of findings + DPIA + history, 🎯 idempotent single-finding ADO dispatch with deterministic mock work-item IDs, 🔀 scan-diff with new/fixed/regressed/persisted buckets, ✅ verify-fix flow auto-promoting `fixed` → `verified`, 🌐 environment matrix across local/test/staging/prod), aligned to Trine Bruu's Teststrategi 30.3 |
+| **Enonic Red Cross (project knowledge)** | **Enonic 'Red Cross'** agent — a grounded knowledge & testing assistant for the Norwegian Red Cross **Enonic XP 8 / Content Studio 6** installation (Item Agents, below Humanizing AI): evidence-tagged cited chat, curated knowledge base, imported **test catalog** (Sprint 5 / 6 / 7 — filter by persona / result / sprint), and project context. Complements the Red Cross Web QA Agent (knowledge & guidance, not execution). User guide: [docs/enonic-red-cross-help.md](docs/enonic-red-cross-help.md) |
 | **Language Agents** | 6 language tutors (Japanese, Chinese, Korean, English Mastery, Norwegian, Spanish) — pronunciation, grammar, vocab SRS, conversation; **native cloned-voice examples** (Voicebox, local) and **spoken Conversation Audio** (Web Speech ASR + TTS, optional web research) |
 | **Specialized AI Use Cases testing** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
@@ -80,6 +81,7 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **MCP / Postman testing**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer via MCP or HTTP
 - **Andrés the Robot** (developmental AI companion — user guide): [docs/andres-robot-help.md](docs/andres-robot-help.md)
 - **Self-Simulating Reality Agent** (OPH philosophy companion — user guide): [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md)
+- **Enonic 'Red Cross'** (Enonic project knowledge & testing assistant — user guide): [docs/enonic-red-cross-help.md](docs/enonic-red-cross-help.md)
 
 ---
 
