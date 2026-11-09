@@ -354,6 +354,17 @@
         "blocked": "Blokkert",
         "runs": "Kjøringer"
       },
+      "connected": {
+        "title": "Tilkoblede ferdigheter (spesialiserte eksperter)",
+        "intro": "Eksterne ekspertagenter Andrés kan rådføre seg med ved behov. De er ikke hans minne eller identitet — han påkaller en når en oppgave krever dens ekspertise, og tilskriver svaret, med dets evidensmerker, til ferdigheten.",
+        "available": "tilgjengelig",
+        "unavailable": "frakoblet",
+        "askPlaceholder": "Still eksperten et spørsmål…",
+        "consult": "Rådfør",
+        "sources": "Kilder",
+        "evidence": "Evidensstatus",
+        "mockNote": "Frakoblet mock-svar fra eksperten (ingen LLM konfigurert) — strukturen er representativ."
+      },
       "proposeTitle": "Foreslå en ferdighet",
       "taskPlaceholder": "Beskriv en oppgave Andrés skal skissere…",
       "draft": "Skisser med KI",

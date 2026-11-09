@@ -4,7 +4,16 @@ import { useTheme } from "../ThemeContext";
 import {
   draftAndresSkill, proposeAndresSkill, getAndresSkills, getAndresSkillMetrics,
   approveAndresSkill, rejectAndresSkill, runAndresSkill, deleteAndresSkill,
+  getAndresConnectedSkills, consultAndresConnectedSkill,
 } from "../api";
+
+const toSkillLang = (lng) => (lng === "es" ? "es" : lng === "no" ? "no" : "en");
+// Evidence-level colors for the Enonic Red Cross expert's tagged answers.
+const EVIDENCE_COLORS = {
+  "platform-doc": "#1d4ed8", "project-fact": "#047857", "project-observation": "#b45309",
+  "test-recipe": "#6d28d9", "guidance": "#475569", "unsupported": "#b91c1c",
+  supported: "#047857", partial: "#b45309", insufficient: "#b91c1c",
+};
 
 /**
  * Andrés — Skills tab (V4). A bounded, auditable skill library.
@@ -19,10 +28,14 @@ const STATUS_COLORS = {
 };
 
 export default function Skills({ onProfileChange }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const { colors } = useTheme();
   const [skills, setSkills] = useState([]);
   const [metrics, setMetrics] = useState(null);
+  const [connected, setConnected] = useState([]);
+  const [consultQ, setConsultQ] = useState({});      // skillId -> question
+  const [consultRes, setConsultRes] = useState({});  // skillId -> { answer, attribution }
+  const [consultBusy, setConsultBusy] = useState({}); // skillId -> bool
   const [task, setTask] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -76,16 +89,31 @@ export default function Skills({ onProfileChange }) {
 
   const load = useCallback(async () => {
     try {
-      const [s, m] = await Promise.all([
+      const [s, m, c] = await Promise.all([
         getAndresSkills().catch(() => ({ skills: [] })),
         getAndresSkillMetrics().catch(() => null),
+        getAndresConnectedSkills().catch(() => ({ skills: [] })),
       ]);
       setSkills(s.skills || []);
       setMetrics(m);
+      setConnected(c.skills || []);
     } catch (e) { /* offline */ }
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const consult = async (skillId) => {
+    const q = (consultQ[skillId] || "").trim();
+    if (!q) return;
+    setConsultBusy((b) => ({ ...b, [skillId]: true }));
+    try {
+      const res = await consultAndresConnectedSkill(skillId, q, toSkillLang(i18n.language));
+      setConsultRes((r) => ({ ...r, [skillId]: res }));
+    } catch (e) {
+      setConsultRes((r) => ({ ...r, [skillId]: { error: e?.message || "error" } }));
+    }
+    setConsultBusy((b) => ({ ...b, [skillId]: false }));
+  };
 
   const draft = async () => {
     if (!task.trim()) return;
@@ -148,6 +176,88 @@ export default function Skills({ onProfileChange }) {
           {t("andresRobotModule.skills.intro")}
         </p>
       </div>
+
+      {/* Connected skills — specialized expert agents Andrés can consult */}
+      {connected.length > 0 && (
+        <div style={{ ...card, display: "grid", gap: 12, borderLeft: `3px solid ${colors.primary}` }}>
+          <div>
+            <strong style={{ color: colors.text }}>🔗 {t("andresRobotModule.skills.connected.title")}</strong>
+            <p style={{ fontSize: 13, color: colors.textSecondary, margin: "6px 0 0", lineHeight: 1.6 }}>
+              {t("andresRobotModule.skills.connected.intro")}
+            </p>
+          </div>
+          {connected.map((s) => {
+            const res = consultRes[s.id];
+            const ans = res && res.answer;
+            const health = s.health || {};
+            return (
+              <div key={s.id} style={{ ...card, padding: 16, background: colors.background }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <strong style={{ color: colors.text }}>{s.icon} {s.name}</strong>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: health.available ? "#16a34a" : "#dc2626" }}>
+                    {health.available
+                      ? t("andresRobotModule.skills.connected.available")
+                      : t("andresRobotModule.skills.connected.unavailable")}
+                  </span>
+                </div>
+                <div style={{ fontSize: 12, color: colors.textSecondary, margin: "4px 0" }}>{s.domain}</div>
+                <p style={{ fontSize: 13, color: colors.text, margin: "0 0 8px", lineHeight: 1.6 }}>{s.description}</p>
+
+                {/* consult box */}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  <input style={{ ...input, flex: 1, minWidth: 180 }}
+                         value={consultQ[s.id] ?? ""}
+                         onChange={(e) => setConsultQ((q) => ({ ...q, [s.id]: e.target.value }))}
+                         onKeyDown={(e) => { if (e.key === "Enter") consult(s.id); }}
+                         placeholder={t("andresRobotModule.skills.connected.askPlaceholder")} />
+                  <button onClick={() => consult(s.id)} disabled={consultBusy[s.id] || !(consultQ[s.id] || "").trim()}
+                          style={{ background: colors.primary, color: "#fff", border: 0, borderRadius: 8, padding: "9px 16px", fontWeight: 600,
+                                   cursor: consultBusy[s.id] ? "not-allowed" : "pointer", opacity: consultBusy[s.id] || !(consultQ[s.id] || "").trim() ? 0.6 : 1 }}>
+                    {consultBusy[s.id] ? "…" : t("andresRobotModule.skills.connected.consult")}
+                  </button>
+                </div>
+
+                {/* result — the expert's cited, evidence-tagged answer, attributed */}
+                {res && res.error && (
+                  <div style={{ marginTop: 10, color: "#dc2626", fontSize: 13 }}>✗ {res.error}</div>
+                )}
+                {ans && (
+                  <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+                    <div style={{ fontSize: 11.5, fontStyle: "italic", color: colors.textSecondary,
+                                  padding: "6px 10px", borderRadius: 8, background: colors.cardBackground, border: `1px dashed ${colors.border}` }}>
+                      ↪ {res.attribution}
+                    </div>
+                    {ans.is_mock && (
+                      <div style={{ fontSize: 11.5, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "6px 10px" }}>
+                        {t("andresRobotModule.skills.connected.mockNote")}
+                      </div>
+                    )}
+                    <p style={{ margin: 0, color: colors.text, lineHeight: 1.6, fontSize: 14 }}>{ans.short_answer}</p>
+                    {Array.isArray(ans.sections) && ans.sections.map((sec, i) => (
+                      <div key={i} style={{ border: `1px solid ${colors.border}`, borderRadius: 8, padding: 10, background: colors.cardBackground }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.3,
+                                       color: EVIDENCE_COLORS[sec.level] || colors.textSecondary }}>{sec.level}</span>
+                        <p style={{ margin: "6px 0 0", fontSize: 13, color: colors.text, lineHeight: 1.55 }}>{sec.text}</p>
+                        {Array.isArray(sec.sources) && sec.sources.length > 0 && (
+                          <div style={{ marginTop: 6, fontSize: 11.5, color: colors.textSecondary }}>
+                            {t("andresRobotModule.skills.connected.sources")}: {sec.sources.join(" · ")}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {ans.evidence_status && (
+                      <div style={{ fontSize: 12, color: colors.textSecondary }}>
+                        {t("andresRobotModule.skills.connected.evidence")}:{" "}
+                        <span style={{ fontWeight: 700, color: EVIDENCE_COLORS[ans.evidence_status] || colors.text }}>{ans.evidence_status}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Metrics */}
       {metrics && (

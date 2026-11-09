@@ -28,6 +28,7 @@ from backend.services.andres import (
     evolution_manager, creativity_engine, skill_service, capsule_service,
     development_service, web_research, curriculum_service, research_service,
     scholarly_research, progress_service, consolidation_service, rate_limit,
+    connected_skills,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -294,7 +295,8 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
             recent_turns = []
 
     system_prompt = assemble_system_prompt(
-        profile_doc, memories=recalled, projects=projects, skills=active_skills
+        profile_doc, memories=recalled, projects=projects, skills=active_skills,
+        connected_skills_block=connected_skills.prompt_block(),
     )
     messages = [{"role": "system", "content": system_prompt}]
     # Research tier 4 (MCP Nervous System — read-only catalog): only when user
@@ -761,6 +763,32 @@ async def skills_run(skill_id: str, body: SkillRunRequest, user=Depends(_verify_
 @router.delete("/skills/{skill_id}")
 async def skills_delete(skill_id: str, user=Depends(_verify_token)):
     return await skill_service.delete_skill(user.get("uid"), skill_id)
+
+
+# ── Connected skills: specialized expert agents Andrés can CONSULT on demand ───
+# Not sandboxed code, not Andrés' memory — invocable experts that answer WITH
+# attribution + their own evidence tags (first: the Enonic 'Red Cross' agent).
+
+class ConnectedConsultRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=2000)
+    lang: str = Field("en", pattern=r"^(en|es|no)$")
+
+
+@router.get("/connected-skills")
+async def connected_skills_list(user=Depends(_verify_token)):
+    """List the specialized expert agents Andrés can consult, with availability."""
+    return {"skills": connected_skills.list_connected()}
+
+
+@router.post("/connected-skills/{skill_id}/consult")
+async def connected_skills_consult(skill_id: str, body: ConnectedConsultRequest,
+                                   http_request: Request, user=Depends(_verify_token)):
+    """Andrés consults a connected expert; returns its cited, evidence-tagged
+    answer under an attribution envelope (knowledge stays the expert's, not his)."""
+    return await connected_skills.consult(
+        skill_id, body.question, body.lang,
+        request_headers=dict(http_request.headers),
+    )
 
 
 # ── V5: Personality Capsule + identity history (user-initiated, reversible) ────

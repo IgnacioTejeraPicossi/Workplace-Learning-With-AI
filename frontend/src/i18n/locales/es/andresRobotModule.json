@@ -354,6 +354,17 @@
         "blocked": "Bloqueadas",
         "runs": "Ejecuciones"
       },
+      "connected": {
+        "title": "Habilidades conectadas (expertos especializados)",
+        "intro": "Agentes expertos externos que Andrés puede consultar bajo demanda. No son su memoria ni su identidad — invoca uno cuando una tarea requiere su experiencia y atribuye la respuesta, con sus etiquetas de evidencia, a la habilidad.",
+        "available": "disponible",
+        "unavailable": "sin conexión",
+        "askPlaceholder": "Haz una pregunta al experto…",
+        "consult": "Consultar",
+        "sources": "Fuentes",
+        "evidence": "Estado de evidencia",
+        "mockNote": "Respuesta mock sin conexión del experto (sin LLM configurado) — la estructura es representativa."
+      },
       "proposeTitle": "Proponer una habilidad",
       "taskPlaceholder": "Describe una tarea para que Andrés la esboce…",
       "draft": "Esbozar con IA",

@@ -354,6 +354,17 @@
         "blocked": "Blocked",
         "runs": "Runs"
       },
+      "connected": {
+        "title": "Connected skills (specialized experts)",
+        "intro": "External expert agents Andrés can consult on demand. They are not his memory or identity — he invokes one when a task needs its expertise and attributes the answer, with its evidence tags, to the skill.",
+        "available": "available",
+        "unavailable": "offline",
+        "askPlaceholder": "Ask the expert a question…",
+        "consult": "Consult",
+        "sources": "Sources",
+        "evidence": "Evidence status",
+        "mockNote": "Offline mock answer from the expert (no LLM configured) — structure is representative."
+      },
       "proposeTitle": "Propose a skill",
       "taskPlaceholder": "Describe a task for Andrés to draft…",
       "draft": "Draft with AI",

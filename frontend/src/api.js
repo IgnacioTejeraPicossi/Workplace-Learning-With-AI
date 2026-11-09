@@ -321,6 +321,13 @@ export async function runAndresSkill(skillId, input) {
 export async function deleteAndresSkill(skillId) {
   return apiCall(`/api/andres/skills/${skillId}`, "DELETE");
 }
+// Andrés — connected skills (specialized expert agents he can consult on demand)
+export async function getAndresConnectedSkills() {
+  return apiCall("/api/andres/connected-skills", "GET");
+}
+export async function consultAndresConnectedSkill(skillId, question, lang) {
+  return apiCall(`/api/andres/connected-skills/${skillId}/consult`, "POST", { question, lang });
+}
 // Andrés V5 — Personality Capsule, identity history, developmental initiative
 export async function exportAndresCapsule() {
   return apiCall("/api/andres/capsule/export", "GET");

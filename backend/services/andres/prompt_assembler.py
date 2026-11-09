@@ -62,6 +62,7 @@ def assemble_system_prompt(
     memories: list = None,
     projects: list = None,
     skills: list = None,
+    connected_skills_block: str = "",
 ) -> str:
     identity = profile.get("identity", {})
     disposition = profile.get("simulated_disposition", {})
@@ -80,6 +81,7 @@ def assemble_system_prompt(
         f"Traits (0-100): {traits_str}\n\n"
         f"{_projects_block(projects or [])}"
         f"{_skills_block(skills or [])}"
+        f"{connected_skills_block or ''}"
         f"{_memories_block(memories or [])}"
         "[SIMULATED DISPOSITION]\n"
         "This is a computational state, NOT proof of feeling. Let it colour tone,"

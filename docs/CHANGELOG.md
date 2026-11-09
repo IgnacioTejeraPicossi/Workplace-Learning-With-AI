@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.47.0] - 2026-11-09
+
+### Andrés the Robot — connected skills (consult a specialized expert agent) + Enonic Red Cross as the first one
+
+Andrés gains a new, honest capability: **connected skills** — external specialized expert agents he
+can **consult on demand**, distinct from his sandboxed Python skill library and, per his own framing,
+**neither his identity nor his memory**. The first connected skill is the **Enonic 'Red Cross'** agent.
+
+- **Backend** — `backend/services/andres/connected_skills.py` (registry + `list_connected()` with live
+  availability + `consult(skill_id, question, lang)` that calls the Enonic Red Cross `answer()`
+  **in-process** and returns its cited, evidence-tagged response under an **attribution envelope**;
+  `prompt_block()` makes Andrés aware he can consult it, with a honesty rail — *never present the
+  expert's knowledge as your own, attribute it and keep its evidence tags*). Router: `GET
+  /api/andres/connected-skills`, `POST /api/andres/connected-skills/{id}/consult`
+  (`backend/routers/andres_robot.py`); the connected-skills awareness block is threaded into Andrés'
+  system prompt (`prompt_assembler.assemble_system_prompt(..., connected_skills_block=…)`).
+- **Frontend** — `frontend/src/andres-robot/Skills.jsx` gains a **Connected Skills** section at the top:
+  the Enonic Red Cross card with availability, a consult box, and the expert's answer rendered with its
+  evidence-level badges, sources, evidence status, an attribution note and an offline-mock note. Full
+  EN/NO/ES i18n (`andresRobotModule.skills.connected.*`). API: `getAndresConnectedSkills` /
+  `consultAndresConnectedSkill` in `frontend/src/api.js`.
+- **Tests** — `backend/tests/test_andres_connected_skills.py` (4 offline: registry + availability,
+  attributed consult preserving the expert's grounded shape, 404/400 error paths, prompt-awareness
+  honesty rail). Frontend `npm run build` passes.
+
+---
+
 ## [1.46.0] - 2026-11-09
 
 ### New Item Agent — Enonic 'Red Cross' (grounded project-knowledge & testing assistant, V1)
