@@ -17,11 +17,11 @@ from typing import Any, Dict, List, Optional
 
 try:
     from backend.services.enonic_red_cross import (
-        answer, knowledge, test_catalog, project_context, health,
+        answer, knowledge, test_catalog, project_context, health, sprints,
     )
 except ImportError:  # pragma: no cover
     from services.enonic_red_cross import (  # type: ignore
-        answer, knowledge, test_catalog, project_context, health,
+        answer, knowledge, test_catalog, project_context, health, sprints,
     )
 
 router = APIRouter(prefix="/api/enonic-red-cross")
@@ -52,14 +52,15 @@ def knowledge_endpoint() -> Dict[str, Any]:
     return {"count": len(items), "knowledge": items}
 
 
-@router.get("/test-catalog", summary="Seed Sprint-7 test cases (observations, not official steps)")
+@router.get("/test-catalog", summary="Seed test cases (observations, not official steps)")
 def test_catalog_endpoint(
     query: str = Query("", max_length=200, description="Match id / title / note"),
     persona: str = Query("", description="Filter by persona (Sluttbruker / Redaktør)"),
     result: str = Query("", description="Filter by result (pass/fail/partial/blocked)"),
+    sprint: str = Query("", max_length=8, description="Filter by sprint (e.g. 7)"),
 ) -> Dict[str, Any]:
-    items = test_catalog(query=query, persona=persona, result=result)
-    return {"count": len(items), "cases": items,
+    items = test_catalog(query=query, persona=persona, result=result, sprint=sprint)
+    return {"count": len(items), "cases": items, "sprints": sprints(),
             "disclaimer": "Observations at test time, not imported official steps or live status."}
 
 

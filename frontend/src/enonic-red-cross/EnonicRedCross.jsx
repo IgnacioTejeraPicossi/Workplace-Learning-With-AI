@@ -124,13 +124,14 @@ function Overview({ t, onOpenAssistant }) {
 }
 
 // ─── Tab: Assistant (grounded chat) ───────────────────────────────────────────
-function Assistant({ t, lang }) {
+function Assistant({ t, lang, caseAsk }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState(null);
   const [error, setError] = useState('');
   const [history, setHistory] = useState([]);
   const taRef = useRef(null);
+  const lastNonce = useRef(null);
 
   const ask = useCallback(async (q) => {
     const message = (q ?? input).trim();
@@ -151,6 +152,15 @@ function Assistant({ t, lang }) {
     } catch (e) { setError(t('enonicRedCrossModule.assistant.error')); }
     finally { setLoading(false); }
   }, [input, loading, lang, history, t]);
+
+  // Cross-tab bridge: a case clicked in the Test Catalog arrives as {text, nonce}
+  // and is asked once (nonce guards against re-firing on unrelated re-renders).
+  useEffect(() => {
+    if (caseAsk && caseAsk.nonce !== lastNonce.current) {
+      lastNonce.current = caseAsk.nonce;
+      ask(caseAsk.text);
+    }
+  }, [caseAsk, ask]);
 
   const onKey = (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ask(); } };
   const suggestions = ['q1', 'q2', 'q3', 'q4'];

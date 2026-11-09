@@ -663,11 +663,25 @@ def knowledge() -> List[Dict[str, Any]]:
             for c in KNOWLEDGE_BASE]
 
 
-def test_catalog(query: str = "", persona: str = "", result: str = "") -> List[Dict[str, Any]]:
-    """The seed Sprint-7 catalog (observations), filterable by text/persona/result."""
+def sprints() -> List[str]:
+    """Distinct sprints present in the catalog (newest first). Defaults to '7'."""
+    vals = {str(c.get("sprint", "7")) for c in TEST_CATALOG}
+    return sorted(vals, key=lambda s: (len(s), s), reverse=True)
+
+
+def test_catalog(query: str = "", persona: str = "", result: str = "",
+                 sprint: str = "") -> List[Dict[str, Any]]:
+    """The seed catalog (observations), filterable by text/persona/result/sprint.
+
+    Cases default to Sprint 7; future cases (Sprint 5/6/8…) just carry their own
+    'sprint' key and the filter picks them up with no other change.
+    """
     q = (query or "").strip().lower()
     out = []
     for c in TEST_CATALOG:
+        c_sprint = str(c.get("sprint", "7"))
+        if sprint and c_sprint != str(sprint):
+            continue
         if persona and c["persona"].lower() != persona.lower():
             continue
         if result and c["result"] != result.lower():
@@ -675,7 +689,8 @@ def test_catalog(query: str = "", persona: str = "", result: str = "") -> List[D
         if q and q not in c["id"] and q not in c["title"].lower() and q not in c["note"].lower():
             continue
         meta = _RESULT_META[c["result"]]
-        out.append({**c, "result_label": meta["label"], "result_emoji": meta["emoji"]})
+        out.append({**c, "sprint": c_sprint,
+                    "result_label": meta["label"], "result_emoji": meta["emoji"]})
     return out
 
 
