@@ -219,6 +219,44 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 **Optional environment variables for Red Cross Web QA**:
 - `ADO_PAT` (or `AZURE_DEVOPS_PAT`) — Azure DevOps Personal Access Token with `Work Items: Read & Write` scope. When set, `POST /api/qa/security/findings/{id}/dispatch-ado` creates a real ADO work item via the REST API; when absent, dispatch falls back to a deterministic mock so the workshop UX remains green. Never commit the value — read from `.env` only.
 
+### Enonic 'Red Cross' (1.46.0 · November 2026 — grounded project-knowledge & testing assistant)
+
+A project **knowledge and testing assistant** for the Norwegian Red Cross **Enonic XP 8 / Content Studio 6** installation. Found in the sidebar under **Item Agents → Enonic Red Cross**, directly below Humanizing AI. It helps the team (and anyone new to this installation) understand the platform and the project, and prepare, explain and troubleshoot its tests. It is the **knowledge & guidance** companion to the **Red Cross Web QA Agent**, which remains the test *execution and reporting* workspace — this agent never edits the CMS, publishes, runs tests or writes to Azure DevOps.
+
+Built from a ChatGPT handoff plan, right-sized to the pattern the app's other agents shipped with (self-sim-reality / cyber / EA-brain): a **curated, source-credited knowledge base + grounded chat** with offline mock fallback, rather than a full document-ingestion pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
+
+**Epistemic discipline (non-negotiable).** Every claim is tagged by evidence level so you always know how solid it is: **platform-doc** (Enonic product docs) · **project-fact** (confirmed about this install) · **project-observation** (a dated, environment-specific result) · **test-recipe** (a how-to) · **guidance** (a general suggestion). The assistant never presents speculation as fact, never claims to have opened Content Studio or executed a test, never invents official test steps or Azure DevOps ids, and treats a past "Passed/Active" as a dated observation, not today's status.
+
+**5 tabs** (`frontend/src/enonic-red-cross/EnonicRedCross.jsx`):
+
+| # | Tab | Purpose |
+|---|-----|---------|
+| 1 | 🧭 Overview | What the agent is, the evidence legend, and its limits |
+| 2 | 💬 Assistant | Grounded, cited chat about the platform or the installation and how to test it. Every answer returns a short answer, evidence sections (each tagged + sourced), an evidence status (supported / partial / insufficient), missing-information list and a suggested follow-up. Offline mock fallback when no LLM is reachable |
+| 3 | 📚 Knowledge | The curated facts the assistant may cite, each tagged by evidence level with its source |
+| 4 | 🗂️ Test Catalog | The imported test cases, filterable by text / persona (Sluttbruker / Redaktør) / result / sprint. **Click a case id** to jump to the Assistant with "How should I test case N?" pre-asked |
+| 5 | 📍 Project Context | Environment URLs, architecture, Azure DevOps coordinates and the "known unknowns" still to collect |
+
+**Test catalog.** Imported from the Azure DevOps Test Plan as dated **observations** (recorded outcomes), not official step definitions or live status. Results map: Passed → `pass` ✅, Failed → `fail` ❌, Blocked → `blocked` ⛔, **Active (not yet run) → `planned`** 🗓️, plus `partial` 🟡 where a case passed with a caveat. Because the same test case can belong to several sprint suites, the catalog is keyed by **(case id, sprint)** — the same id may appear once per sprint. Currently seeded with **Sprint 5 (152) + Sprint 6 (58) + Sprint 7 (115) = 325 test points**. The cases run in a hands-on browser session carry richer per-step notes (a few go deeper than the official outcome). Since the Red Cross keeps Azure DevOps private, sprint data is transcribed from screenshots rather than fetched live.
+
+**Backend:**
+- Service: `backend/services/enonic_red_cross.py` — RAG-lite over a curated **17-chunk knowledge base** (Enonic platform docs + verified install facts + dated observations + test recipes) + the **test catalog** + `retrieve()` (exact test-id first, then keyword) + `answer()` via the shared `ask_ai_unified` LLM with a trilingual mock fallback (CI-safe).
+- Router: `backend/routers/enonic_red_cross.py` — `/api/enonic-red-cross/*`: `GET /health`, `GET /knowledge`, `GET /test-catalog` (filters: query / persona / result / sprint; returns available sprints), `GET /project-context`, `POST /chat`.
+
+**Frontend** (`frontend/src/enonic-red-cross/EnonicRedCross.jsx`): light-theme, Red-Cross-red accent, inline-style tabs; evidence-level + result badges; cross-tab bridge from the catalog to the Assistant. Full EN / NO / ES i18n (`enonicRedCrossModule.json`).
+
+**How to use it**:
+1. Backend from repo root: `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000`
+2. Frontend: `cd frontend && npm start` → `http://localhost:3000`
+3. Sidebar → **Item Agents** → ➕ **Enonic Red Cross**
+4. Ask a question in **Assistant**, browse the **Knowledge** base, search the **Test Catalog** (filter by sprint), or review **Project Context**. No separate API key — it uses the app's shared LLM config (API Config).
+
+**User guide:** [docs/enonic-red-cross-help.md](docs/enonic-red-cross-help.md) (also `.es.md` / `.no.md`, and in the in-app README Viewer). Implementation plan + V2 roadmap: [docs/enonic-red-cross-agent-plan.md](docs/enonic-red-cross-agent-plan.md).
+
+**Validation status**: 8 offline contract tests (`backend/tests/test_enonic_red_cross_contracts.py`) — retrieval grounding incl. exact test-id, KB/catalog well-formedness (uniqueness per (id, sprint)), evidence-level/status clamping, and both the mock and the LLM-parse chat paths. Frontend `npm run build` succeeds.
+
+**V2 (deferred, in the plan)**: document upload → approve → index ingestion, Mongo persistence (case / point / result separate), CSV/JSON test import, embeddings retrieval, and read-only Enonic / Azure DevOps connectors with a permissioned handoff to the QA runner.
+
 ### Self-Simulating Reality Agent (1.36.0 · August 2026 — V0+V1+V2+V3)
 
 A serious-toned, epistemically disciplined companion for the most speculative idea on the roadmap: the proposition that observers, minds or consciousness participate in constructing the universe they experience. The anchor framework is **Observer Patch Holography (OPH)** by Bernhard Mueller et al. The agent's guiding phrase — *"I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination"* — is non-negotiable. Every claim passes through a 5-level epistemic classifier (`established / mainstream / speculative / philosophy / metaphor / unsupported`) before it leaves.
