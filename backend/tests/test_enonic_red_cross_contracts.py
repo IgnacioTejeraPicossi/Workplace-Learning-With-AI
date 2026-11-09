@@ -48,9 +48,9 @@ def test_knowledge_base_is_wellformed():
 def test_catalog_seed_and_filters():
     cat = svc.test_catalog()
     assert len(cat) >= 15
-    # ids unique, every result in the known palette
-    ids = [c["id"] for c in cat]
-    assert len(ids) == len(set(ids))
+    # unique per (id, sprint) — the same test case can belong to several sprint suites
+    keys = [(c["id"], c["sprint"]) for c in cat]
+    assert len(keys) == len(set(keys))
     assert all(c["result"] in {"pass", "fail", "partial", "blocked", "planned"} for c in cat)
     # the 29376 CTA-button case is recorded as a FAIL (feature not deployed)
     f = svc.test_catalog(result="fail")
@@ -64,12 +64,14 @@ def test_catalog_seed_and_filters():
     s6 = svc.test_catalog(sprint="6")
     s7 = svc.test_catalog(sprint="7")
     assert len(s5) + len(s6) + len(s7) == len(cat)  # every case has a sprint
-    assert len(s5) == 152 and len(s6) == 58 and len(s7) == 23
+    assert len(s5) == 152 and len(s6) == 58 and len(s7) == 115
     assert svc.test_catalog(sprint="999") == []
     assert all(c["sprint"] == "6" for c in s6)
     # imported outcomes: Sprint 5 has 7 recorded failures, Sprint 6 has 2
     assert len(svc.test_catalog(sprint="5", result="fail")) == 7
     assert len(svc.test_catalog(sprint="6", result="fail")) == 2
+    # Sprint 7 (complete) has many not-yet-run 'Active' cases → 'planned'
+    assert len(svc.test_catalog(sprint="7", result="planned")) >= 40
 
 
 def test_health_and_accessors():

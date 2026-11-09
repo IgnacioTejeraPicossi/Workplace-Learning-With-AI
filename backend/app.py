@@ -2568,6 +2568,7 @@ _HELP_DOCS = [
     "docs/andres-robot-help.md",
     "docs/self-sim-reality-help.md",
     "docs/red-cross-qa-help.md",
+    "docs/enonic-red-cross-help.md",
     "docs/api-config-help.md",
     "docs/ai-study-buddy.md",
     "docs/architecture.md",

@@ -37,11 +37,14 @@ pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
   more than one sprint is present. **Cross-tab bridge**: clicking a case id in the catalog opens the
   Assistant pre-asked "How should I test case N?". Added a `planned` 🗓️ status for defined-but-not-run
   cases.
-- **Sprint 5 + 6 imported** from the Azure DevOps Test Plan outcomes (transcribed from screenshots —
-  recorded Passed/Failed, dated observations not live status): Sprint 5 = 152 cases (Redaktør 68 +
-  Sluttbruker 84, 7 failures ≈ 95% passed); Sprint 6 = 58 cases (Redaktør 31 + Sluttbruker 27, 2
-  failures ≈ 96% passed). Shared case id 29132 re-attributed to its real Sprint-6 suite to keep ids
-  unique. Catalog now holds **233 cases** across Sprint 5 + 6 + 7.
+- **Sprints 5, 6 and the complete 7 imported** from the Azure DevOps Test Plan outcomes (transcribed
+  from screenshots — recorded Passed/Failed/Blocked/Active, dated observations not live status):
+  Sprint 5 = 152 (Redaktør 68 + Sluttbruker 84, 7 fail); Sprint 6 = 58 (Redaktør 31 + Sluttbruker 27,
+  2 fail); **Sprint 7 = 115** (Redaktør 45 + Sluttbruker 70; 53 not-yet-run 'Active' → `planned`, 6
+  blocked (skjema not merged), 3 fail). Catalog now holds **325 test points**. Catalog model is now
+  keyed by **(id, sprint)** since the same test case is shared across sprint suites (e.g. 29132 /
+  29139-29150 appear in Sprint 6 and 7); the 23 cases this session ran in-browser keep their richer
+  per-step notes (7 of them carry a session finding deeper than the official outcome).
 - **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
   retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
   mock and LLM-parse chat paths). Frontend `npm run build` passes.
