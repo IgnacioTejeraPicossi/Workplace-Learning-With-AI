@@ -48,7 +48,9 @@ pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
 - **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
   retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
   mock and LLM-parse chat paths). Frontend `npm run build` passes.
-- **Docs** — `docs/enonic-red-cross-agent-plan.md` (improved plan + V2 roadmap).
+- **Docs** — `docs/enonic-red-cross-agent-plan.md` (improved plan + V2 roadmap). **Trilingual in-app
+  help** `docs/enonic-red-cross-help.md` (+ `.es.md` / `.no.md`), wired into the README Viewer dropdown
+  (`ReadmeViewer.jsx`) and the AI Study Companion help-search index (`_HELP_DOCS` in `app.py`).
 
 ---
 
