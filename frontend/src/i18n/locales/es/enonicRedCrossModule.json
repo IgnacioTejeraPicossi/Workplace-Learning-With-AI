@@ -72,7 +72,10 @@
       "searchPlaceholder": "Buscar id, título o nota…",
       "persona": "Persona",
       "result": "Resultado",
+      "sprint": "Sprint",
       "all": "Todos",
+      "askTemplate": "¿Cómo debo probar el caso {{id}}?",
+      "askTitle": "Pregunta al asistente cómo probar este caso",
       "colId": "ID",
       "colTitle": "Título",
       "colPersona": "Persona",
@@ -85,7 +88,8 @@
         "pass": "Aprobado",
         "fail": "Fallido",
         "partial": "Parcial",
-        "blocked": "Bloqueado"
+        "blocked": "Bloqueado",
+        "planned": "Planificado"
       }
     },
     "projectContext": {

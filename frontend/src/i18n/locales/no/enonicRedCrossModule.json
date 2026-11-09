@@ -72,7 +72,10 @@
       "searchPlaceholder": "Søk id, tittel eller notat…",
       "persona": "Persona",
       "result": "Resultat",
+      "sprint": "Sprint",
       "all": "Alle",
+      "askTemplate": "Hvordan bør jeg teste sak {{id}}?",
+      "askTitle": "Spør assistenten hvordan denne saken testes",
       "colId": "ID",
       "colTitle": "Tittel",
       "colPersona": "Persona",
@@ -85,7 +88,8 @@
         "pass": "Bestått",
         "fail": "Feilet",
         "partial": "Delvis",
-        "blocked": "Blokkert"
+        "blocked": "Blokkert",
+        "planned": "Planlagt"
       }
     },
     "projectContext": {

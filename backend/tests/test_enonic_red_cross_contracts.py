@@ -51,13 +51,18 @@ def test_catalog_seed_and_filters():
     # ids unique, every result in the known palette
     ids = [c["id"] for c in cat]
     assert len(ids) == len(set(ids))
-    assert all(c["result"] in {"pass", "fail", "partial", "blocked"} for c in cat)
+    assert all(c["result"] in {"pass", "fail", "partial", "blocked", "planned"} for c in cat)
     # the 29376 CTA-button case is recorded as a FAIL (feature not deployed)
     f = svc.test_catalog(result="fail")
     assert "29376" in [c["id"] for c in f]
     # persona filter works
     red = svc.test_catalog(persona="Redaktør")
     assert red and all(c["persona"] == "Redaktør" for c in red)
+    # sprint support: all seed cases are Sprint 7; filtering an absent sprint is empty
+    assert "7" in svc.sprints()
+    assert len(svc.test_catalog(sprint="7")) == len(cat)
+    assert svc.test_catalog(sprint="999") == []
+    assert all(c["sprint"] == "7" for c in cat)
 
 
 def test_health_and_accessors():

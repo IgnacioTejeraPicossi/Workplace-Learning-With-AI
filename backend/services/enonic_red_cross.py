@@ -417,6 +417,7 @@ _RESULT_META = {
     "fail":    {"label": "Failed",  "emoji": "❌"},
     "partial": {"label": "Partial", "emoji": "🟡"},
     "blocked": {"label": "Blocked", "emoji": "⛔"},
+    "planned": {"label": "Planned", "emoji": "🗓️"},  # defined but not yet executed
 }
 
 _STOPWORDS = {

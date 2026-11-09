@@ -42,6 +42,7 @@ const RESULT_META = {
   fail:    { color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' },
   partial: { color: '#b45309', bg: '#fffbeb', border: '#fde68a' },
   blocked: { color: '#475569', bg: '#f1f5f9', border: '#cbd5e1' },
+  planned: { color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
 };
 
 const isHttpUrl = (s) => {
@@ -295,11 +296,13 @@ function Knowledge({ t }) {
 }
 
 // ─── Tab: Test Catalog ────────────────────────────────────────────────────────
-function TestCatalog({ t }) {
+function TestCatalog({ t, onAskCase }) {
   const [cases, setCases] = useState(null);
   const [q, setQ] = useState('');
   const [persona, setPersona] = useState('');
   const [result, setResult] = useState('');
+  const [sprint, setSprint] = useState('');
+  const [sprintOpts, setSprintOpts] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -307,10 +310,12 @@ function TestCatalog({ t }) {
     if (q) params.set('query', q);
     if (persona) params.set('persona', persona);
     if (result) params.set('result', result);
+    if (sprint) params.set('sprint', sprint);
     fetch(`${API_BASE}/api/enonic-red-cross/test-catalog?${params.toString()}`).then((r) => r.json())
-      .then((d) => { if (alive) setCases(d.cases || []); }).catch(() => { if (alive) setCases([]); });
+      .then((d) => { if (alive) { setCases(d.cases || []); if (Array.isArray(d.sprints)) setSprintOpts(d.sprints); } })
+      .catch(() => { if (alive) setCases([]); });
     return () => { alive = false; };
-  }, [q, persona, result]);
+  }, [q, persona, result, sprint]);
 
   const sel = { border: `1px solid ${LINE}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#fff' };
   return (
@@ -326,9 +331,15 @@ function TestCatalog({ t }) {
         </select>
         <select value={result} onChange={(e) => setResult(e.target.value)} style={sel}>
           <option value="">{t('enonicRedCrossModule.testCatalog.result')}: {t('enonicRedCrossModule.testCatalog.all')}</option>
-          {['pass', 'fail', 'partial', 'blocked'].map((r) =>
+          {['pass', 'fail', 'partial', 'blocked', 'planned'].map((r) =>
             <option key={r} value={r}>{t(`enonicRedCrossModule.testCatalog.results.${r}`)}</option>)}
         </select>
+        {sprintOpts.length > 1 && (
+          <select value={sprint} onChange={(e) => setSprint(e.target.value)} style={sel}>
+            <option value="">{t('enonicRedCrossModule.testCatalog.sprint')}: {t('enonicRedCrossModule.testCatalog.all')}</option>
+            {sprintOpts.map((s) => <option key={s} value={s}>{t('enonicRedCrossModule.testCatalog.sprint')} {s}</option>)}
+          </select>
+        )}
       </div>
 
       {cases === null ? (
@@ -355,7 +366,14 @@ function TestCatalog({ t }) {
                     const m = RESULT_META[c.result] || RESULT_META.blocked;
                     return (
                       <tr key={c.id} style={{ borderBottom: `1px solid ${LINE}` }}>
-                        <td style={{ padding: '10px 12px', fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>{c.id}</td>
+                        <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                          <button onClick={() => onAskCase && onAskCase(c.id)}
+                            title={t('enonicRedCrossModule.testCatalog.askTitle')}
+                            style={{ background: 'none', border: 'none', padding: 0, fontWeight: 700,
+                              color: RED, cursor: 'pointer', textDecoration: 'underline', fontSize: 13 }}>
+                            {c.id}
+                          </button>
+                        </td>
                         <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
                           <span style={{ fontSize: 11, fontWeight: 700, color: m.color, background: m.bg, border: `1px solid ${m.border}`, borderRadius: 999, padding: '2px 8px' }}>
                             {c.result_emoji} {t(`enonicRedCrossModule.testCatalog.results.${c.result}`)}
@@ -443,7 +461,13 @@ const TABS = ['overview', 'assistant', 'knowledge', 'testCatalog', 'projectConte
 export default function EnonicRedCross() {
   const { t, i18n } = useTranslation();
   const [tab, setTab] = useState('overview');
+  const [caseAsk, setCaseAsk] = useState(null);
   const lang = i18n.language;
+
+  const askCase = (id) => {
+    setCaseAsk({ text: t('enonicRedCrossModule.testCatalog.askTemplate', { id }), nonce: Date.now() });
+    setTab('assistant');
+  };
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto', padding: '20px 16px', color: INK,
@@ -466,9 +490,9 @@ export default function EnonicRedCross() {
       </div>
 
       {tab === 'overview' && <Overview t={t} onOpenAssistant={() => setTab('assistant')} />}
-      {tab === 'assistant' && <Assistant t={t} lang={lang} />}
+      {tab === 'assistant' && <Assistant t={t} lang={lang} caseAsk={caseAsk} />}
       {tab === 'knowledge' && <Knowledge t={t} />}
-      {tab === 'testCatalog' && <TestCatalog t={t} />}
+      {tab === 'testCatalog' && <TestCatalog t={t} onAskCase={askCase} />}
       {tab === 'projectContext' && <ProjectContext t={t} />}
     </div>
   );

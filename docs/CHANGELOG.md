@@ -32,6 +32,10 @@ pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
 - **Frontend** — `frontend/src/enonic-red-cross/EnonicRedCross.jsx` (5 tabs: Overview · Assistant
   (grounded, cited chat) · Knowledge · Test Catalog (filterable) · Project Context). Full EN/NO/ES
   i18n (`enonicRedCrossModule.json`). Sidebar + route wired (`enonic-red-cross`).
+- **Multi-sprint ready** — catalog cases carry a `sprint` field (default 7); `/test-catalog` takes a
+  `sprint` filter and returns the available sprints; the Test Catalog tab shows a sprint dropdown once
+  more than one sprint is present (so adding Sprint 5/6/8 cases needs no code change). **Cross-tab
+  bridge**: clicking a case id in the catalog opens the Assistant pre-asked "How should I test case N?".
 - **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
   retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
   mock and LLM-parse chat paths). Frontend `npm run build` passes.

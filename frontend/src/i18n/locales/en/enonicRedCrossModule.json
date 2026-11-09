@@ -72,7 +72,10 @@
       "searchPlaceholder": "Search id, title or note…",
       "persona": "Persona",
       "result": "Result",
+      "sprint": "Sprint",
       "all": "All",
+      "askTemplate": "How should I test case {{id}}?",
+      "askTitle": "Ask the assistant how to test this case",
       "colId": "ID",
       "colTitle": "Title",
       "colPersona": "Persona",
@@ -85,7 +88,8 @@
         "pass": "Passed",
         "fail": "Failed",
         "partial": "Partial",
-        "blocked": "Blocked"
+        "blocked": "Blocked",
+        "planned": "Planned"
       }
     },
     "projectContext": {
