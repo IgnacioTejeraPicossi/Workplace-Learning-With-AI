@@ -271,6 +271,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Self-Correcting Loop router: {e}")
 
+# Enonic 'Red Cross' Agent — grounded project-knowledge & testing assistant (V1)
+try:
+    from backend.routers.enonic_red_cross import router as enonic_red_cross_router
+    app.include_router(enonic_red_cross_router, tags=["Enonic Red Cross"])
+    print("✅ Enonic Red Cross router included successfully")
+except Exception as e:
+    print(f"❌ Error including Enonic Red Cross router: {e}")
+
 # English Mastery AI router (Language Agents group)
 try:
     from backend.routers.english_mentor import router as english_mentor_router
