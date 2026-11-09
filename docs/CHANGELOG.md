@@ -37,9 +37,11 @@ pipeline (deferred to V2 — see `docs/enonic-red-cross-agent-plan.md`).
   more than one sprint is present. **Cross-tab bridge**: clicking a case id in the catalog opens the
   Assistant pre-asked "How should I test case N?". Added a `planned` 🗓️ status for defined-but-not-run
   cases.
-- **Sprint 5 imported** (152 cases: Redaktør 68 + Sluttbruker 84, from the Azure DevOps Test Plan
-  outcomes transcribed from screenshots — recorded Passed/Failed, 7 failures ≈ 95% passed, framed as
-  dated observations not live status). Catalog now holds 176 cases across Sprint 5 + 7.
+- **Sprint 5 + 6 imported** from the Azure DevOps Test Plan outcomes (transcribed from screenshots —
+  recorded Passed/Failed, dated observations not live status): Sprint 5 = 152 cases (Redaktør 68 +
+  Sluttbruker 84, 7 failures ≈ 95% passed); Sprint 6 = 58 cases (Redaktør 31 + Sluttbruker 27, 2
+  failures ≈ 96% passed). Shared case id 29132 re-attributed to its real Sprint-6 suite to keep ids
+  unique. Catalog now holds **233 cases** across Sprint 5 + 6 + 7.
 - **Tests** — `backend/tests/test_enonic_red_cross_contracts.py` (8 offline contract tests:
   retrieval grounding incl. exact test-id, KB/catalog well-formedness, level clamping, both the
   mock and LLM-parse chat paths). Frontend `npm run build` passes.

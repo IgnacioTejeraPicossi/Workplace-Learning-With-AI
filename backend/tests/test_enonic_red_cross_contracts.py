@@ -58,15 +58,18 @@ def test_catalog_seed_and_filters():
     # persona filter works
     red = svc.test_catalog(persona="Redaktør")
     assert red and all(c["persona"] == "Redaktør" for c in red)
-    # multi-sprint support: Sprint 5 (imported) + Sprint 7 (session) both present
-    assert {"5", "7"}.issubset(set(svc.sprints()))
-    s5, s7 = svc.test_catalog(sprint="5"), svc.test_catalog(sprint="7")
-    assert len(s5) + len(s7) == len(cat)            # every case has a sprint
-    assert len(s5) == 152 and len(s7) == 24         # 68 Redaktør + 84 Sluttbruker; Sprint-7 seed
+    # multi-sprint support: Sprint 5, 6 (imported) + Sprint 7 (session) all present
+    assert {"5", "6", "7"}.issubset(set(svc.sprints()))
+    s5 = svc.test_catalog(sprint="5")
+    s6 = svc.test_catalog(sprint="6")
+    s7 = svc.test_catalog(sprint="7")
+    assert len(s5) + len(s6) + len(s7) == len(cat)  # every case has a sprint
+    assert len(s5) == 152 and len(s6) == 58 and len(s7) == 23
     assert svc.test_catalog(sprint="999") == []
-    assert all(c["sprint"] == "5" for c in s5)
-    # Sprint-5 imported outcomes: exactly 7 recorded failures (~95% passed)
+    assert all(c["sprint"] == "6" for c in s6)
+    # imported outcomes: Sprint 5 has 7 recorded failures, Sprint 6 has 2
     assert len(svc.test_catalog(sprint="5", result="fail")) == 7
+    assert len(svc.test_catalog(sprint="6", result="fail")) == 2
 
 
 def test_health_and_accessors():

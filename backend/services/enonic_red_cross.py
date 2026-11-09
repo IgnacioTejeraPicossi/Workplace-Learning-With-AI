@@ -335,7 +335,7 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
 # OBSERVATIONS of what the team saw, NOT imported official steps or live status.
 # 'result' is the observed outcome at test time; the full Azure DevOps export
 # (official steps + expected results) is still to be imported.
-_FAIL_NOTE = "Recorded Failed in Azure DevOps (Sprint 5); failure reason not captured here."
+_FAIL_NOTE = "Recorded as Failed in Azure DevOps; failure reason not captured in this import."
 
 TEST_CATALOG: List[Dict[str, Any]] = [
     # Sluttbruker (visitor)
@@ -379,9 +379,6 @@ TEST_CATALOG: List[Dict[str, Any]] = [
      "title": "Besøkende bruker knappene nederst i toppbanneret på lokalforeningssiden",
      "note": "FAIL — toppbanner CTA buttons ('Bli frivillig' + 2nd) are not in the deployed frontend; no knapp/CTA field exists. Flag to dev."},
     # Redaktør (editor)
-    {"id": "29132", "persona": "Redaktør", "result": "pass",
-     "title": "Redaktør oppretter en listeside og lister ut innholdet under den",
-     "note": "Listeside with 3 Side children; published tree lists them. (Ingress must be set via CKEDITOR.setData.)"},
     {"id": "29360", "persona": "Redaktør", "result": "pass",
      "title": "Redaktør oppretter distriktsside med samme felter som en lokalforening",
      "note": "Distrikt type offered; TOPPBANNER = Bilde / alt text / Distrikt (CRM) / Lenker til sosiale medier."},
@@ -571,6 +568,72 @@ TEST_CATALOG: List[Dict[str, Any]] = [
     {"id": "28760", "sprint": "5", "persona": "Sluttbruker", "result": "pass", "title": "Skjermleserbruker hører videotittel som er skjult visuelt", "note": ""},
     {"id": "28761", "sprint": "5", "persona": "Sluttbruker", "result": "fail", "title": "Besøkende ser videobeskrivelse under videoen", "note": _FAIL_NOTE},
     {"id": "28762", "sprint": "5", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser videoblokken tilpasset mobilskjerm", "note": ""},
+
+    # ── Sprint 6 - 2026 (plan 28443) — imported from the Azure DevOps Test Plan
+    # outcomes (recorded Passed/Failed; dated observations, not live status).
+    # Redaktør suite 28792 (31) + Sluttbruker suite 28793 (27). 2 Failed (~96% passed).
+    # NB: test case 29132 lives in this sprint's Redaktør suite (shared cases can
+    # appear in several sprints; kept once here to preserve unique ids).
+    # -- Redaktør (28792) --
+    {"id": "29178", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til tallblokk med tittel, ingress og tre tall", "note": ""},
+    {"id": "29179", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør skriver tallverdi med benevning", "note": ""},
+    {"id": "29180", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør får feilmelding når tallverdien ikke starter med et tall", "note": ""},
+    {"id": "29181", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør får feilmelding når tallverdien er negativ", "note": ""},
+    {"id": "29182", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør kan ikke publisere tallblokk uten tallverdi", "note": ""},
+    {"id": "29183", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør kan ikke publisere tallblokk uten stikktittel", "note": ""},
+    {"id": "29184", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør publiserer tall med bare stikktittel og tallverdi", "note": ""},
+    {"id": "29185", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til Se flere-lenke med egen lenketekst", "note": ""},
+    {"id": "29196", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør oppretter ny nyhetsartikkel", "note": ""},
+    {"id": "29197", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør skiller nyhetsartikkel fra fagartikkel i innholdstreet", "note": ""},
+    {"id": "29198", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til innholdsblokker i nyhetsartikkel", "note": ""},
+    {"id": "29199", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør fyller ut byline på nyhetsartikkel", "note": ""},
+    {"id": "29200", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør publiserer nyhetsartikkel uten byline", "note": ""},
+    {"id": "29201", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør ser byline-feltet på fagartikkel", "note": ""},
+    {"id": "29202", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør skrur av byline og publiseringsdato i toppbanneret", "note": ""},
+    {"id": "29203", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør skjuler tilbakelenken i toppbanneret", "note": ""},
+    {"id": "29132", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør oppretter en listeside og lister ut innholdet under den", "note": "Listeside lists its Side children on publish; Ingress must be set via CKEDITOR.setData to persist."},
+    {"id": "29133", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør slår av antall resultater over listen", "note": ""},
+    {"id": "29134", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør slår på sortering for listesiden", "note": ""},
+    {"id": "29136", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger bilde på et innhold og ser raden bytte type", "note": ""},
+    {"id": "29137", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør publiserer en endret side og ser raden endres ute", "note": ""},
+    {"id": "29138", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør åpner en listeside uten publisert innhold under seg", "note": ""},
+    {"id": "29282", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til gjenbruksblokk med innhold som har blokker", "note": ""},
+    {"id": "29283", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør ser endring i gjenbrukt innhold på siden som gjenbruker det", "note": ""},
+    {"id": "29284", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør ser blokker fra innhold som gjenbrukes i flere ledd", "note": ""},
+    {"id": "29285", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør lar en side gjenbruke seg selv uten at blokkene gjentas", "note": ""},
+    {"id": "29286", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til gjenbruksblokk med fragment", "note": ""},
+    {"id": "29287", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør kan ikke markere gjenbrukt fragment som egen komponent i sideredigereren", "note": ""},
+    {"id": "29288", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør får ikke publisert gjenbruksblokk uten valgt innhold", "note": ""},
+    {"id": "29293", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør gir delen «Blokklistevisning» egne blokker som erstatter innholdets blokker", "note": ""},
+    {"id": "29294", "sprint": "6", "persona": "Redaktør", "result": "pass", "title": "Redaktør fjerner egne blokker fra delen «Blokklistevisning» og får tilbake innholdets blokker", "note": ""},
+    # -- Sluttbruker (28793) --
+    {"id": "29186", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser tre tall side om side på stor skjerm", "note": ""},
+    {"id": "29187", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser tallene under hverandre på mobil", "note": ""},
+    {"id": "29188", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser fjerde tall på en ny rad", "note": ""},
+    {"id": "29189", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser mellomrom mellom tusener i store tall", "note": ""},
+    {"id": "29190", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser desimaltall med komma", "note": ""},
+    {"id": "29191", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser benevningen mindre og i fet skrift etter tallet", "note": ""},
+    {"id": "29192", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser lenke med blokkens tittel når lenketeksten er tom", "note": ""},
+    {"id": "29193", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser «Les mer» når både lenketeksten og tittelen er tomme", "note": ""},
+    {"id": "29204", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser fotokreditering under toppbildet", "note": ""},
+    {"id": "29205", "sprint": "6", "persona": "Sluttbruker", "result": "fail", "title": "Besøkende ser toppbilde uten fotokreditering når Copyright er tomt", "note": _FAIL_NOTE},
+    {"id": "29139", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser ti rader og blar til neste side", "note": ""},
+    {"id": "29140", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende deler lenken til side to", "note": ""},
+    {"id": "29141", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende åpner et sidetall utenfor rekkevidde", "note": ""},
+    {"id": "29142", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser en listeside med bare ett treff", "note": ""},
+    {"id": "29143", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende sorterer listen alfabetisk", "note": ""},
+    {"id": "29144", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende uten JavaScript blar og sorterer i listen", "note": ""},
+    {"id": "29145", "sprint": "6", "persona": "Sluttbruker", "result": "fail", "title": "Besøkende på mobil ser antall resultater og sortering på samme linje", "note": _FAIL_NOTE},
+    {"id": "29146", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende på mobil blar i listen", "note": ""},
+    {"id": "29147", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende betjener pagineringen med tastatur", "note": ""},
+    {"id": "29148", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Skjermleserbruker hører hvilken side hen står på", "note": ""},
+    {"id": "29149", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser rader med og uten bilde i samme liste", "note": ""},
+    {"id": "29150", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Listesiden passerer en automatisk tilgjengelighetssjekk", "note": ""},
+    {"id": "29289", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser gjenbrukte blokker som en del av blokkene på siden", "note": ""},
+    {"id": "29290", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser tabell fra gjenbrukt innhold", "note": ""},
+    {"id": "29291", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser fragment mellom blokkene på siden", "note": ""},
+    {"id": "29292", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser siden uten gjenbrukt innhold som ikke er publisert", "note": ""},
+    {"id": "29295", "sprint": "6", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser egne blokker fra et fragment av delen «Blokklistevisning»", "note": ""},
 ]
 
 _RESULT_META = {
