@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.47.1] - 2026-11-09
+
+### Andrés — second connected skill: AGI Progress Hub expert
+
+Andrés' connected-skills roster grows to two, proving the "one registry entry + one `consult()` branch"
+extensibility. The **AGI Progress Hub** gains a grounded consult surface it never had.
+
+- **Backend** — `backend/services/agi_consult.py`: a grounded Q&A (`answer(question, lang)`) over a
+  curated **17-chunk** knowledge base that mirrors the Hub's own content — the full **Homo-vs-AI
+  Activity Matrix** (10 testing activities × human/AI/hybrid verdicts + rationale + confidence, from
+  `homoVsAi.activities.*`) plus the Hub's framing principles (verdicts are a snapshot not dogma;
+  human+AI pairing; tracker purpose; possible-endings & benefits held with an honest counterpoint).
+  RAG-lite retrieval + shared LLM + trilingual mock fallback, same shape as the Enonic expert. Its own
+  evidence palette (`workshop-verdict | principle | tracker | scenario | benefit | guidance`).
+- **Wiring** — registered as the `agi-progress` connected skill in
+  `backend/services/andres/connected_skills.py` (registry entry + `consult()` branch + availability);
+  no new endpoints needed. Frontend `Skills.jsx` gained colors for the AGI evidence levels; the
+  Connected Skills UI is generic so the second expert renders with no other change.
+- **Tests** — `test_andres_connected_skills.py` extended (now 5): both experts listed + available, and
+  an AGI consult returns a grounded, evidence-tagged answer. Frontend `npm run build` passes.
+
+---
+
 ## [1.47.0] - 2026-11-09
 
 ### Andrés the Robot — connected skills (consult a specialized expert agent) + Enonic Red Cross as the first one
