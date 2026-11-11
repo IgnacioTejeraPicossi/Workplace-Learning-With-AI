@@ -1,6 +1,6 @@
 # 🤖 Plataforma de Aprendizaje Laboral con IA
 
-**Workplace Learning With AI (WLWAI)** es un proyecto de portafolio centrado en **pruebas automáticas, validación asistida por IA, flujos de trabajo con agentes y experimentación de producto habilitada por LLM**. Combina FastAPI, React, MCP, Postman y pipelines de IA estructurados para explorar cómo los sistemas de IA modernos pueden probarse, depurarse, integrarse y mejorarse en escenarios reales. (Test Manager/AI Test/Automatic test)
+**Workplace Learning With AI (WLWAI)** es un proyecto de portafolio centrado en **pruebas automáticas, validación asistida por IA, flujos de trabajo con agentes y experimentación de producto habilitada por LLM**. Combina FastAPI, React, MCP, Postman y pipelines de IA estructurados para explorar cómo los sistemas de IA modernos pueden probarse, depurarse, integrarse y mejorarse en escenarios reales. (Test Manager/AI Test/Automatic testing)
 
 ---
 
