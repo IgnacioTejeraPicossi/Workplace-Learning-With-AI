@@ -706,7 +706,7 @@ Rules:
 2) Distinguish production/active modules (e.g. J-messages Analyzer, Red Cross Web QA Agent, AGI Progress Hub, Robomind Clinic, Cybersecurity) from prototype modules under “Future Item Agents” or “Web Lab V0”.
 3) Style: concise, friendly, structured (short bullets when listing features). Offer 1–3 concrete next actions inside WLWAI.
 4) At the very end of your response, when one or more modules are relevant, output a valid JSON array after `ACTIONS:` using exact module targets from the catalog, for example:
-ACTIONS:
+   ACTIONS:
 [{"type": "NAVIGATE", "target": "red-cross-web-qa"}, {"type": "NAVIGATE", "target": "agi-progress"}]
 """.strip()
 

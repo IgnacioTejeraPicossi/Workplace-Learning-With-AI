@@ -39,13 +39,13 @@ class AGIItem(BaseModel):
 DEFAULT_DATA: List[AGIItem] = [
     AGIItem(
         model="GPT-4", year=2023,
-        scores={"K":8,"RW":6,"M":4,"R":0,"WM":2,"MS":0,"MR":4,"V":0,"A":0,"S":3},
+            scores={"K":8,"RW":6,"M":4,"R":0,"WM":2,"MS":0,"MR":4,"V":0,"A":0,"S":3},
         total=27,
         notes="Baseline frontier model (2023). Strong knowledge/writing, weak reasoning, no native audio/vision-in-reasoning loop.",
     ),
     AGIItem(
         model="GPT-5", year=2025,
-        scores={"K":9,"RW":10,"M":10,"R":7,"WM":5,"MS":0,"MR":4,"V":4,"A":6,"S":3},
+            scores={"K":9,"RW":10,"M":10,"R":7,"WM":5,"MS":0,"MR":4,"V":4,"A":6,"S":3},
         total=58,
         notes="Major jump in math, reasoning, and multimodality. Per Hendrycks et al. (2025): ~57% AGI score.",
     ),
@@ -228,7 +228,7 @@ async def get_progress():
             if items:
                 # Sort by year then total for stable UI ordering
                 items.sort(key=lambda x: (x.get("year", 0), x.get("total", 0)))
-                return items
+            return items
     except Exception:
         pass
     return DEFAULT_DATA
