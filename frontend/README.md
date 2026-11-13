@@ -155,7 +155,7 @@ It turns feature ideas into working code scaffolds — saving time and standardi
      This feature sends a daily AI-generated learning tip to users.
      ```
 
-🚀 Workflow Example (Developer)
+🚀 Workflow Example (Developer and test)
 - A new idea is added to roadmap: "Daily Learning Tip".
 - Admin sets status to Planned.
 - Developer chooses:
