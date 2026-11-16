@@ -710,6 +710,46 @@ def _openrouter_create_with_fallback(or_client, messages, params, primary_model)
     raise last_exc
 
 
+def _openrouter_stream_with_fallback(or_client, messages, params, primary_model):
+    """Streaming analog of _openrouter_create_with_fallback.
+
+    Yields content chunks, falling back across the free models on a transient
+    404/429 — but only BEFORE any content has been streamed. Once bytes have been
+    yielded the stream can't be restarted on another model (the client already has
+    partial output), so we re-raise; in practice the shared-pool 429 happens at
+    stream-open time, so a pre-first-chunk retry covers it. Re-raises immediately on
+    an auth error (bad key → other models would fail the same way).
+    """
+    candidates = [primary_model] + [m for m in OPENROUTER_FREE_FALLBACKS if m != primary_model]
+    last_exc = None
+    for model_id in candidates:
+        produced = False
+        try:
+            response = or_client.chat.completions.create(
+                model=model_id, messages=messages, stream=True, **params
+            )
+            for chunk in response:
+                if hasattr(chunk, 'choices') and chunk.choices:
+                    delta = chunk.choices[0].delta
+                    content = getattr(delta, 'content', None)
+                    if content:
+                        produced = True
+                        yield content
+            return  # stream finished cleanly
+        except Exception as e:
+            last_exc = e
+            if produced:
+                raise  # already streamed partial content → can't switch models now
+            err = str(e).lower()
+            if any(tok in err for tok in _OPENROUTER_AUTH_MARKERS):
+                raise  # bad/revoked key → other models would fail the same way
+            if any(tok in err for tok in _OPENROUTER_RETRYABLE_MARKERS):
+                continue  # transient/provider issue → try the next free model
+            raise  # real error → surface immediately
+    if last_exc:
+        raise last_exc
+
+
 def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None):
     """
     OpenRouter API function with model selection and optimization.
@@ -1029,28 +1069,14 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         from openai import OpenAI
         or_client = OpenAI(api_key=_or_key, base_url=OPENROUTER_BASE_URL)
 
-        if messages:
-            response = or_client.chat.completions.create(
-                model=model_to_use,
-                messages=messages,
-                stream=True,
-                **params
-            )
-        else:
-            response = or_client.chat.completions.create(
-                model=model_to_use,
-                messages=[{"role": "user", "content": prompt}],
-                stream=True,
-                **params
-            )
-        for chunk in response:
-            if hasattr(chunk, 'choices') and chunk.choices:
-                delta = chunk.choices[0].delta
-                content = getattr(delta, 'content', None)
-                if content:
-                    yield content
+        msgs = messages if messages else [{"role": "user", "content": prompt}]
+        # Free models can be transiently 404/429 on their shared upstream pool → fall
+        # back across diverse free providers (same resilience the non-streaming
+        # ask_openrouter already has), retrying only before any content is streamed.
+        for content in _openrouter_stream_with_fallback(or_client, msgs, params, model_to_use):
+            yield content
     except Exception as e:
-        # Fallback to mock response if API call fails
+        # All free models failed (or an auth/real error) → canned fallback text.
         mock_response = f"Sorry, I encountered an error: {str(e)}. Here's a helpful response instead:\n\n"
         mock_response += f"Regarding your question about '{prompt or 'learning'}', here are some general insights:\n"
         mock_response += "- Micro-lessons are bite-sized learning modules\n"

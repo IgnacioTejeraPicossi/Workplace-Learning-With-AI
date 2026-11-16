@@ -136,3 +136,85 @@ def test_header_openrouter_key_never_used_as_openai_key():
          patch.object(llm, "_saved_api_config", return_value={}):
         cfg = llm.get_api_config_from_headers(headers)
     assert cfg["openai_key"] == ""
+
+
+# ── helper: _openrouter_stream_with_fallback (streaming) ────────────────────
+# Added 2026-11-16: the STREAMING OpenRouter path (used by Micro-lesson, AI Study
+# Buddy chat, …) previously called the single default free model with no fallback,
+# so a transient gemma 429 surfaced as "Sorry, I encountered an error…". These cover
+# the pre-first-chunk fallback that mirrors _openrouter_create_with_fallback.
+
+
+class _FakeStreamClient:
+    """Mimics OpenAI(...).chat.completions.create(stream=True). A model can fail at
+    create() time, on the first stream iteration, or after the first chunk."""
+
+    def __init__(self, fail_on_create=None, fail_on_iter=None, fail_after_first=None, content="hello world"):
+        self.fail_on_create = fail_on_create or {}
+        self.fail_on_iter = fail_on_iter or {}
+        self.fail_after_first = fail_after_first or {}
+        self.content = content
+        self.calls = []
+        self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
+
+    def _create(self, model, messages, stream=False, **params):
+        self.calls.append(model)
+        if model in self.fail_on_create:
+            raise Exception(self.fail_on_create[model])
+        parent = self
+
+        def _chunk(text):
+            return SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content=text))])
+
+        def _gen():
+            if model in parent.fail_on_iter:
+                raise Exception(parent.fail_on_iter[model])
+            for i, w in enumerate(parent.content.split()):
+                yield _chunk(w + " ")
+                if i == 0 and model in parent.fail_after_first:
+                    raise Exception(parent.fail_after_first[model])
+        return _gen()
+
+
+def _collect(gen):
+    return "".join(gen)
+
+
+def test_stream_primary_success_uses_primary():
+    client = _FakeStreamClient(content="one two")
+    out = _collect(llm._openrouter_stream_with_fallback(client, MSGS, {}, OPENROUTER_MODEL))
+    assert "one" in out and "two" in out
+    assert client.calls == [OPENROUTER_MODEL]
+
+
+@pytest.mark.parametrize("where", ["create", "iter"])
+def test_stream_transient_error_falls_back_to_next_free_model(where):
+    err = "Error code: 429 - google/gemma-4-31b-it:free is temporarily rate-limited upstream"
+    kw = {"fail_on_create": {OPENROUTER_MODEL: err}} if where == "create" else {"fail_on_iter": {OPENROUTER_MODEL: err}}
+    client = _FakeStreamClient(content="answer here", **kw)
+    out = _collect(llm._openrouter_stream_with_fallback(client, MSGS, {}, OPENROUTER_MODEL))
+    assert "answer" in out
+    assert client.calls == [OPENROUTER_MODEL, FALLBACK]
+
+
+def test_stream_auth_error_is_not_retried():
+    client = _FakeStreamClient(fail_on_iter={OPENROUTER_MODEL: "Error code: 401 - User not found"})
+    with pytest.raises(Exception, match="401"):
+        _collect(llm._openrouter_stream_with_fallback(client, MSGS, {}, OPENROUTER_MODEL))
+    assert client.calls == [OPENROUTER_MODEL]  # bad key → no pointless retries
+
+
+def test_stream_does_not_switch_models_after_content_started():
+    # Primary streams one chunk then drops mid-stream → can't restart on another model.
+    client = _FakeStreamClient(fail_after_first={OPENROUTER_MODEL: "Error code: 429 - mid-stream drop"}, content="partial text")
+    with pytest.raises(Exception, match="429"):
+        _collect(llm._openrouter_stream_with_fallback(client, MSGS, {}, OPENROUTER_MODEL))
+    assert client.calls == [OPENROUTER_MODEL]  # did NOT fall back once bytes were sent
+
+
+def test_stream_all_candidates_fail_raises_last():
+    failures = {m: f"429 rate-limit on {m}" for m in OPENROUTER_FREE_FALLBACKS}
+    client = _FakeStreamClient(fail_on_iter=failures)
+    with pytest.raises(Exception):
+        _collect(llm._openrouter_stream_with_fallback(client, MSGS, {}, OPENROUTER_MODEL))
+    assert client.calls == list(dict.fromkeys([OPENROUTER_MODEL] + OPENROUTER_FREE_FALLBACKS))
