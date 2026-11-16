@@ -19,18 +19,13 @@ except Exception:  # pragma: no cover
 # transient 404/429 so the "Test API" button doesn't fail just because one free
 # model's upstream pool is momentarily rate-limited.
 try:
-    from backend.llm import _openrouter_create_with_fallback
+    from backend.llm import _openrouter_create_with_fallback, _OPENROUTER_AUTH_MARKERS
 except Exception:  # pragma: no cover
     try:
-        from llm import _openrouter_create_with_fallback  # type: ignore
+        from llm import _openrouter_create_with_fallback, _OPENROUTER_AUTH_MARKERS  # type: ignore
     except Exception:
         _openrouter_create_with_fallback = None
-
-# OpenRouter support
-try:
-    import openrouter
-except ImportError:
-    openrouter = None
+        _OPENROUTER_AUTH_MARKERS = ("401", "user not found", "unauthorized", "invalid api key")
 
 
 def _saved_cfg() -> dict:
@@ -124,11 +119,28 @@ async def test_api_connection(request: APITestRequest):
             or_client = OpenAI(api_key=effective_key, base_url="https://openrouter.ai/api/v1")
             msgs = [{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}]
             params = {"max_tokens": 50}
-            if _openrouter_create_with_fallback is not None:
-                response, used_model = _openrouter_create_with_fallback(or_client, msgs, params, OPENROUTER_MODEL)
-            else:  # pragma: no cover — defensive if the helper import failed
-                used_model = OPENROUTER_MODEL
-                response = or_client.chat.completions.create(model=OPENROUTER_MODEL, messages=msgs, **params)
+            try:
+                if _openrouter_create_with_fallback is not None:
+                    response, used_model = _openrouter_create_with_fallback(or_client, msgs, params, OPENROUTER_MODEL)
+                else:  # pragma: no cover — defensive if the helper import failed
+                    used_model = OPENROUTER_MODEL
+                    response = or_client.chat.completions.create(model=OPENROUTER_MODEL, messages=msgs, **params)
+            except Exception as or_err:
+                detail = str(or_err) or repr(or_err) or type(or_err).__name__
+                # Recurring footgun: a stale/revoked OpenRouter key lingering in the
+                # browser's localStorage (shown in the UI field) takes precedence over a
+                # valid key saved server-side, so the key the UI sends is rejected with a
+                # 401 "User not found". If the rejected key came from the UI field AND a
+                # DIFFERENT key is saved on the server, point the user at the saved key.
+                looks_auth = any(tok in detail.lower() for tok in _OPENROUTER_AUTH_MARKERS)
+                field_key = (request.openrouterKey or "").strip()
+                saved_key = (_saved_cfg().get("openrouter_key", "") or "").strip()
+                if looks_auth and field_key and saved_key and field_key != saved_key:
+                    detail += (" — The OpenRouter key entered in this field was rejected (401), but a "
+                               "different key is saved on the server. Clear this field and Test again to use "
+                               "the saved key (do NOT click Save Keys while the field is empty — that would "
+                               "overwrite the saved key), or paste the correct key and Save.")
+                raise HTTPException(status_code=502, detail=detail)
 
             note = "" if used_model == OPENROUTER_MODEL else f" (default model was rate-limited; used free fallback {used_model})"
             return {
