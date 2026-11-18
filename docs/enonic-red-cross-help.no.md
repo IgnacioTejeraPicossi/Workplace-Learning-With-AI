@@ -23,14 +23,20 @@ arbeidsflaten for kjøring og rapportering.
 
 - **Oversikt** — hva agenten er, evidensforklaringen og dens begrensninger.
 - **Assistent** — en forankret chat. Spør om plattformen eller installasjonen og hvordan man
-  tester den. Hvert svar kommer med siterte kilder, en evidensstatus (underbygd / delvis /
-  utilstrekkelig) og, når det er relevant, manglende informasjon og et foreslått
-  oppfølgingsspørsmål. Skriv spørsmålet ditt (Ctrl/Cmd+Enter sender) eller trykk på et forslag.
+  tester den. Svaret **skrives ut fortløpende** (strømming) og faller så på plass med siterte
+  kilder, en evidensstatus (underbygd / delvis / utilstrekkelig) og, når det er relevant,
+  manglende informasjon og et foreslått oppfølgingsspørsmål. Et sammenleggbart panel
+  **«Grunnlag»** viser nøyaktig hvilke kunnskapsbiter og testsaker svaret bygde på — klikk en
+  testsak der for å spørre om den på nytt. Skriv spørsmålet ditt (Ctrl/Cmd+Enter sender) eller
+  trykk på et forslag.
 - **Kunnskap** — de forankrede faktaene assistenten kan sitere, hver merket med evidensnivå og
-  sin kilde.
+  sin kilde. **Søk** på tittel, tekst eller tagg, og **filtrer på evidensnivå** med brikkene
+  (hver viser hvor mange biter den inneholder).
 - **Testkatalog** — de importerte testsakene. Filtrer på tekst, persona (Sluttbruker /
-  Redaktør), resultat og sprint. **Klikk på en saks-id** for å hoppe til Assistenten med
-  «Hvordan bør jeg teste sak N?» allerede spurt.
+  Redaktør), resultat og sprint; en **oversiktslinje** viser antall per resultat for gjeldende
+  visning (klikk en brikke for å filtrere på den), hver rad bærer sin **sprint** inline, og
+  **Eksporter CSV** laster ned den filtrerte visningen (UTF-8, åpnes rent i Excel). **Klikk på en
+  saks-id** for å hoppe til Assistenten med «Hvordan bør jeg teste sak N?» allerede spurt.
 - **Prosjektkontekst** — miljø-URL-er, arkitektur, Azure DevOps-koordinatene og de «kjente
   ukjente» som fortsatt må samles inn.
 
@@ -77,6 +83,11 @@ merket.
 
 ## Legge til flere testdata
 
-Nye sprinter legges til ved å utvide katalogen i `backend/services/enonic_red_cross.py` (hver
-sak bærer sin `sprint`). Fordi Røde Kors holder Azure DevOps privat, transkriberes sprint-data
-fra skjermbilder i stedet for å hentes live.
+Kunnskapsbasen og testkatalogen ligger som JSON-datafiler under
+`backend/data/enonic_red_cross/` (`knowledge.json` og `test_catalog.json`). Nye sprinter legges
+til ved å utvide `test_catalog.json` (hver sak bærer sin `sprint`); tjenesten **validerer dataene
+ved innlasting** (påkrevde felt, tillatt evidensnivå og resultat, og en unik `(saks-id, sprint)`
+per sak), slik at en feilformet oppføring feiler høylytt i stedet for å svekke et svar. Dette er
+også sømmen for en framtidig Azure DevOps-import — å skrive `test_catalog.json` krever ingen
+kodeendring. Fordi Røde Kors holder Azure DevOps privat, transkriberes sprint-data fra
+skjermbilder i stedet for å hentes live.

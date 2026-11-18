@@ -23,14 +23,19 @@ and reporting workspace.
 
 - **Overview** — what the agent is, the evidence legend, and its limits.
 - **Assistant** — a grounded chat. Ask about the platform or the installation and how to test
-  it. Every answer comes back with cited sources, an evidence status (supported / partial /
-  insufficient) and, when relevant, a list of missing information and a suggested follow-up.
-  Type your question (Ctrl/Cmd+Enter sends), or click a suggested question.
+  it. The answer **types out live** (streaming), then settles into cited sources, an evidence
+  status (supported / partial / insufficient) and, when relevant, a list of missing information
+  and a suggested follow-up. A collapsible **"Grounded on"** panel shows exactly which knowledge
+  chunks and test cases the answer drew on — click a test case there to re-ask about it. Type
+  your question (Ctrl/Cmd+Enter sends), or click a suggested question.
 - **Knowledge** — the curated facts the assistant may cite, each tagged by evidence level with
-  its source.
+  its source. **Search** by title, text or tag, and **filter by evidence level** with the chips
+  (each shows how many chunks it holds).
 - **Test Catalog** — the imported test cases. Filter by text, persona (Sluttbruker / Redaktør),
-  result and sprint. **Click a case id** to jump to the Assistant with "How should I test case
-  N?" already asked.
+  result and sprint; a **breakdown bar** shows the count per result for the current view (click a
+  chip to filter by it), each row carries its **sprint** inline, and **Export CSV** downloads the
+  current filtered view (UTF-8, opens cleanly in Excel). **Click a case id** to jump to the
+  Assistant with "How should I test case N?" already asked.
 - **Project Context** — environment URLs, architecture, the Azure DevOps coordinates and the
   "known unknowns" still to collect.
 
@@ -76,6 +81,11 @@ needed. If no model is reachable it falls back to an offline placeholder answer,
 
 ## Adding more test data
 
-New sprints are added by widening the catalog in `backend/services/enonic_red_cross.py` (each
-case carries its `sprint`). Because the Red Cross keeps Azure DevOps private, sprint data is
-transcribed from screenshots rather than fetched live.
+The knowledge base and the test catalog live as JSON data files under
+`backend/data/enonic_red_cross/` (`knowledge.json` and `test_catalog.json`). New sprints are
+added by extending `test_catalog.json` (each case carries its `sprint`); the service **validates
+the data on load** (required fields, allowed evidence level and result, and a unique
+`(case id, sprint)` per case), so a malformed entry fails loudly instead of degrading an answer.
+This is also the seam for a future Azure DevOps import — writing `test_catalog.json` needs no code
+change. Because the Red Cross keeps Azure DevOps private, sprint data is transcribed from
+screenshots rather than fetched live.

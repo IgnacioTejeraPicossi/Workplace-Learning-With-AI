@@ -23,14 +23,21 @@ ejecución y reporte.
 
 - **Resumen** — qué es el agente, la leyenda de evidencia y sus límites.
 - **Asistente** — un chat fundamentado. Pregunta sobre la plataforma o la instalación y cómo
-  probarla. Cada respuesta llega con fuentes citadas, un estado de evidencia (respaldado /
-  parcial / insuficiente) y, cuando aplica, información que falta y una siguiente pregunta
-  sugerida. Escribe tu pregunta (Ctrl/Cmd+Enter envía) o pulsa una sugerida.
+  probarla. La respuesta se **escribe en vivo** (streaming) y luego se asienta con fuentes
+  citadas, un estado de evidencia (respaldado / parcial / insuficiente) y, cuando aplica,
+  información que falta y una siguiente pregunta sugerida. Un panel plegable **«Basado en»**
+  muestra exactamente qué fragmentos de conocimiento y qué casos de test usó la respuesta —
+  pulsa ahí un caso de test para volver a preguntar sobre él. Escribe tu pregunta
+  (Ctrl/Cmd+Enter envía) o pulsa una sugerida.
 - **Conocimiento** — los hechos curados que el asistente puede citar, cada uno etiquetado por
-  nivel de evidencia con su fuente.
+  nivel de evidencia con su fuente. **Busca** por título, texto o etiqueta, y **filtra por nivel
+  de evidencia** con los chips (cada uno indica cuántos fragmentos contiene).
 - **Catálogo de tests** — los casos importados. Filtra por texto, persona (Sluttbruker /
-  Redaktør), resultado y sprint. **Pulsa el id de un caso** para saltar al Asistente con la
-  pregunta «¿Cómo debo probar el caso N?» ya formulada.
+  Redaktør), resultado y sprint; una **barra de desglose** muestra el conteo por resultado de la
+  vista actual (pulsa un chip para filtrar por él), cada fila lleva su **sprint** en línea, y
+  **Exportar CSV** descarga la vista filtrada actual (UTF-8, se abre bien en Excel). **Pulsa el
+  id de un caso** para saltar al Asistente con la pregunta «¿Cómo debo probar el caso N?» ya
+  formulada.
 - **Contexto del proyecto** — URLs del entorno, arquitectura, las coordenadas de Azure DevOps y
   las «incógnitas conocidas» por recopilar.
 
@@ -78,7 +85,11 @@ claramente marcada.
 
 ## Añadir más datos de test
 
-Los nuevos sprints se añaden ampliando el catálogo en
-`backend/services/enonic_red_cross.py` (cada caso lleva su `sprint`). Como la Cruz Roja mantiene
-Azure DevOps en privado, los datos de sprint se transcriben desde capturas, no se obtienen en
-vivo.
+La base de conocimiento y el catálogo de tests viven como ficheros JSON en
+`backend/data/enonic_red_cross/` (`knowledge.json` y `test_catalog.json`). Los nuevos sprints se
+añaden extendiendo `test_catalog.json` (cada caso lleva su `sprint`); el servicio **valida los
+datos al cargar** (campos obligatorios, nivel de evidencia y resultado permitidos, y un
+`(id de caso, sprint)` único por caso), así que una entrada malformada falla ruidosamente en vez
+de degradar una respuesta. Esta es además la costura para un futuro import de Azure DevOps:
+escribir `test_catalog.json` no requiere tocar código. Como la Cruz Roja mantiene Azure DevOps en
+privado, los datos de sprint se transcriben desde capturas, no se obtienen en vivo.
