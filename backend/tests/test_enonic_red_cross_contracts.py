@@ -150,6 +150,33 @@ async def test_chat_llm_path_parses_and_sanitizes():
 
 
 @pytest.mark.asyncio
+async def test_chat_stream_mock_path_emits_sse():
+    # No streaming LLM -> deterministic mock, streamed as SSE (meta → tok → done).
+    with patch.object(svc, "ask_openai_stream", None):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as ac:
+            r = await ac.post("/api/enonic-red-cross/chat/stream",
+                              json={"message": "Which content types are deployed?", "lang": "es"})
+    assert r.status_code == 200
+    assert "text/event-stream" in r.headers.get("content-type", "")
+    body = r.text
+    assert '"t": "meta"' in body and '"grounding"' in body   # grounding sent up front
+    assert '"t": "tok"' in body                               # some prose streamed
+    assert '"t": "done"' in body and '"is_mock": true' in body
+
+
+def test_short_answer_stream_extractor():
+    # The incremental extractor streams only the short_answer prose out of growing JSON,
+    # correctly across chunk boundaries (and stops at the closing quote).
+    st = {"phase": "search", "cursor": 0, "esc": False}
+    raw, got = "", ""
+    for piece in ['{"short_answer":"Seven ', 'content ty', 'pes are ', 'deployed.",', '"sections":[]}']:
+        raw += piece
+        got += svc._sa_extract_step(raw, st)
+    assert got == "Seven content types are deployed."
+    assert st["phase"] == "done"
+
+
+@pytest.mark.asyncio
 async def test_catalog_endpoint_filters():
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as ac:
         r = await ac.get("/api/enonic-red-cross/test-catalog", params={"result": "fail"})

@@ -12,16 +12,17 @@ Endpoints (plan §9, prefix adapted to repo convention):
 """
 
 from fastapi import APIRouter, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional
 
 try:
     from backend.services.enonic_red_cross import (
-        answer, knowledge, test_catalog, project_context, health, sprints,
+        answer, answer_stream_events, knowledge, test_catalog, project_context, health, sprints,
     )
 except ImportError:  # pragma: no cover
     from services.enonic_red_cross import (  # type: ignore
-        answer, knowledge, test_catalog, project_context, health, sprints,
+        answer, answer_stream_events, knowledge, test_catalog, project_context, health, sprints,
     )
 
 router = APIRouter(prefix="/api/enonic-red-cross")
@@ -73,3 +74,13 @@ def project_context_endpoint() -> Dict[str, Any]:
 async def chat_endpoint(body: ChatRequest) -> Dict[str, Any]:
     hist = [t.model_dump() for t in body.history] if body.history else None
     return await answer(body.message, body.lang, hist)
+
+
+@router.post("/chat/stream", summary="Streamed grounded turn (SSE): meta → tokens → done")
+async def chat_stream_endpoint(body: ChatRequest) -> StreamingResponse:
+    hist = [t.model_dump() for t in body.history] if body.history else None
+    return StreamingResponse(
+        answer_stream_events(body.message, body.lang, hist),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )

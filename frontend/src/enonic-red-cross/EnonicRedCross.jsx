@@ -131,28 +131,63 @@ function Assistant({ t, lang, caseAsk }) {
   const [answer, setAnswer] = useState(null);
   const [error, setError] = useState('');
   const [history, setHistory] = useState([]);
+  const [streamText, setStreamText] = useState('');
   const taRef = useRef(null);
   const lastNonce = useRef(null);
+
+  const commit = useCallback((message, data) => {
+    setAnswer(data);
+    setHistory((h) => [...h, { role: 'user', content: message },
+      { role: 'assistant', content: data.short_answer || '' }]);
+    setInput('');
+  }, []);
+
+  // Fallback: the original single-shot request (used if streaming is unavailable).
+  const askFallback = useCallback(async (message) => {
+    const res = await fetch(`${API_BASE}/api/enonic-red-cross/chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, lang: toLang(lang), history: history.slice(-6) }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    commit(message, data);
+  }, [lang, history, commit]);
 
   const ask = useCallback(async (q) => {
     const message = (q ?? input).trim();
     if (!message || loading) return;
-    setLoading(true); setError(''); setAnswer(null);
+    setLoading(true); setError(''); setAnswer(null); setStreamText('');
     try {
-      const res = await fetch(`${API_BASE}/api/enonic-red-cross/chat`, {
+      const res = await fetch(`${API_BASE}/api/enonic-red-cross/chat/stream`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, lang: toLang(lang), history: history.slice(-6) }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setAnswer(data);
-      setHistory((h) => [...h, { role: 'user', content: message },
-        { role: 'assistant', content: data.short_answer || '' }]);
-      setInput('');
-    } catch (e) { setError(t('enonicRedCrossModule.assistant.error')); }
-    finally { setLoading(false); }
-  }, [input, loading, lang, history, t]);
+      if (!res.ok || !res.body) throw new Error('stream-unavailable');
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '', acc = '', finalAnswer = null;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const parts = buf.split('\n\n');
+        buf = parts.pop();
+        for (const part of parts) {
+          const line = part.trim();
+          if (!line.startsWith('data:')) continue;
+          let obj; try { obj = JSON.parse(line.slice(5).trim()); } catch { continue; }
+          if (obj.t === 'tok') { acc += obj.v; setStreamText(acc); }
+          else if (obj.t === 'done') { finalAnswer = obj.answer; }
+        }
+      }
+      if (!finalAnswer || finalAnswer.error) throw new Error('no-result');
+      commit(message, finalAnswer);
+    } catch (e) {
+      try { await askFallback(message); }
+      catch (e2) { setError(t('enonicRedCrossModule.assistant.error')); }
+    } finally { setLoading(false); setStreamText(''); }
+  }, [input, loading, lang, history, t, askFallback, commit]);
 
   // Cross-tab bridge: a case clicked in the Test Catalog arrives as {text, nonce}
   // and is asked once (nonce guards against re-firing on unrelated re-renders).
@@ -200,7 +235,24 @@ function Assistant({ t, lang, caseAsk }) {
         </div>
       )}
 
-      {answer && <AnswerCard t={t} answer={answer} onFollowUp={(q) => ask(q)} />}
+      {loading && !streamText && (
+        <div style={{ ...card, color: MUTED, textAlign: 'center', fontStyle: 'italic' }}>
+          {t('enonicRedCrossModule.assistant.thinking')}
+        </div>
+      )}
+
+      {loading && streamText && (
+        <div style={{ ...card, display: 'grid', gap: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: 'uppercase' }}>
+            {t('enonicRedCrossModule.assistant.shortAnswer')}
+          </div>
+          <p style={{ margin: 0, lineHeight: 1.65, color: INK, fontSize: 15 }}>
+            {streamText}<span aria-hidden style={{ opacity: 0.5 }}>▍</span>
+          </p>
+        </div>
+      )}
+
+      {answer && !loading && <AnswerCard t={t} answer={answer} onFollowUp={(q) => ask(q)} />}
     </div>
   );
 }

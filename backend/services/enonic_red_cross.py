@@ -36,12 +36,13 @@ import re
 from typing import Any, Dict, List, Optional
 
 try:
-    from backend.llm import ask_ai_unified
+    from backend.llm import ask_ai_unified, ask_openai_stream
 except Exception:  # pragma: no cover
     try:
-        from llm import ask_ai_unified  # type: ignore
+        from llm import ask_ai_unified, ask_openai_stream  # type: ignore
     except Exception:
         ask_ai_unified = None  # type: ignore
+        ask_openai_stream = None  # type: ignore
 
 
 ENONIC_RED_CROSS_VERSION = "1.0.0"
@@ -1001,6 +1002,125 @@ def _grounding_meta(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return out
 
 
+def _parse_answer(raw: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Strip markdown fences and parse the model's JSON answer; None on failure."""
+    if not raw or raw.startswith("[MOCKED RESPONSE"):
+        return None
+    clean = raw.strip()
+    if clean.startswith("```"):
+        parts = clean.split("```")
+        clean = parts[1] if len(parts) > 1 else clean
+        if clean.startswith("json"):
+            clean = clean[4:]
+    try:
+        return json.loads(clean.strip())
+    except Exception:
+        return None
+
+
+_SA_OPEN = re.compile(r'"short_answer"\s*:\s*"')
+_SA_ESC = {"n": "\n", "t": "\t", "r": "\r", '"': '"', "\\": "\\", "/": "/"}
+
+
+def _sa_extract_step(raw: str, st: Dict[str, Any]) -> str:
+    """Incrementally pull the plain-text value of "short_answer" out of a GROWING
+    JSON string so it can be streamed as clean prose (no prompt-format change).
+    `st` is carried across calls: {phase:'search'|'stream'|'done', cursor:int, esc:bool}."""
+    if st["phase"] == "done":
+        return ""
+    if st["phase"] == "search":
+        m = _SA_OPEN.search(raw)
+        if not m:
+            return ""
+        st["phase"] = "stream"
+        st["cursor"] = m.end()
+    out, i = [], st["cursor"]
+    while i < len(raw):
+        ch = raw[i]
+        if st["esc"]:
+            out.append(_SA_ESC.get(ch, ch))
+            st["esc"] = False
+            i += 1
+            continue
+        if ch == "\\":
+            st["esc"] = True
+            i += 1
+            continue
+        if ch == '"':
+            st["phase"] = "done"
+            i += 1
+            break
+        out.append(ch)
+        i += 1
+    st["cursor"] = i
+    return "".join(out)
+
+
+def _sse(obj: Dict[str, Any]) -> str:
+    return "data: " + json.dumps(obj, ensure_ascii=False) + "\n\n"
+
+
+def answer_stream_events(message: str, lang: str = "en",
+                         history: Optional[List[Dict[str, str]]] = None):
+    """Sync generator of SSE events for a streamed answer. Emits, in order:
+      {"t":"meta","grounding":[...]}  once, up front (UI can show it immediately);
+      {"t":"tok","v":"<prose>"}       the short answer typing out;
+      {"t":"done","answer":{...}}     the full structured, sanitized answer.
+    Never raises; falls back to the trilingual mock as the final event."""
+    message = (message or "").strip()
+    if not message:
+        yield _sse({"t": "done", "answer": {"error": "empty_message"}})
+        return
+    if len(message) > _MAX_MESSAGE_CHARS:
+        message = message[:_MAX_MESSAGE_CHARS] + "…"
+
+    chunks = retrieve(message)
+    yield _sse({"t": "meta", "grounding": _grounding_meta(chunks)})
+
+    if ask_openai_stream is None:
+        m = _MOCK[_mock_lang(lang)]
+        yield _sse({"t": "tok", "v": m["short"]})
+        yield _sse({"t": "done", "answer": _make_mock(lang, chunks)})
+        return
+
+    raw, st, mocked = "", {"phase": "search", "cursor": 0, "esc": False}, False
+    try:
+        messages = [{"role": "system", "content": _system_prompt(lang)},
+                    {"role": "system", "content": _grounding_block(chunks)}]
+        for turn in (history or [])[-_MAX_HISTORY_TURNS:]:
+            role = turn.get("role")
+            content = (turn.get("content") or "").strip()
+            if role in ("user", "assistant") and content:
+                messages.append({"role": role, "content": content[:2000]})
+        messages.append({"role": "user", "content": message})
+
+        for chunk in ask_openai_stream(messages=messages, task_type="analysis",
+                                       complexity="high", max_tokens=1600):
+            if not chunk:
+                continue
+            if chunk.startswith("[MOCKED RESPONSE"):
+                mocked = True
+                break
+            raw += chunk
+            delta = _sa_extract_step(raw, st)
+            if delta:
+                yield _sse({"t": "tok", "v": delta})
+
+        if not mocked:
+            parsed = _parse_answer(raw)
+            if parsed is not None:
+                parsed = _sanitize(parsed, chunks)
+                parsed["is_mock"] = False
+                parsed["version"] = ENONIC_RED_CROSS_VERSION
+                parsed["grounding"] = _grounding_meta(chunks)
+                yield _sse({"t": "done", "answer": parsed})
+                return
+    except Exception:
+        pass
+
+    yield _sse({"t": "done", "answer": _make_mock(lang, chunks)})
+
+
 def _system_prompt(lang: str) -> str:
     return (
         "You are Enonic 'Red Cross', a project knowledge and testing assistant inside "
@@ -1139,14 +1259,8 @@ async def answer(message: str, lang: str = "en",
 
             raw = await ask_ai_unified(messages=messages, task_type="analysis",
                                        complexity="high", max_tokens=1600)
-            if raw and not raw.startswith("[MOCKED RESPONSE"):
-                clean = raw.strip()
-                if clean.startswith("```"):
-                    parts = clean.split("```")
-                    clean = parts[1] if len(parts) > 1 else clean
-                    if clean.startswith("json"):
-                        clean = clean[4:]
-                parsed = json.loads(clean.strip())
+            parsed = _parse_answer(raw)
+            if parsed is not None:
                 parsed = _sanitize(parsed, chunks)
                 parsed["is_mock"] = False
                 parsed["version"] = ENONIC_RED_CROSS_VERSION
