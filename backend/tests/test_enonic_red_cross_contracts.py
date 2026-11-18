@@ -34,6 +34,18 @@ def test_retrieve_exact_id_and_keyword_grounded():
     assert fb and len(fb) >= 1
 
 
+def test_retrieve_surfaces_catalog_cases_by_keyword():
+    # A topical question with NO explicit id now surfaces concrete executed cases
+    # from the catalog (title + note keyword match), not only the curated KB.
+    ids = [c["id"] for c in svc.retrieve("map marker popup cluster")]
+    assert "rk-kart-map" in ids                     # the KB map chunk still ranks
+    assert any(i.startswith("case-") for i in ids)  # NEW: a catalog case, no id typed
+    # keyword-matched cases are capped (never flood the grounding)
+    assert sum(1 for i in ids if i.startswith("case-")) <= svc._CASE_SLOTS
+    # exact-id retrieval still wins and ranks first
+    assert [c["id"] for c in svc.retrieve("steps for case 30439?")][0] == "case-30439"
+
+
 def test_knowledge_base_is_wellformed():
     kb = svc.KNOWLEDGE_BASE
     assert len(kb) >= 12

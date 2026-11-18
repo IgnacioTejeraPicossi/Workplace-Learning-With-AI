@@ -869,55 +869,108 @@ def _extract_ids(message: str) -> List[str]:
     return re.findall(r"\b(2\d{4}|3\d{4})\b", message or "")
 
 
-def retrieve(message: str, k: int = _RETRIEVE_K) -> List[Dict[str, Any]]:
-    """Rank KB chunks for grounding. Deterministic; no LLM.
+# How many keyword-matched catalog cases to reserve room for in a retrieval, so a
+# topical question always surfaces at least one concrete executed case next to the
+# curated KB chunks (the exact-id path is separate and unbounded by this).
+_CASE_SLOTS = 2
 
-    Exact test-ID hits first (via a synthetic chunk built from the catalog),
-    then keyword overlap, then a sensible default so an answer is always
-    grounded in something. Upgrade seam for a vector store later.
+
+def _case_chunk(case: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a grounding chunk from a catalog case (observation, not official steps)."""
+    cid = case["id"]
+    note = (case.get("note") or "").strip()
+    return {
+        "id": f"case-{cid}",
+        "title": f"Test {cid} ({case['persona']}, Sprint {case.get('sprint', '7')})",
+        "level": "project-observation",
+        "text": (f"'{case['title']}' — observed result: "
+                 f"{_RESULT_META[case['result']]['label']}." + (f" {note}" if note else "")),
+        "sources": [f"Red Cross QA test catalog — case {cid} (observation, not official steps)"],
+        "tags": [cid, case["persona"].lower()],
+    }
+
+
+def retrieve(message: str, k: int = _RETRIEVE_K) -> List[Dict[str, Any]]:
+    """Rank grounding chunks for a question. Deterministic; no LLM.
+
+    Three tiers, blended into one capped result:
+      1) exact test-ID hits  → a grounding chunk per referenced case;
+      2) keyword overlap over the curated KB;
+      3) keyword overlap over the TEST CATALOG (title + note) — so a topical
+         question ("how do I test the map markers?") surfaces concrete executed
+         cases, not only exact-id lookups. A few case slots are reserved so KB
+         chunks do not crowd the cases out.
+    Falls back to a sensible default so an answer is always grounded in something.
+    Upgrade seam for a vector store later (swap the keyword scorers for embeddings).
     """
-    chunks: List[Dict[str, Any]] = []
+    q = _tokens(message)
+    msg_lower = (message or "").lower()
 
     # 1) Exact test-id matches → a grounding chunk per referenced case.
+    id_chunks: List[Dict[str, Any]] = []
+    id_seen = set()
     for cid in _extract_ids(message):
+        if cid in id_seen:
+            continue
         case = next((c for c in TEST_CATALOG if c["id"] == cid), None)
         if case:
-            chunks.append({
-                "id": f"case-{cid}",
-                "title": f"Test {cid} ({case['persona']})",
-                "level": "project-observation",
-                "text": (f"'{case['title']}' — observed result: "
-                         f"{_RESULT_META[case['result']]['label']}. {case['note']}"),
-                "sources": [f"Red Cross QA test catalog — case {cid} (observation, not official steps)"],
-                "tags": [cid, case["persona"].lower()],
-            })
+            id_seen.add(cid)
+            id_chunks.append(_case_chunk(case))
 
     # 2) Keyword overlap over the curated KB.
-    q = _tokens(message)
-    scored = []
+    kb_scored = []
     for chunk in KNOWLEDGE_BASE:
         hay = _tokens(chunk["text"]) | {t.lower() for t in chunk["tags"]} | _tokens(chunk["title"])
         overlap = len(q & hay)
-        tag_hit = sum(1 for t in chunk["tags"] if t.lower() in (message or "").lower())
+        tag_hit = sum(1 for t in chunk["tags"] if t.lower() in msg_lower)
         score = overlap + 2 * tag_hit
         if score > 0:
-            scored.append((score, chunk))
-    scored.sort(key=lambda x: x[0], reverse=True)
-    chunks.extend(c for _, c in scored)
+            kb_scored.append((score, chunk))
+    kb_scored.sort(key=lambda x: x[0], reverse=True)
+    kb_chunks = [c for _, c in kb_scored]
 
-    if not chunks:
+    # 3) Keyword overlap over the test catalog (title + note). Executed cases with a
+    #    recorded note get a small boost over not-yet-run 'planned' stubs.
+    case_scored = []
+    for case in TEST_CATALOG:
+        hay = _tokens(case["title"]) | _tokens(case.get("note", ""))
+        overlap = len(q & hay)
+        if overlap > 0:
+            boost = 1 if (case["result"] != "planned" and (case.get("note") or "").strip()) else 0
+            case_scored.append((overlap + boost, case["result"] != "planned", case))
+    case_scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
+    kw_case_chunks = [_case_chunk(c) for _, _, c in case_scored]
+
+    if not id_chunks and not kb_chunks and not kw_case_chunks:
         # default: platform + the two most load-bearing project facts
         defaults = [c for c in KNOWLEDGE_BASE
                     if c["id"] in ("xp8-platform", "rk-content-types", "rk-publish-flow")]
         return defaults[:k]
-    # de-dup by id, keep order, cap at k
-    seen, out = set(), []
-    for c in chunks:
-        if c["id"] not in seen:
-            seen.add(c["id"])
-            out.append(c)
-        if len(out) >= k:
-            break
+
+    # Assemble: exact-id first, then a reserved mix of KB + keyword cases, then
+    # whatever remains — de-duped by id and capped at k.
+    out: List[Dict[str, Any]] = []
+    seen = set()
+
+    def _add(chunk: Dict[str, Any]) -> None:
+        if chunk and chunk["id"] not in seen and len(out) < k:
+            seen.add(chunk["id"])
+            out.append(chunk)
+
+    for c in id_chunks:
+        _add(c)
+    budget = max(0, k - len(out))
+    n_cases = min(_CASE_SLOTS, len(kw_case_chunks), budget)
+    n_kb = max(0, budget - n_cases)
+    for c in kb_chunks[:n_kb]:
+        _add(c)
+    for c in kw_case_chunks[:n_cases]:
+        _add(c)
+    # fill any slack (a short tier) with the remaining KB then cases
+    for c in kb_chunks:
+        _add(c)
+    for c in kw_case_chunks:
+        _add(c)
     return out
 
 
