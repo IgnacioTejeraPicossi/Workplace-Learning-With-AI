@@ -1,0 +1,371 @@
+[
+  {
+    "id": "xp8-platform",
+    "title": "Enonic XP 8 platform",
+    "level": "platform-doc",
+    "text": "Enonic XP is an open-source platform for building content-driven apps and headless CMS solutions. XP 8 is the current major line. Content Studio 6 (the editorial UI) requires XP 8.0 or newer. Keep XP 7 material separate and explicitly labelled — it is a different major version.",
+    "sources": [
+      "https://developer.enonic.com/docs/platform/stable",
+      "https://developer.enonic.com/docs/content-studio/stable/release"
+    ],
+    "tags": [
+      "enonic",
+      "xp",
+      "xp8",
+      "version",
+      "platform",
+      "content studio",
+      "cms"
+    ]
+  },
+  {
+    "id": "xp-content-studio",
+    "title": "Content Studio — the editorial UI",
+    "level": "platform-doc",
+    "text": "Content Studio is Enonic's editor. Content lives in a tree under a Site; each item has a content TYPE (schema). Editors Save (Lagre), Mark as ready (Marker som klar) and Publish (Publiser). The Draft branch is what editors see; the Master branch is what the public frontend reads.",
+    "sources": [
+      "https://developer.enonic.com/docs/cms/stable"
+    ],
+    "tags": [
+      "content studio",
+      "editor",
+      "draft",
+      "master",
+      "branch",
+      "publish",
+      "tree",
+      "type"
+    ]
+  },
+  {
+    "id": "xp-guillotine-headless",
+    "title": "Headless delivery (Guillotine GraphQL + Next.js)",
+    "level": "platform-doc",
+    "text": "In a headless setup the frontend fetches content from XP's Guillotine GraphQL API and renders it elsewhere. The Red Cross public site is a Next.js app that reads published content and uses ISR (Incremental Static Regeneration) to serve and revalidate pages.",
+    "sources": [
+      "https://developer.enonic.com/docs/code/stable"
+    ],
+    "tags": [
+      "headless",
+      "guillotine",
+      "graphql",
+      "nextjs",
+      "isr",
+      "frontend",
+      "delivery"
+    ]
+  },
+  {
+    "id": "rk-content-types",
+    "title": "Red Cross content types (deployed)",
+    "level": "project-fact",
+    "text": "The deployed rodekors app exposes exactly 7 content types (verified via /admin/rest-v2/cs/schema/content/all): branch-district (Distrikt), branch-local (Lokalforening), frontpage (Forside), list-page (Listeside), news-article, page (= 'Side', also labelled 'Fagartikkel'), story-article. 'Fakta' (fact) and 'topic' were added later (schema/content/all → 9 rodekors types, 2026-11). The multi-page FORM type is now deployed too, as 'no.item.forms:form' (Item Consulting Forms app, Content Studio 6.1.0).",
+    "sources": [
+      "Red Cross QA test log (schema/content/all, 2026-11)"
+    ],
+    "tags": [
+      "content type",
+      "side",
+      "fagartikkel",
+      "forside",
+      "listeside",
+      "distrikt",
+      "lokalforening",
+      "fakta",
+      "skjema",
+      "form",
+      "schema"
+    ]
+  },
+  {
+    "id": "rk-url-patterns",
+    "title": "Public URL patterns",
+    "level": "project-fact",
+    "text": "Public URLs strip the '/rodekors' site root. Districts: /distrikter/D000…D018 (e.g. D000 Mollekleiva, D001 Østfold, D003 Oslo). Local branches: /lokalforeninger/L000… (L000 Nøklebye, L001 Rakkestad). A Fakta has its own page under its parent (e.g. /fakta/fakta-om-sudan). Content Studio path /rodekors/distrikter/D0NN maps to public /distrikter/D0NN.",
+    "sources": [
+      "Red Cross QA test log (URL recipe, 2026-11)"
+    ],
+    "tags": [
+      "url",
+      "distrikter",
+      "lokalforeninger",
+      "fakta",
+      "public",
+      "slug",
+      "path"
+    ]
+  },
+  {
+    "id": "rk-publish-flow",
+    "title": "Publish flow (Publiseringsveiviser)",
+    "level": "test-recipe",
+    "text": "To publish: Lagre → Marker som klar → Publiser nå. For a parent + its children use 'Publiser trestruktur' (publish tree). In the wizard, 'Under arbeid (N)' items need 'Marker som klar' (Publiser nå stays DISABLED until then); 'Ugyldige elementer' must be excluded with 'Utelat'; unpublished dependencies appear under AVHENGIGHETER with their checkbox UNCHECKED = excluded by default.",
+    "sources": [
+      "Red Cross QA test log (publish wizard, 2026-11)"
+    ],
+    "tags": [
+      "publish",
+      "publiser",
+      "marker som klar",
+      "trestruktur",
+      "wizard",
+      "under arbeid",
+      "ugyldig",
+      "avhengigheter",
+      "publiseringsveiviser"
+    ]
+  },
+  {
+    "id": "rk-propagation-blocker",
+    "title": "New-slug propagation to the public frontend",
+    "level": "project-observation",
+    "text": "Observed 2026-11: NEWLY created page slugs return a soft 'Ikke funnet' (HTTP 200 with a Next.js notFound body) on next.lunix.cloud and do not appear until a frontend rebuild. CHANGES to an ALREADY-LIVE page DO propagate on publish (ISR revalidates existing paths). Workaround for visitor tests: modify an existing live page instead of creating a new slug. This is a frontend/infra behaviour of the test environment, not a CMS bug — confirm the revalidation story with the dev.",
+    "sources": [
+      "Red Cross QA test log (propagation blocker, 2026-11-03/04)"
+    ],
+    "tags": [
+      "propagation",
+      "isr",
+      "revalidate",
+      "ikke funnet",
+      "notfound",
+      "new page",
+      "next.lunix.cloud",
+      "cache",
+      "deploy"
+    ]
+  },
+  {
+    "id": "rk-branch-crm",
+    "title": "District vs local-branch contact data",
+    "level": "project-observation",
+    "text": "Lokalforeninger carry REAL per-branch CRM data (branch-specific Besøksadresse + email on the ostfoldrk.no / rodekors.org domains) and show a 'Kontakt oss' header. The 20 districts currently share generic national data (post@redcross.no / (+47) 22 05 40 00) and a 'Kontakt' header. So generic district contact info is a CRM-load characteristic of the test data, not a render bug.",
+    "sources": [
+      "Red Cross QA test log (29364/29373, 2026-11)"
+    ],
+    "tags": [
+      "kontakt",
+      "contact",
+      "crm",
+      "besøksadresse",
+      "email",
+      "distrikt",
+      "lokalforening",
+      "google maps"
+    ]
+  },
+  {
+    "id": "rk-toppbanner",
+    "title": "Toppbanner (image vs buttons) on branch pages",
+    "level": "project-observation",
+    "text": "On a Lokalforening/Distrikt, the toppbanner 'Bilde' (image) + alt text ARE content fields and render on publish ('Foto:' credit = the image media's Kunstner field). The toppbanner CTA BUTTONS ('Bli frivillig' as primary + a second button) are NOT in the deployed frontend (no knapp/CTA field on the content type; no button rendered on any branch page) — a feature not yet deployed (test 29376 FAIL). The link-as-buttons config also exists as a page-template part that is template-LOCKED (needs 'Tilpass side').",
+    "sources": [
+      "Red Cross QA test log (29374/29375/29376/29372, 2026-11)"
+    ],
+    "tags": [
+      "toppbanner",
+      "banner",
+      "bilde",
+      "image",
+      "knapp",
+      "button",
+      "bli frivillig",
+      "cta",
+      "tilpass side",
+      "foto",
+      "kunstner"
+    ]
+  },
+  {
+    "id": "rk-fakta-listeside",
+    "title": "Fakta + Listeside (list page)",
+    "level": "project-fact",
+    "text": "A 'Listeside' (list-page, 'Utlisting av innhold under') lists the content under it; config = Innholdstyper filter (empty = all), Vis antall resultater, Vis sortering. A 'Fakta' (fact) is used in block content via a 'Gjenbruk' block that selects the fakta; a Fakta's fields are 'Illustrasjon' (image OR video block) + 'Tekst' (the visible body). Observed: the 2-column faktaboks layout is NOT in the deployed frontend yet (renders stacked; test 30075 FAIL).",
+    "sources": [
+      "Red Cross QA test log (30074/30075, 29132, 2026-11)"
+    ],
+    "tags": [
+      "fakta",
+      "listeside",
+      "list-page",
+      "gjenbruk",
+      "illustrasjon",
+      "tekst",
+      "innholdsblokker",
+      "faktaboks",
+      "utlisting"
+    ]
+  },
+  {
+    "id": "rk-required-fields",
+    "title": "Required fields & invalid content block publish",
+    "level": "test-recipe",
+    "text": "Save (Lagre) is allowed even when a content is invalid, but publishing is stopped: an invalid ('Ugyldig') content shows NO publish button in browse, and in the editor 'Flere handlinger' the Marker som klar / Publiser / Publiser trestruktur items are disabled. Example: an Ikoner block entry requires both 'Ikon' and 'Beskrivelse'; a Kort card requires an 'Intern lenke'; a branch image with no own alt text makes 'Beskrivelse av bildet (alt text)' required ('Beskriv bildet for brukere med synshemminger').",
+    "sources": [
+      "Red Cross QA test log (30094/30095, 29363/29371, 2026-11)"
+    ],
+    "tags": [
+      "required",
+      "påkrevd",
+      "ugyldig",
+      "invalid",
+      "validation",
+      "ikon",
+      "beskrivelse",
+      "alt text",
+      "intern lenke",
+      "publish blocked"
+    ]
+  },
+  {
+    "id": "rk-undeployed-features",
+    "title": "Feature deployment status (authored vs merged)",
+    "level": "project-observation",
+    "text": "Several test cases were authored before their feature was merged. Status as of Sprint 8 (2026-11): NOW DEPLOYED and testable — the multi-page form/skjema (no.item.forms:form), the ankerlenke-meny / SNARVEIER anchor menu, the Kart (map) Innholdsblokk, and the «Vis mer» long-fakta truncation. STILL NOT in the deployed frontend — the toppbanner CTA buttons ('Bli frivillig', 29376 FAIL) and the 2-column / wide faktaboks layout (renders stacked; 30075/30080). New Sprint 8 areas (Relatert innhold cards, sticky snarveier, Unitas external-data sync) are authored but not yet executed. Confirm a feature's status with the dev before deep testing.",
+    "sources": [
+      "Red Cross QA test log (deployment status, 2026-11, Sprint 7-8)"
+    ],
+    "tags": [
+      "deployed",
+      "not deployed",
+      "skjema",
+      "form",
+      "ankerlenke",
+      "snarveier",
+      "anchor menu",
+      "kart",
+      "map",
+      "vis mer",
+      "toppbanner buttons",
+      "faktaboks",
+      "relatert innhold",
+      "unitas",
+      "status",
+      "tom"
+    ]
+  },
+  {
+    "id": "rk-kart-map",
+    "title": "Kart (map) block — MapLibre (Sprint 8)",
+    "level": "project-fact",
+    "text": "The 'Kart' block (an Innholdsblokk on a Side, and a 'Fakta' illustration option) renders with MapLibre GL and is deployed on xp8dev. Config: Blokktittel, Introtekst, Senter (center as 'lat,long'), Zoom (0-22, decimals allowed) and a Markører list — each marker is a 'Koordinatpunkt' with an address/coordinate and an optional Tekst. Verified behaviour (Sprint 8): a marker WITH text shows as a red dot whose click opens a popup (text above the marker, an «×»/Lukk closes it, marker stays); a marker WITHOUT text is inert (normal cursor, no hover colour, no popup). Markers at the SAME coordinate merge into one marker whose popup groups all texts stacked with a thin separator. Zooming out clusters markers into a red circle with a count that counts EACH marker (incl. same-address ones); hovering a cluster darkens it + shows a hand cursor; clicking a cluster zooms in until the markers separate. The map uses cooperative gestures: plain wheel scrolls the PAGE and shows 'Bruk Ctrl + rulling for å zoome i kartet', Ctrl/⌘+scroll zooms. When the browser cannot use WebGL, a grey rounded box 'Kartet kan ikke vises.' replaces the map.",
+    "sources": [
+      "Red Cross QA test log (Kart/map 30419-30447, Sprint 8, 2026-11)"
+    ],
+    "tags": [
+      "kart",
+      "map",
+      "maplibre",
+      "markør",
+      "marker",
+      "popup",
+      "cluster",
+      "klynge",
+      "zoom",
+      "cooperative gestures",
+      "ctrl",
+      "webgl",
+      "koordinatpunkt",
+      "snarveier",
+      "fakta",
+      "vis mer"
+    ]
+  },
+  {
+    "id": "recipe-create-content",
+    "title": "Create content under the site root / a parent",
+    "level": "test-recipe",
+    "text": "In browse, clear any active search (Nullstill, else the tree stays filtered), select the 'Røde kors' root row, press alt+n → 'Lag innhold på: /' → pick the type → set 'Visningsnavn' → Lagre (use the real toolbar Lagre; the back-arrow discards unsaved new content with no confirm). To create a CHILD, select the parent row first, then alt+n (dialog shows 'Lag innhold på: /parent/path/').",
+    "sources": [
+      "Red Cross QA test log (content creation recipe, 2026-11)"
+    ],
+    "tags": [
+      "create",
+      "ny",
+      "new content",
+      "visningsnavn",
+      "child",
+      "root",
+      "lagre",
+      "recipe"
+    ]
+  },
+  {
+    "id": "recipe-ckeditor",
+    "title": "Rich-text (Ingress / Tekst) does not save via typing",
+    "level": "test-recipe",
+    "text": "The CKEditor rich-text fields (Ingress, a Tekst block body) do NOT persist when typed via automation — they mark unsaved but save EMPTY. The reliable way is to set the data programmatically and fire change: CKEDITOR.instances['htmlarea-intro-0'].setData('<p>…</p>'); then fire 'change'; then Lagre. A 'Tekst' block title becomes an H2 whose id is the slugified title.",
+    "sources": [
+      "Red Cross QA test log (29132/29301, 2026-11)"
+    ],
+    "tags": [
+      "ckeditor",
+      "ingress",
+      "tekst",
+      "rich text",
+      "setdata",
+      "save",
+      "h2",
+      "anchor",
+      "slug"
+    ]
+  },
+  {
+    "id": "recipe-verify-public",
+    "title": "Verify rendering on the public frontend",
+    "level": "test-recipe",
+    "text": "Verify behaviour by reading the DOM of next.lunix.cloud (the Master branch; no login) rather than the editor preview (which renders the Draft branch). Confirm a publish truly completed (CS toast 'har blitt publisert' + toolbar flips to 'Avpubliser') before trusting the public page; '?v=' cache-busting alone will not surface a publish that did not go through. Responsive checks: emulate the viewport width and reload.",
+    "sources": [
+      "Red Cross QA test log (verification recipe, 2026-11)"
+    ],
+    "tags": [
+      "verify",
+      "public",
+      "master branch",
+      "preview",
+      "draft",
+      "avpubliser",
+      "responsive",
+      "viewport",
+      "dom"
+    ]
+  },
+  {
+    "id": "recipe-existing-page",
+    "title": "Run visitor tests on existing live pages (propagation workaround)",
+    "level": "test-recipe",
+    "text": "Because new slugs do not propagate, run visitor (Sluttbruker) tests by MODIFYING an existing live page and reverting after. Reusable harness: a live page with a 'Lenker' block (e.g. Test Fil 29334) — swap its linked file/tags and republish, verify on its existing public URL, then restore the original. For branch tests, temporarily add an image / social links to an existing lokalforening (e.g. Rakkestad L001) and revert.",
+    "sources": [
+      "Red Cross QA test log (existing-page unlock, 2026-11-04)"
+    ],
+    "tags": [
+      "workaround",
+      "existing page",
+      "revert",
+      "lenker",
+      "harness",
+      "visitor",
+      "sluttbruker",
+      "rakkestad"
+    ]
+  },
+  {
+    "id": "guidance-generate-case",
+    "title": "How to draft a manual test from a title only",
+    "level": "guidance",
+    "text": "When only a case TITLE is known (no official steps), produce a clearly-labelled PROPOSED procedure: persona + preconditions + test data + numbered action/expected-result pairs + negative cases + evidence to capture + cleanup. Give it a local draft ID, never an invented Azure DevOps ID, and state that the official steps and exact expected behaviour are still missing until the real export is imported.",
+    "sources": [
+      "Enonic Red Cross agent — guidance"
+    ],
+    "tags": [
+      "draft",
+      "generate",
+      "manual test",
+      "procedure",
+      "charter",
+      "proposed",
+      "expected result",
+      "negative"
+    ]
+  }
+]
