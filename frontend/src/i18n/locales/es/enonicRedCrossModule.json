@@ -65,7 +65,11 @@
       "intro": "Los hechos fundamentados que el asistente puede citar. Cada fragmento lleva un nivel de evidencia y su fuente.",
       "sources": "Fuentes",
       "loading": "Cargando conocimiento…",
-      "empty": "Sin entradas de conocimiento."
+      "empty": "Sin entradas de conocimiento.",
+      "searchPlaceholder": "Buscar título, texto o etiquetas…",
+      "count": "{{n}} entradas",
+      "noMatch": "Ninguna entrada coincide con los filtros.",
+      "filterByLevel": "Filtrar por este nivel de evidencia"
     },
     "testCatalog": {
       "title": "Catálogo de tests (Sprint 7 — ejecutados)",

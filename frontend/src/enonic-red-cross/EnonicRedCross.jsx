@@ -365,6 +365,8 @@ function GroundedOn({ t, items, onAskCase }) {
 // ─── Tab: Knowledge ───────────────────────────────────────────────────────────
 function Knowledge({ t }) {
   const [items, setItems] = useState(null);
+  const [q, setQ] = useState('');
+  const [level, setLevel] = useState('');
   useEffect(() => {
     let alive = true;
     fetch(`${API_BASE}/api/enonic-red-cross/knowledge`).then((r) => r.json())
@@ -372,20 +374,64 @@ function Knowledge({ t }) {
     return () => { alive = false; };
   }, []);
   if (items === null) return <div style={{ ...card, color: MUTED }}>{t('enonicRedCrossModule.knowledge.loading')}</div>;
+
+  // Client-side filtering — the whole KB (18 chunks) is already loaded, so search
+  // (title + text + tags) and the level chips are instant with no extra request.
+  const LEVEL_ORDER = ['platform-doc', 'project-fact', 'project-observation', 'test-recipe', 'guidance', 'unsupported'];
+  const levelCounts = {};
+  items.forEach((c) => { levelCounts[c.level] = (levelCounts[c.level] || 0) + 1; });
+  const needle = q.trim().toLowerCase();
+  const shown = items.filter((c) => {
+    if (level && c.level !== level) return false;
+    if (!needle) return true;
+    const hay = `${c.title} ${c.text} ${(c.tags || []).join(' ')}`.toLowerCase();
+    return hay.includes(needle);
+  });
+
+  const sel = { border: `1px solid ${LINE}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#fff' };
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <p style={{ margin: 0, color: MUTED, fontSize: 13.5 }}>{t('enonicRedCrossModule.knowledge.intro')}</p>
-      {items.length === 0 && <div style={{ ...card, color: MUTED }}>{t('enonicRedCrossModule.knowledge.empty')}</div>}
-      {items.map((c) => (
-        <div key={c.id} style={card}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <h3 style={{ margin: 0, fontSize: 15.5, color: INK }}>{c.title}</h3>
-            <LevelBadge level={c.level}>{t(`enonicRedCrossModule.evidence.${c.level}`, c.level)}</LevelBadge>
+      {items.length === 0 ? (
+        <div style={{ ...card, color: MUTED }}>{t('enonicRedCrossModule.knowledge.empty')}</div>
+      ) : (
+        <>
+          <input value={q} onChange={(e) => setQ(e.target.value)}
+            placeholder={t('enonicRedCrossModule.knowledge.searchPlaceholder')}
+            style={{ ...sel, width: '100%', boxSizing: 'border-box' }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {LEVEL_ORDER.filter((lv) => levelCounts[lv]).map((lv) => {
+              const m = LEVEL_META[lv] || LEVEL_META.guidance;
+              const active = level === lv;
+              return (
+                <button key={lv} onClick={() => setLevel(active ? '' : lv)}
+                  title={t('enonicRedCrossModule.knowledge.filterByLevel')}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                    fontSize: 11.5, fontWeight: 700, color: m.color, background: m.bg,
+                    borderRadius: 999, padding: '4px 10px', textTransform: 'uppercase', letterSpacing: 0.3,
+                    border: `1px solid ${active ? m.color : m.border}`,
+                    outline: active ? `2px solid ${m.color}` : 'none', outlineOffset: active ? 1 : 0 }}>
+                  <span>{t(`enonicRedCrossModule.evidence.${lv}`, lv)}</span>
+                  <span style={{ background: '#fff', border: `1px solid ${m.border}`, borderRadius: 999, padding: '0 6px', fontSize: 11 }}>{levelCounts[lv]}</span>
+                </button>
+              );
+            })}
           </div>
-          <p style={{ margin: '8px 0 0', color: '#374151', lineHeight: 1.6, fontSize: 14 }}>{c.text}</p>
-          <Sources items={c.sources} label={t('enonicRedCrossModule.knowledge.sources')} />
-        </div>
-      ))}
+          <div style={{ fontSize: 12, color: MUTED }}>{t('enonicRedCrossModule.knowledge.count', { n: shown.length })}</div>
+          {shown.length === 0 ? (
+            <div style={{ ...card, color: MUTED }}>{t('enonicRedCrossModule.knowledge.noMatch')}</div>
+          ) : shown.map((c) => (
+            <div key={c.id} style={card}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <h3 style={{ margin: 0, fontSize: 15.5, color: INK }}>{c.title}</h3>
+                <LevelBadge level={c.level}>{t(`enonicRedCrossModule.evidence.${c.level}`, c.level)}</LevelBadge>
+              </div>
+              <p style={{ margin: '8px 0 0', color: '#374151', lineHeight: 1.6, fontSize: 14 }}>{c.text}</p>
+              <Sources items={c.sources} label={t('enonicRedCrossModule.knowledge.sources')} />
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 }

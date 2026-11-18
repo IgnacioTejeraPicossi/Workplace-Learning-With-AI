@@ -65,7 +65,11 @@
       "intro": "De forankrede fakta assistenten kan sitere. Hver bit har et evidensnivå og sin kilde.",
       "sources": "Kilder",
       "loading": "Laster kunnskap…",
-      "empty": "Ingen kunnskapsoppføringer."
+      "empty": "Ingen kunnskapsoppføringer.",
+      "searchPlaceholder": "Søk i tittel, tekst eller tagger…",
+      "count": "{{n}} oppføringer",
+      "noMatch": "Ingen oppføringer samsvarer med filtrene.",
+      "filterByLevel": "Filtrer på dette evidensnivået"
     },
     "testCatalog": {
       "title": "Testkatalog (Sprint 7 — kjørt)",

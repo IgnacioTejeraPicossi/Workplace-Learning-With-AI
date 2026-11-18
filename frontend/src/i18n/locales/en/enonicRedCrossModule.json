@@ -65,7 +65,11 @@
       "intro": "The grounded facts the assistant may cite. Each chunk carries an evidence level and its source.",
       "sources": "Sources",
       "loading": "Loading knowledge…",
-      "empty": "No knowledge entries."
+      "empty": "No knowledge entries.",
+      "searchPlaceholder": "Search title, text or tags…",
+      "count": "{{n}} entries",
+      "noMatch": "No entries match your filters.",
+      "filterByLevel": "Filter by this evidence level"
     },
     "testCatalog": {
       "title": "Test catalog (Sprint 7 — executed)",
