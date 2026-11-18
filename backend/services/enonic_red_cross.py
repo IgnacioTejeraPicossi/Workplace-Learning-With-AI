@@ -81,7 +81,7 @@ PROJECT_CONTEXT = {
     "azure_devops": {
         "organization": "RedCrossNorway",
         "project": "rkdotno",
-        "sprint": "Sprint 7 - 2026",
+        "sprint": "Sprint 8 - 2026",
         "suites": ["Sluttbruker (visitor)", "Redaktør (editor)"],
     },
     "platform": "Enonic XP 8 + Content Studio 6 (headless) + Next.js frontend (ISR)",
@@ -91,7 +91,8 @@ PROJECT_CONTEXT = {
         "Exact installed XP / Content Studio / Red Cross app minor+patch versions.",
         "Full Azure DevOps export (official steps + expected results for both personas).",
         "Approved content schemas, role matrix and acceptance criteria.",
-        "Which of the new 30xxx features are actually merged/deployed to xp8dev.",
+        "Expected behaviour / acceptance for the not-yet-run Sprint 8 areas "
+        "(Relatert innhold cards, sticky snarveier, Unitas external-data sync).",
     ],
 }
 
@@ -143,8 +144,9 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
                  "/admin/rest-v2/cs/schema/content/all): branch-district (Distrikt), "
                  "branch-local (Lokalforening), frontpage (Forside), list-page (Listeside), "
                  "news-article, page (= 'Side', also labelled 'Fagartikkel'), story-article. "
-                 "'Fakta' (fact) was added later (deployed 2026-11-04). No form/skjema type is "
-                 "merged yet."),
+                 "'Fakta' (fact) and 'topic' were added later (schema/content/all → 9 rodekors "
+                 "types, 2026-11). The multi-page FORM type is now deployed too, as "
+                 "'no.item.forms:form' (Item Consulting Forms app, Content Studio 6.1.0)."),
         "sources": ["Red Cross QA test log (schema/content/all, 2026-11)"],
         "tags": ["content type", "side", "fagartikkel", "forside", "listeside", "distrikt",
                  "lokalforening", "fakta", "skjema", "form", "schema"],
@@ -248,18 +250,45 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
     },
     {
         "id": "rk-undeployed-features",
-        "title": "Features created as test cases but not yet deployed",
+        "title": "Feature deployment status (authored vs merged)",
         "level": "project-observation",
-        "text": ("Several test cases were authored before their feature was merged to xp8dev. As "
-                 "of 2026-11 the following are NOT deployed and their tests are BLOCKED or FAIL: "
-                 "the form/skjema content type & component (30035/30036/30049-51), the "
-                 "ankerlenke-meny / SNARVEIER anchor menu (29301/29313 cluster — only H2 id-slug "
-                 "generation is live), the toppbanner CTA buttons (29376), and the 2-column "
-                 "faktaboks layout (30075). Ask the dev (Tom) which 30xxx features are actually "
-                 "deployed before attempting them."),
-        "sources": ["Red Cross QA test log (blockers, 2026-11)"],
-        "tags": ["blocked", "not deployed", "skjema", "form", "ankerlenke", "snarveier",
-                 "anchor menu", "toppbanner buttons", "faktaboks", "tom"],
+        "text": ("Several test cases were authored before their feature was merged. Status as of "
+                 "Sprint 8 (2026-11): NOW DEPLOYED and testable — the multi-page form/skjema "
+                 "(no.item.forms:form), the ankerlenke-meny / SNARVEIER anchor menu, the Kart "
+                 "(map) Innholdsblokk, and the «Vis mer» long-fakta truncation. STILL NOT in the "
+                 "deployed frontend — the toppbanner CTA buttons ('Bli frivillig', 29376 FAIL) "
+                 "and the 2-column / wide faktaboks layout (renders stacked; 30075/30080). New "
+                 "Sprint 8 areas (Relatert innhold cards, sticky snarveier, Unitas external-data "
+                 "sync) are authored but not yet executed. Confirm a feature's status with the "
+                 "dev before deep testing."),
+        "sources": ["Red Cross QA test log (deployment status, 2026-11, Sprint 7-8)"],
+        "tags": ["deployed", "not deployed", "skjema", "form", "ankerlenke", "snarveier",
+                 "anchor menu", "kart", "map", "vis mer", "toppbanner buttons", "faktaboks",
+                 "relatert innhold", "unitas", "status", "tom"],
+    },
+    {
+        "id": "rk-kart-map",
+        "title": "Kart (map) block — MapLibre (Sprint 8)",
+        "level": "project-fact",
+        "text": ("The 'Kart' block (an Innholdsblokk on a Side, and a 'Fakta' illustration option) "
+                 "renders with MapLibre GL and is deployed on xp8dev. Config: Blokktittel, "
+                 "Introtekst, Senter (center as 'lat,long'), Zoom (0-22, decimals allowed) and a "
+                 "Markører list — each marker is a 'Koordinatpunkt' with an address/coordinate and "
+                 "an optional Tekst. Verified behaviour (Sprint 8): a marker WITH text shows as a "
+                 "red dot whose click opens a popup (text above the marker, an «×»/Lukk closes it, "
+                 "marker stays); a marker WITHOUT text is inert (normal cursor, no hover colour, no "
+                 "popup). Markers at the SAME coordinate merge into one marker whose popup groups "
+                 "all texts stacked with a thin separator. Zooming out clusters markers into a red "
+                 "circle with a count that counts EACH marker (incl. same-address ones); hovering a "
+                 "cluster darkens it + shows a hand cursor; clicking a cluster zooms in until the "
+                 "markers separate. The map uses cooperative gestures: plain wheel scrolls the PAGE "
+                 "and shows 'Bruk Ctrl + rulling for å zoome i kartet', Ctrl/⌘+scroll zooms. When "
+                 "the browser cannot use WebGL, a grey rounded box 'Kartet kan ikke vises.' replaces "
+                 "the map."),
+        "sources": ["Red Cross QA test log (Kart/map 30419-30447, Sprint 8, 2026-11)"],
+        "tags": ["kart", "map", "maplibre", "markør", "marker", "popup", "cluster", "klynge",
+                 "zoom", "cooperative gestures", "ctrl", "webgl", "koordinatpunkt", "snarveier",
+                 "fakta", "vis mer"],
     },
     # ── Testing recipes (test-recipe) ──────────────────────────────────────
     {
@@ -736,6 +765,80 @@ TEST_CATALOG: List[Dict[str, Any]] = [
     {"id": "30072", "sprint": "7", "persona": "Redaktør", "result": "pass", "title": "Redaktør lagrer fakta uten alt-tekst når bildet har egen alternativ tekst", "note": ""},
     {"id": "30073", "sprint": "7", "persona": "Redaktør", "result": "pass", "title": "Redaktør bytter illustrasjon fra bilde til video uten krav om alt-tekst", "note": ""},
     {"id": "30093", "sprint": "7", "persona": "Redaktør", "result": "pass", "title": "Redaktør får bare tilbud om SVG-filer i feltet «Ikon»", "note": ""},
+
+    # ── Sprint 8 - 2026 (plans 29606 Sluttbruker / 29605 Redaktør) — Kart (map),
+    # «Vis mer» long-fakta, «Relatert innhold» cards, sticky snarveier and the
+    # Unitas external-data sync cases. The Kart + «Vis mer» cases (30419-30447)
+    # were verified LIVE this session; 30445/30446 structurally (the shared
+    # Hausmanns-gate test map was not built); the rest carry the team's recorded
+    # Azure outcome ('Active' → 'planned', not yet executed).
+    # -- Sluttbruker (29606) --
+    {"id": "30419", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser «Vis mer»-knappen inne i boksen på en lang fakta", "note": "A long fakta is cut off at max-height 850px (desktop); the «Vis mer» button sits centered inside the box over the bottom fade, transparent bg, no text showing behind it."},
+    {"id": "30420", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende åpner en lang fakta og ser hele teksten", "note": "«Vis mer» → box grows to max-content (full text shown); the button becomes «Vis mindre», sits under the text and inside the box, covering no text."},
+    {"id": "30421", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende lukker en åpnet fakta med «Vis mindre»", "note": "«Vis mindre» → box cut off again, bottom fade returns, button reverts to «Vis mer»."},
+    {"id": "30422", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser ingen «Vis mer»-knapp på en kort fakta", "note": "A short fakta shows the whole text with no «Vis mer» button and no bottom fade."},
+    {"id": "30423", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Tastaturbruker ser lenken som får fokus i den avkuttede delen av en fakta", "note": "Tabbing to a link in the cut-off region scrolls the box (scroll-padding-block-end) so the focused link appears above the «Vis mer» button and the fade, not covered by them."},
+    {"id": "30429", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende åpner teksten til en markør ved å klikke på den", "note": "Clicking a marker that has text opens a MapLibre popup above it with the text + an «×» (Lukk) that closes it, leaving the marker on the map."},
+    {"id": "30430", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende klikker på markør uten tekst og ingenting åpnes", "note": "A no-text marker (no tabindex) keeps the normal map cursor (not a hand), does not change colour on hover, and opens no box on click."},
+    {"id": "30431", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende åpner teksten til en markør med tastaturet", "note": ""},
+    {"id": "30432", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende scroller forbi kartet uten at kartet zoomer", "note": "Plain wheel over the map scrolls the PAGE (the map does not zoom) and shows the cooperative-gesture overlay «Bruk Ctrl + rulling for å zoome i kartet»; Ctrl/⌘+scroll zooms."},
+    {"id": "30438", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser markør med tekst bli mørkere når musepekeren holdes over den", "note": ""},
+    {"id": "30439", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser en samlet gruppe markører bli mørkere når musepekeren holdes over den", "note": "A cluster (larger red circle + count) darkens to red-base-hover with a hand cursor on hover, and returns to its normal red when the pointer leaves."},
+    {"id": "30440", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser en melding i stedet for kartet når nettleseren ikke kan vise kart", "note": "With WebGL unavailable the map is replaced by a grey rounded box with centered text «Kartet kan ikke vises.»; restoring WebGL brings the map + markers back. (Steps are Firefox about:config; the equivalent was verified in the Chromium test browser.)"},
+    {"id": "30444", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser stedsnavn på norsk i kartet", "note": ""},
+    {"id": "30445", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser én markør for flere steder på samme adresse", "note": "Markers at the same coordinate render as ONE marker; the popup groups all texts stacked with a thin separator (CSS .KmX60q_popupGroup). Verified structurally — the shared Hausmanns-gate test map was not built in this session."},
+    {"id": "30446", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende ser at en samlet gruppe teller hver markør på samme adresse", "note": "A cluster counts each marker entry (count = number of marker occurrences, including same-address ones). Verified structurally."},
+    {"id": "30447", "sprint": "8", "persona": "Sluttbruker", "result": "pass", "title": "Besøkende klikker på en samlet gruppe markører og kartet zoomer inn til de skilles", "note": "Clicking a cluster zooms the map in toward it until the markers separate; geographically close markers separate progressively over the cluster's expansion zooms."},
+    {"id": "30448", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende klikker på en samlet gruppe markører uten at siden hopper", "note": ""},
+    {"id": "30449", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende med tastatur kommer tilbake til markøren når boksen lukkes", "note": ""},
+    {"id": "30450", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende med skjermleser hører navnet på hver markør", "note": ""},
+    {"id": "30510", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser kartet mellom tittelen og teksten i en faktaboks på mobil", "note": ""},
+    {"id": "30511", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende åpner teksten til en markør i kartet i en faktaboks", "note": ""},
+    {"id": "30512", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser hvitt land i kartet i en faktaboks", "note": ""},
+    {"id": "30681", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser ett innhold med bildet ved siden av teksten", "note": ""},
+    {"id": "30682", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser to kort i hver rad når blokken har fire innhold", "note": ""},
+    {"id": "30683", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser tre kort i én rad på en bred side", "note": ""},
+    {"id": "30684", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser tre innhold to og to på en smal side", "note": ""},
+    {"id": "30685", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser kortene under hverandre på mobil", "note": ""},
+    {"id": "30686", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser dato bare på nyhetsartikler i «Relatert innhold»", "note": ""},
+    {"id": "30687", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser en pil foran tittelen på kort uten bilde på mobil", "note": ""},
+    {"id": "30688", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser «Relatert innhold» på et lyseblått felt", "note": ""},
+    {"id": "30689", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser ikke upublisert innhold i «Relatert innhold»", "note": ""},
+    {"id": "30690", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende åpner innholdet ved å klikke hvor som helst på kortet", "note": ""},
+    {"id": "30761", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser snarveiene holde seg synlige mens siden scrolles på stor skjerm", "note": ""},
+    {"id": "30762", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser snarveiene i venstre kolonne uten overskrift og linje", "note": ""},
+    {"id": "30763", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser snarveiene over innholdet på mobil", "note": ""},
+    {"id": "30764", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser snarveiene scrolle bort når «Lås fast i toppen ved scrolling» ikke er krysset av", "note": ""},
+    {"id": "30765", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Besøkende ser snarveiene med overskrift og linje på side uten «To kolonner»", "note": ""},
+    {"id": "30958", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Tester ser tøyinnsamlingsboksene fra Unitas med navn, adresse, koordinater og fullstatus", "note": ""},
+    {"id": "30959", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Tester ser at en lokasjon fjernet i Unitas er borte etter neste henting", "note": ""},
+    {"id": "30960", "sprint": "8", "persona": "Sluttbruker", "result": "planned", "title": "Tester finner ikke Unitas-nøkkelen i svaret fra Guillotine", "note": ""},
+    # -- Redaktør (29605) --
+    {"id": "30426", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til kartblokk med tittel og introtekst", "note": ""},
+    {"id": "30427", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til markør med tekst på kartet", "note": ""},
+    {"id": "30428", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør endrer zoomnivået på kartet", "note": ""},
+    {"id": "30433", "sprint": "8", "persona": "Redaktør", "result": "fail", "title": "Redaktør legger til markør ved å søke opp en adresse i Norge", "note": _FAIL_NOTE},
+    {"id": "30434", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør ser valgt adresse igjen etter å ha åpnet innholdet på nytt", "note": ""},
+    {"id": "30435", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør finner ikke adresser utenfor Norge", "note": ""},
+    {"id": "30436", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør får feilmelding når zoom er utenfor 0–22", "note": ""},
+    {"id": "30437", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør ser alle adresser som deler punkt med den valgte adressen", "note": ""},
+    {"id": "30506", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør velger kart som illustrasjon i faktaboks", "note": ""},
+    {"id": "30507", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør legger til markør med tekst på kartet i en faktaboks", "note": ""},
+    {"id": "30508", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør lagrer faktaboks med bilde uten å fylle ut kartet", "note": ""},
+    {"id": "30509", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør bytter illustrasjon fra bilde til kart i en faktaboks", "note": ""},
+    {"id": "30513", "sprint": "8", "persona": "Redaktør", "result": "pass", "title": "Redaktør lagrer zoom med desimaltall", "note": ""},
+    {"id": "30675", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør legger til «Relatert innhold»-blokk med selvvalgt innhold", "note": ""},
+    {"id": "30676", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør velger innhold av ulike typer i «Relatert innhold»", "note": ""},
+    {"id": "30677", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør velger bakgrunnsfarge for «Relatert innhold»", "note": ""},
+    {"id": "30678", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør endrer rekkefølgen på innholdet i «Relatert innhold»", "note": ""},
+    {"id": "30679", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør legger til nøkkelord på en nyhetsartikkel", "note": ""},
+    {"id": "30680", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør legger til en bunnlenke i «Relatert innhold»", "note": ""},
+    {"id": "30759", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør legger til layouten «To kolonner» med snarveier til venstre", "note": ""},
+    {"id": "30760", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Redaktør krysser av «Lås fast i toppen ved scrolling» på ankerlenke-menyen", "note": ""},
+    {"id": "30954", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Administrator ser én seksjon per kilde i «Synkronisering av eksterne data»", "note": ""},
+    {"id": "30955", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Administrator synkroniserer tøyinnsamlingsbokser og ser at synkroniseringen blir ferdig", "note": ""},
+    {"id": "30956", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Administrator starter tøyinnsamlingsbokser mens lokalforeninger synkroniseres", "note": ""},
+    {"id": "30957", "sprint": "8", "persona": "Redaktør", "result": "planned", "title": "Administrator får beskjed om at en synkronisering av lokalforeninger allerede kjører", "note": ""},
 ]
 
 _RESULT_META = {
