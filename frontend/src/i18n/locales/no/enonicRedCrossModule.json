@@ -91,7 +91,9 @@
         "partial": "Delvis",
         "blocked": "Blokkert",
         "planned": "Planlagt"
-      }
+      },
+      "exportCsv": "Eksporter CSV",
+      "filterByResult": "Filtrer på dette resultatet"
     },
     "projectContext": {
       "title": "Prosjektkontekst",

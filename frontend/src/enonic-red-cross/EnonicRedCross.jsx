@@ -413,6 +413,42 @@ function TestCatalog({ t, onAskCase }) {
   }, [q, persona, result, sprint]);
 
   const sel = { border: `1px solid ${LINE}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#fff' };
+
+  // Breakdown of the CURRENT filtered view, by result (emoji taken from the rows).
+  const RESULT_ORDER = ['pass', 'fail', 'partial', 'blocked', 'planned'];
+  const stats = {};
+  const emojiFor = {};
+  (cases || []).forEach((c) => {
+    stats[c.result] = (stats[c.result] || 0) + 1;
+    if (c.result_emoji) emojiFor[c.result] = c.result_emoji;
+  });
+
+  // Export the current filtered view as CSV (UTF-8 BOM so Excel renders æøå; the
+  // data is already on screen — a local Blob download, nothing leaves the browser).
+  const csvCell = (v) => {
+    const s = v == null ? '' : String(v);
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const downloadCsv = () => {
+    if (!cases || !cases.length) return;
+    const tc = (k) => t(`enonicRedCrossModule.testCatalog.${k}`);
+    const head = [tc('colId'), tc('sprint'), tc('colResult'), tc('colPersona'), tc('colTitle'), tc('colNote')];
+    const rows = (cases || []).map((c) => [
+      c.id, c.sprint || '', t(`enonicRedCrossModule.testCatalog.results.${c.result}`),
+      c.persona, c.title, c.note || '',
+    ]);
+    const csv = '﻿' + [head, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `enonic-red-cross-test-catalog${sprint ? `-sprint${sprint}` : ''}-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <p style={{ margin: 0, color: MUTED, fontSize: 13.5 }}>{t('enonicRedCrossModule.testCatalog.intro')}</p>
@@ -443,6 +479,32 @@ function TestCatalog({ t, onAskCase }) {
         <div style={{ ...card, color: MUTED }}>{t('enonicRedCrossModule.testCatalog.empty')}</div>
       ) : (
         <>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              {RESULT_ORDER.filter((r) => stats[r]).map((r) => {
+                const m = RESULT_META[r] || RESULT_META.blocked;
+                const active = result === r;
+                return (
+                  <button key={r} onClick={() => setResult(active ? '' : r)}
+                    title={t('enonicRedCrossModule.testCatalog.filterByResult')}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                      fontSize: 12, fontWeight: 700, color: m.color, background: m.bg,
+                      borderRadius: 999, padding: '4px 10px',
+                      border: `1px solid ${active ? m.color : m.border}`,
+                      outline: active ? `2px solid ${m.color}` : 'none', outlineOffset: active ? 1 : 0 }}>
+                    <span>{emojiFor[r]} {t(`enonicRedCrossModule.testCatalog.results.${r}`)}</span>
+                    <span style={{ background: '#fff', border: `1px solid ${m.border}`, borderRadius: 999, padding: '0 6px', fontSize: 11 }}>{stats[r]}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button onClick={downloadCsv}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                fontSize: 12.5, fontWeight: 700, color: RED, background: '#fff',
+                border: `1px solid ${LINE}`, borderRadius: 8, padding: '6px 12px' }}>
+              ⬇ {t('enonicRedCrossModule.testCatalog.exportCsv')}
+            </button>
+          </div>
           <div style={{ fontSize: 12, color: MUTED }}>{t('enonicRedCrossModule.testCatalog.count', { n: cases.length })}</div>
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
             <div style={{ overflowX: 'auto' }}>
@@ -468,6 +530,13 @@ function TestCatalog({ t, onAskCase }) {
                               color: RED, cursor: 'pointer', textDecoration: 'underline', fontSize: 13 }}>
                             {c.id}
                           </button>
+                          {sprintOpts.length > 1 && c.sprint && (
+                            <span title={`${t('enonicRedCrossModule.testCatalog.sprint')} ${c.sprint}`}
+                              style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: MUTED,
+                                background: BG_SOFT, border: `1px solid ${LINE}`, borderRadius: 6, padding: '1px 5px' }}>
+                              S{c.sprint}
+                            </span>
+                          )}
                         </td>
                         <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
                           <span style={{ fontSize: 11, fontWeight: 700, color: m.color, background: m.bg, border: `1px solid ${m.border}`, borderRadius: 999, padding: '2px 8px' }}>
@@ -476,7 +545,9 @@ function TestCatalog({ t, onAskCase }) {
                         </td>
                         <td style={{ padding: '10px 12px', color: MUTED, whiteSpace: 'nowrap' }}>{c.persona}</td>
                         <td style={{ padding: '10px 12px', color: INK, minWidth: 220 }}>{c.title}</td>
-                        <td style={{ padding: '10px 12px', color: '#374151', minWidth: 240 }}>{c.note}</td>
+                        <td style={{ padding: '10px 12px', color: '#374151', minWidth: 240 }}>
+                          {c.note ? c.note : <span style={{ color: '#9ca3af' }}>—</span>}
+                        </td>
                       </tr>
                     );
                   })}

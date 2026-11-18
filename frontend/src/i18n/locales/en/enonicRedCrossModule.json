@@ -91,7 +91,9 @@
         "partial": "Partial",
         "blocked": "Blocked",
         "planned": "Planned"
-      }
+      },
+      "exportCsv": "Export CSV",
+      "filterByResult": "Filter by this result"
     },
     "projectContext": {
       "title": "Project context",
