@@ -57,7 +57,8 @@
       "nextQuestion": "Siguiente pregunta sugerida",
       "emptyHint": "Tu respuesta fundamentada aparecerá aquí, con fuentes citadas y niveles de evidencia.",
       "error": "El asistente no pudo responder ahora mismo. Inténtalo de nuevo.",
-      "mockNote": "Respuesta mock sin conexión (sin LLM configurado) — la estructura es representativa; el texto es un marcador de posición."
+      "mockNote": "Respuesta mock sin conexión (sin LLM configurado) — la estructura es representativa; el texto es un marcador de posición.",
+      "groundedOn": "Basado en ({{n}})"
     },
     "knowledge": {
       "title": "Base de conocimiento curada",

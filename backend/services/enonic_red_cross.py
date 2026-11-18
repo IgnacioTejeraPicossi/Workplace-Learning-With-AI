@@ -982,6 +982,25 @@ def _grounding_block(chunks: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def _grounding_meta(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Lightweight view of the retrieved grounding, for the client to show
+    'what this answer was grounded on' (transparency). Catalog cases are flagged
+    so the UI can make them clickable (re-ask)."""
+    out = []
+    for c in chunks:
+        is_case = c["id"].startswith("case-")
+        out.append({
+            "id": c["id"],
+            "title": c["title"],
+            "level": c["level"],
+            "text": c["text"],
+            "sources": c["sources"],
+            "is_case": is_case,
+            "case_id": c["id"][5:] if is_case else None,
+        })
+    return out
+
+
 def _system_prompt(lang: str) -> str:
     return (
         "You are Enonic 'Red Cross', a project knowledge and testing assistant inside "
@@ -1068,6 +1087,7 @@ def _make_mock(lang: str, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
         "missing_information": [m["missing"]],
         "suggested_next_question": m["next"],
         "sources_consulted": sorted({s for c in chunks for s in c["sources"]}),
+        "grounding": _grounding_meta(chunks),
         "is_mock": True,
         "version": ENONIC_RED_CROSS_VERSION,
     }
@@ -1130,6 +1150,7 @@ async def answer(message: str, lang: str = "en",
                 parsed = _sanitize(parsed, chunks)
                 parsed["is_mock"] = False
                 parsed["version"] = ENONIC_RED_CROSS_VERSION
+                parsed["grounding"] = _grounding_meta(chunks)
                 return parsed
         except Exception:
             pass

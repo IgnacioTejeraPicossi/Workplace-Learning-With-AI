@@ -57,7 +57,8 @@
       "nextQuestion": "Suggested next question",
       "emptyHint": "Your grounded answer will appear here, with cited sources and evidence levels.",
       "error": "The assistant could not answer right now. Please try again.",
-      "mockNote": "Offline mock response (no LLM configured) — structure is representative; wording is a placeholder."
+      "mockNote": "Offline mock response (no LLM configured) — structure is representative; wording is a placeholder.",
+      "groundedOn": "Grounded on ({{n}})"
     },
     "knowledge": {
       "title": "Curated knowledge base",

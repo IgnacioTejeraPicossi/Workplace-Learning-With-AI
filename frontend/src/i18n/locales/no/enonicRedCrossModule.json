@@ -57,7 +57,8 @@
       "nextQuestion": "Foreslått neste spørsmål",
       "emptyHint": "Det forankrede svaret vises her, med siterte kilder og evidensnivåer.",
       "error": "Assistenten kunne ikke svare akkurat nå. Prøv igjen.",
-      "mockNote": "Frakoblet mock-svar (ingen LLM konfigurert) — strukturen er representativ; ordlyden er en plassholder."
+      "mockNote": "Frakoblet mock-svar (ingen LLM konfigurert) — strukturen er representativ; ordlyden er en plassholder.",
+      "groundedOn": "Grunnlag ({{n}})"
     },
     "knowledge": {
       "title": "Kuratert kunnskapsbase",

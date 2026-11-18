@@ -119,6 +119,9 @@ async def test_chat_mock_path_is_wellformed():
     assert d["is_mock"] is True
     assert d["evidence_status"] in _STATUS
     assert d["sections"] and all(s["level"] in _LEVELS for s in d["sections"])
+    # grounding transparency: the answer exposes what it was grounded on
+    assert isinstance(d.get("grounding"), list) and d["grounding"]
+    assert all({"id", "title", "level", "is_case"} <= set(g) for g in d["grounding"])
 
 
 @pytest.mark.asyncio
@@ -143,6 +146,7 @@ async def test_chat_llm_path_parses_and_sanitizes():
     assert d["sections"][0]["level"] == "project-fact"
     assert d["sections"][1]["level"] == "guidance"        # off-palette clamped
     assert d["evidence_status"] == "supported"
+    assert isinstance(d.get("grounding"), list) and d["grounding"]
 
 
 @pytest.mark.asyncio

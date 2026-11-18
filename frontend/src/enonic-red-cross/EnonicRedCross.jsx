@@ -263,6 +263,49 @@ function AnswerCard({ t, answer, onFollowUp }) {
           ↪ {answer.suggested_next_question}
         </button>
       )}
+
+      {Array.isArray(answer.grounding) && answer.grounding.length > 0 && (
+        <GroundedOn t={t} items={answer.grounding} onAskCase={onFollowUp} />
+      )}
+    </div>
+  );
+}
+
+// Transparency: a collapsible list of the chunks the answer was grounded on.
+// Catalog cases (is_case) are clickable and re-ask about that case.
+function GroundedOn({ t, items, onAskCase }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 12 }}>
+      <button onClick={() => setOpen((o) => !o)}
+        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: MUTED,
+          fontSize: 12.5, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span aria-hidden>{open ? '▾' : '▸'}</span>
+        {t('enonicRedCrossModule.assistant.groundedOn', { n: items.length })}
+      </button>
+      {open && (
+        <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+          {items.map((g) => (
+            <div key={g.id} style={{ border: `1px solid ${LINE}`, borderRadius: 10, padding: 10, background: BG_SOFT }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <LevelBadge level={g.level}>{t(`enonicRedCrossModule.evidence.${g.level}`, g.level)}</LevelBadge>
+                {g.is_case && g.case_id ? (
+                  <button onClick={() => onAskCase(t('enonicRedCrossModule.testCatalog.askTemplate', { id: g.case_id }))}
+                    title={t('enonicRedCrossModule.testCatalog.askTitle')}
+                    style={{ background: 'none', border: 'none', padding: 0, color: RED, fontWeight: 700,
+                      cursor: 'pointer', textDecoration: 'underline', fontSize: 13.5 }}>
+                    {g.title}
+                  </button>
+                ) : (
+                  <span style={{ fontWeight: 600, color: INK, fontSize: 13.5 }}>{g.title}</span>
+                )}
+              </div>
+              {g.text && <p style={{ margin: '6px 0 0', color: '#374151', fontSize: 12.5, lineHeight: 1.5 }}>{g.text}</p>}
+              <Sources items={g.sources} label={t('enonicRedCrossModule.assistant.sources')} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
