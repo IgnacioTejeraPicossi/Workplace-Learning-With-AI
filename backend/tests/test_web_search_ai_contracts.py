@@ -12,9 +12,18 @@ from unittest.mock import patch, AsyncMock
 from httpx import AsyncClient, ASGITransport
 
 from backend.app import app
-from backend.simple_web_search import SearchResult
+from backend.simple_web_search import SearchResult, _ws_cache_clear
 
 BASE = "http://test"
+
+
+@pytest.fixture(autouse=True)
+def _clear_ws_cache():
+    # The /web-search-ai cache is module-level; clear it around each test so the
+    # same query across tests doesn't return a previous test's cached answer.
+    _ws_cache_clear()
+    yield
+    _ws_cache_clear()
 
 _SAMPLE = {
     "results": [
@@ -73,3 +82,19 @@ async def test_validation_empty_topic():
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
         r = await c.post("/api/web-search-ai", json={"topic": "   "})
     assert r.status_code == 422
+
+
+@patch("backend.llm.ask_ai_unified_sync", return_value="Cached answer [1].")
+@patch("backend.simple_web_search.simple_web_search", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_ai_answer_is_cached_per_query(mock_search, mock_llm):
+    mock_search.return_value = _SAMPLE
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r1 = await c.post("/api/web-search-ai", json={"topic": "cache me", "limit": 6})
+        r2 = await c.post("/api/web-search-ai", json={"topic": "cache me", "limit": 6})
+    assert r1.status_code == 200 and r2.status_code == 200
+    # The second identical query is served from cache -> upstream search ran once.
+    assert mock_search.call_count == 1
+    assert r1.json().get("cached") is None  # first call is a fresh miss
+    assert r2.json().get("cached") is True  # second call is a cache hit
+    assert r1.json()["answer"] == r2.json()["answer"]

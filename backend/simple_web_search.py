@@ -4,6 +4,8 @@ from typing import List, Dict
 from urllib.parse import quote_plus
 import httpx
 import re
+import asyncio
+import time
 
 router = APIRouter()
 
@@ -169,14 +171,47 @@ def _synthesize_answer(query: str, results: List[SearchResult]):
     return result.strip(), False
 
 
-@router.post("/web-search-ai")
-async def web_search_ai(request: SimpleSearchRequest):
-    """Fresh web search + AI-synthesized, cited answer (reusable across modules)."""
-    query = (request.topic or "").strip()
-    if not query:
-        raise HTTPException(status_code=422, detail="Empty search query")
+# ── Per-query result cache + in-flight de-duplication ────────────────────────
+# DuckDuckGo throttles the HTML endpoint (intermittent 202s), and React 18
+# StrictMode fires each FreshInsights panel's fetch twice in dev. A tiny
+# in-memory TTL cache plus in-flight de-duplication collapses repeated/concurrent
+# identical queries into a SINGLE upstream search, and remembers good answers for
+# a while — fewer DuckDuckGo hits, fewer 202s, and the StrictMode double-call is
+# served once. In-memory only (per process); fine for this best-effort feature.
+_WS_CACHE = {}        # key -> (expires_at_monotonic, data)
+_WS_INFLIGHT = {}     # key -> asyncio.Future for an in-progress computation
+_WS_STATE_LOCK = asyncio.Lock()
+_WS_TTL_OK_S = 900    # cache answers WITH results for 15 min
+_WS_TTL_EMPTY_S = 60  # cache empty/throttled answers only briefly (recover fast)
 
-    search = await simple_web_search(SimpleSearchRequest(topic=query, limit=request.limit or 6))
+
+def _ws_cache_clear() -> None:
+    """Clear the web-search cache + in-flight map. Used by tests for isolation."""
+    _WS_CACHE.clear()
+    _WS_INFLIGHT.clear()
+
+
+def _ws_cache_get(key):
+    entry = _WS_CACHE.get(key)
+    if not entry:
+        return None
+    expires_at, data = entry
+    if time.monotonic() >= expires_at:
+        _WS_CACHE.pop(key, None)
+        return None
+    return data
+
+
+def _ws_cache_put(key, data) -> None:
+    # Good results linger; an empty/throttled result expires quickly so the panel
+    # can recover as soon as DuckDuckGo stops rate-limiting.
+    ttl = _WS_TTL_OK_S if data.get("results") else _WS_TTL_EMPTY_S
+    _WS_CACHE[key] = (time.monotonic() + ttl, data)
+
+
+async def _compute_web_search_ai(query: str, limit: int) -> Dict:
+    """Run the actual search + AI synthesis for one query (no caching)."""
+    search = await simple_web_search(SimpleSearchRequest(topic=query, limit=limit))
     results = search.get("results", [])
     answer, is_mock = _synthesize_answer(query, results)
     citations = [
@@ -191,3 +226,48 @@ async def web_search_ai(request: SimpleSearchRequest):
         "provider": "DuckDuckGo + AI",
         "fallback_url": search.get("fallback_url"),
     }
+
+
+@router.post("/web-search-ai")
+async def web_search_ai(request: SimpleSearchRequest):
+    """Fresh web search + AI-synthesized, cited answer (reusable across modules).
+
+    Cached per (query, limit): a still-fresh result is served from cache, and
+    identical concurrent requests share one upstream search instead of each
+    hitting DuckDuckGo. Responses served without a new search carry cached=True.
+    """
+    query = (request.topic or "").strip()
+    if not query:
+        raise HTTPException(status_code=422, detail="Empty search query")
+    limit = request.limit or 6
+    key = (query.lower(), limit)
+
+    async with _WS_STATE_LOCK:
+        cached = _ws_cache_get(key)
+        if cached is not None:
+            return {**cached, "cached": True}
+        fut = _WS_INFLIGHT.get(key)
+        is_owner = fut is None
+        if is_owner:
+            fut = asyncio.get_running_loop().create_future()
+            _WS_INFLIGHT[key] = fut
+
+    if not is_owner:
+        # Another request is already running this exact query — reuse its result.
+        data = await fut
+        return {**data, "cached": True}
+
+    try:
+        data = await _compute_web_search_ai(query, limit)
+        async with _WS_STATE_LOCK:
+            _ws_cache_put(key, data)
+        if not fut.done():
+            fut.set_result(data)
+        return data
+    except Exception as e:
+        if not fut.done():
+            fut.set_exception(e)
+        raise
+    finally:
+        async with _WS_STATE_LOCK:
+            _WS_INFLIGHT.pop(key, None)
