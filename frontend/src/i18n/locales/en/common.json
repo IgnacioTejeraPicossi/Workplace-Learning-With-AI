@@ -1254,16 +1254,16 @@
       "passphrasePrompt": "Set encryption passphrase (not stored)",
       "disable": "Disable",
       "activate": "Activate",
-      "description": "Your local installation is properly secured with the following features:",
+      "description": "This app encrypts your local data. The other items are local best practices you control on your own device.",
       "encryption": "Encryption",
       "encryptionActive": "All local data is encrypted at rest",
       "encryptionDisabled": "Encryption is currently disabled",
       "accessControl": "Access Control",
-      "accessControlDesc": "Local authentication required",
+      "accessControlDesc": "Protect this device with a login or lock screen",
       "firewall": "Firewall",
-      "firewallDesc": "Local network access restricted",
+      "firewallDesc": "Keep your operating system firewall enabled",
       "updates": "Updates",
-      "updatesDesc": "Security patches automatically applied"
+      "updatesDesc": "Keep your browser and operating system up to date"
     },
     "dataDeletion": {
       "label": "Automatic Data Deletion",
@@ -1524,21 +1524,21 @@
       },
       "additionalInfo": "Additional Information",
       "items": {
-        "lastAudit": {
-          "name": "Last Security Audit",
-          "value": "2024-01-15"
-        },
         "compliance": {
           "name": "Compliance",
           "value": "GDPR, CCPA, SOC 2 Type II"
         },
-        "certifications": {
-          "name": "Security Certifications",
-          "value": "ISO 27001, PCI DSS"
+        "assessment": {
+          "name": "Security assessment",
+          "value": "Self-assessment (not independently certified)"
         },
-        "penTesting": {
-          "name": "Penetration Testing",
-          "value": "Quarterly assessments"
+        "dataLocation": {
+          "name": "Data location",
+          "value": "Stored and processed locally in your browser"
+        },
+        "userControl": {
+          "name": "Your control",
+          "value": "You manage encryption, retention and anonymization"
         }
       }
     },

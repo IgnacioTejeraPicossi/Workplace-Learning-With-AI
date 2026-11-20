@@ -1576,16 +1576,16 @@
       "passphrasePrompt": "Angi krypteringspassord (lagres ikke)",
       "disable": "Deaktiver",
       "activate": "Aktiver",
-      "description": "Den lokale installasjonen din er sikret med følgende funksjoner:",
+      "description": "Denne appen krypterer dine lokale data. De andre punktene er lokale beste praksiser du selv styrer på enheten din.",
       "encryption": "Kryptering",
       "encryptionActive": "Alle lokale data er kryptert i hvile",
       "encryptionDisabled": "Kryptering er for øyeblikket deaktivert",
       "accessControl": "Tilgangskontroll",
-      "accessControlDesc": "Lokal autentisering kreves",
+      "accessControlDesc": "Beskytt denne enheten med innlogging eller skjermlås",
       "firewall": "Brannmur",
-      "firewallDesc": "Lokal nettverkstilgang begrenset",
+      "firewallDesc": "Hold operativsystemets brannmur på",
       "updates": "Oppdateringer",
-      "updatesDesc": "Sikkerhetsoppdateringer brukes automatisk"
+      "updatesDesc": "Hold nettleseren og operativsystemet oppdatert"
     },
     "dataDeletion": {
       "label": "Automatisk datasletting",
@@ -1846,21 +1846,21 @@
       },
       "additionalInfo": "Tilleggsinformasjon",
       "items": {
-        "lastAudit": {
-          "name": "Siste sikkerhetsrevisjon",
-          "value": "15.01.2024"
-        },
         "compliance": {
           "name": "Samsvar",
           "value": "GDPR, CCPA, SOC 2 Type II"
         },
-        "certifications": {
-          "name": "Sikkerhetssertifiseringer",
-          "value": "ISO 27001, PCI DSS"
+        "assessment": {
+          "name": "Sikkerhetsvurdering",
+          "value": "Egenvurdering (ikke uavhengig sertifisert)"
         },
-        "penTesting": {
-          "name": "Penetrasjonstesting",
-          "value": "Kvartalsvise vurderinger"
+        "dataLocation": {
+          "name": "Datalagring",
+          "value": "Lagres og behandles lokalt i nettleseren din"
+        },
+        "userControl": {
+          "name": "Din kontroll",
+          "value": "Du styrer kryptering, oppbevaring og anonymisering"
         }
       }
     },

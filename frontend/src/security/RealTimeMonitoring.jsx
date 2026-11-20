@@ -59,11 +59,11 @@ const RealTimeMonitoring = () => {
   const uniqueTypes = [...new Set(allEvents.map(e => e.type))];
 
   const severityConfig = {
-    [EventSeverity.CRITICAL]: { icon: '🔴', color: '#c62828', bg: '#ffebee' },
-    [EventSeverity.ERROR]:    { icon: '🟠', color: '#e65100', bg: '#fff3e0' },
-    [EventSeverity.WARNING]:  { icon: '🟡', color: '#f57f17', bg: '#fffde7' },
-    [EventSeverity.OK]:       { icon: '🟢', color: '#2e7d32', bg: '#e8f5e9' },
-    [EventSeverity.INFO]:     { icon: '🔵', color: '#1565c0', bg: '#e3f2fd' }
+    [EventSeverity.CRITICAL]: { icon: '🔴', color: '#c62828', bg: colors.dangerBg },
+    [EventSeverity.ERROR]:    { icon: '🟠', color: '#e65100', bg: colors.warningBg },
+    [EventSeverity.WARNING]:  { icon: '🟡', color: '#f57f17', bg: colors.warningBg },
+    [EventSeverity.OK]:       { icon: '🟢', color: '#2e7d32', bg: colors.successBg },
+    [EventSeverity.INFO]:     { icon: '🔵', color: '#1565c0', bg: colors.infoBg }
   };
 
   const typeIcons = {
@@ -82,7 +82,7 @@ const RealTimeMonitoring = () => {
   };
 
   const cardStyle = {
-    background: colors.background,
+    background: colors.cardBackground,
     padding: '20px',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
@@ -255,7 +255,7 @@ const RealTimeMonitoring = () => {
           disabled={allEvents.length === 0}
           style={{
             padding: '6px 14px',
-            background: allEvents.length > 0 ? '#ffebee' : '#eee',
+            background: allEvents.length > 0 ? colors.dangerBg : colors.sidebarBackground,
             border: `1px solid ${allEvents.length > 0 ? '#ef9a9a' : colors.border}`,
             borderRadius: '6px',
             cursor: allEvents.length > 0 ? 'pointer' : 'not-allowed',
@@ -318,7 +318,8 @@ const RealTimeMonitoring = () => {
                   background: sevConf.bg,
                   borderRadius: '6px',
                   borderLeft: `4px solid ${sevConf.color}`,
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  color: colors.text
                 }}>
                   {/* Type icon */}
                   <span style={{ fontSize: '18px', flexShrink: 0 }}>
@@ -390,7 +391,7 @@ const RealTimeMonitoring = () => {
                     </div>
                     <div style={{
                       height: '4px',
-                      background: '#e0e0e0',
+                      background: colors.track,
                       borderRadius: '2px',
                       marginTop: '4px',
                       overflow: 'hidden'
@@ -418,7 +419,7 @@ const RealTimeMonitoring = () => {
           zIndex: 1000
         }}>
           <div style={{
-            background: colors.background,
+            background: colors.cardBackground,
             padding: '28px',
             borderRadius: '12px',
             maxWidth: '400px',

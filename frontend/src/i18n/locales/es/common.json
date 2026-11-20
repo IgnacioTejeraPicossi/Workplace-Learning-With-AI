@@ -3308,16 +3308,16 @@
       "passphrasePrompt": "Establece la frase de cifrado (no se almacena)",
       "disable": "Desactivar",
       "activate": "Activar",
-      "description": "Tu instalación local está correctamente protegida con las siguientes características:",
+      "description": "Esta app cifra tus datos locales. Los demás puntos son buenas prácticas locales que tú controlas en tu dispositivo.",
       "encryption": "Cifrado",
       "encryptionActive": "Todos los datos locales están cifrados en reposo",
       "encryptionDisabled": "El cifrado está actualmente desactivado",
       "accessControl": "Control de acceso",
-      "accessControlDesc": "Se requiere autenticación local",
+      "accessControlDesc": "Protege este dispositivo con inicio de sesión o bloqueo de pantalla",
       "firewall": "Cortafuegos",
-      "firewallDesc": "Acceso a la red local restringido",
+      "firewallDesc": "Mantén activado el firewall de tu sistema operativo",
       "updates": "Actualizaciones",
-      "updatesDesc": "Parches de seguridad aplicados automáticamente"
+      "updatesDesc": "Mantén tu navegador y sistema operativo actualizados"
     },
     "dataDeletion": {
       "label": "Eliminación automática de datos",
@@ -3578,21 +3578,21 @@
       },
       "additionalInfo": "Información adicional",
       "items": {
-        "lastAudit": {
-          "name": "Última auditoría de seguridad",
-          "value": "2024-01-15"
-        },
         "compliance": {
           "name": "Cumplimiento normativo",
           "value": "RGPD, CCPA, SOC 2 Tipo II"
         },
-        "certifications": {
-          "name": "Certificaciones de seguridad",
-          "value": "ISO 27001, PCI DSS"
+        "assessment": {
+          "name": "Evaluación de seguridad",
+          "value": "Autoevaluación (sin certificación independiente)"
         },
-        "penTesting": {
-          "name": "Pruebas de penetración",
-          "value": "Evaluaciones trimestrales"
+        "dataLocation": {
+          "name": "Ubicación de datos",
+          "value": "Se almacena y procesa localmente en tu navegador"
+        },
+        "userControl": {
+          "name": "Tu control",
+          "value": "Tú gestionas el cifrado, la retención y la anonimización"
         }
       }
     },

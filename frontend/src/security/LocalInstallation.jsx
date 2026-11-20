@@ -29,7 +29,7 @@ const LocalInstallation = () => {
         {t('security.localInstallation.title')}
       </h3>
       <div style={{
-        background: colors.background,
+        background: colors.cardBackground,
         padding: '20px',
         borderRadius: '8px',
         border: `1px solid ${colors.border}`
@@ -45,14 +45,14 @@ const LocalInstallation = () => {
             {encryptionOn ? (
               <button
                 onClick={handleDisable}
-                style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer' }}
+                style={{ padding: '8px 12px', borderRadius: 6, border: `1px solid ${colors.border}`, background: colors.cardBackground, color: colors.text, cursor: 'pointer' }}
               >
                 {t('security.localInstallation.disable')}
               </button>
             ) : (
               <button
                 onClick={handleActivate}
-                style={{ padding: '8px 12px', borderRadius: 6, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer' }}
+                style={{ padding: '8px 12px', borderRadius: 6, border: 'none', background: colors.buttonSuccess, color: '#fff', cursor: 'pointer' }}
               >
                 {t('security.localInstallation.activate')}
               </button>

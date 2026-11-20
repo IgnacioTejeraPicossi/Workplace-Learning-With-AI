@@ -144,7 +144,7 @@ const YourData = () => {
   };
 
   const cardStyle = {
-    background: colors.background,
+    background: colors.cardBackground,
     padding: '20px',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
@@ -386,7 +386,7 @@ const YourData = () => {
             <h4 style={{ margin: '20px 0 12px' }}>{t('security.yourData.stats.storageBreakdown')}</h4>
             <div style={{
               height: '16px',
-              background: '#e0e0e0',
+              background: colors.track,
               borderRadius: '8px',
               overflow: 'hidden',
               display: 'flex'
@@ -420,13 +420,13 @@ const YourData = () => {
             ...cardStyle,
             marginTop: 0,
             borderColor: '#f44336',
-            background: '#fff5f5'
+            background: colors.dangerBg
           }}>
             <h4 style={{ color: '#f44336', marginBottom: '12px' }}>⚠️ {t('security.yourData.deleteWarningTitle')}</h4>
-            <p style={{ color: '#666', marginBottom: '16px', fontSize: '14px' }}>
+            <p style={{ color: colors.text, marginBottom: '16px', fontSize: '14px' }}>
               {t('security.yourData.deleteWarningMsg')}
             </p>
-            <ul style={{ color: '#666', marginBottom: '16px', fontSize: '14px', paddingLeft: '20px' }}>
+            <ul style={{ color: colors.text, marginBottom: '16px', fontSize: '14px', paddingLeft: '20px' }}>
               <li>{t('security.yourData.deleteItem1')}</li>
               <li>{t('security.yourData.deleteItem2')}</li>
               <li>{t('security.yourData.deleteItem3')}</li>
@@ -462,7 +462,7 @@ const YourData = () => {
           zIndex: 1000
         }}>
           <div style={{
-            background: colors.background,
+            background: colors.cardBackground,
             padding: '28px',
             borderRadius: '12px',
             maxWidth: '440px',
@@ -488,6 +488,8 @@ const YourData = () => {
                 padding: '10px',
                 borderRadius: '6px',
                 border: `2px solid ${deleteConfirmText === 'DELETE' ? '#f44336' : colors.border}`,
+                background: colors.sidebarBackground,
+                color: colors.text,
                 fontSize: '16px',
                 fontFamily: 'monospace',
                 textAlign: 'center',

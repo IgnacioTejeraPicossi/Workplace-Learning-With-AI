@@ -55,7 +55,7 @@ const DataAnonymization = () => {
   const totalRuleCount = Object.keys(ANONYMIZATION_RULES).length;
 
   const cardStyle = {
-    background: colors.background,
+    background: colors.cardBackground,
     padding: '20px',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
@@ -89,8 +89,8 @@ const DataAnonymization = () => {
               borderRadius: '12px',
               fontSize: '13px',
               fontWeight: 'bold',
-              background: config.enabled ? '#e8f5e9' : '#fce4ec',
-              color: config.enabled ? '#2e7d32' : '#c62828'
+              background: config.enabled ? colors.successBg : colors.dangerBg,
+              color: config.enabled ? colors.successText : colors.dangerText
             }}>
               {config.enabled ? t('security.anonymization.active') : t('security.anonymization.inactive')}
             </span>
@@ -240,10 +240,11 @@ const DataAnonymization = () => {
               gap: '16px',
               marginBottom: '12px',
               padding: '10px 16px',
-              background: previewResult.totalMatches > 0 ? '#fff3e0' : '#e8f5e9',
+              background: previewResult.totalMatches > 0 ? colors.warningBg : colors.successBg,
               borderRadius: '6px',
               fontSize: '14px',
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              color: colors.text
             }}>
               <strong>
                 {previewResult.totalMatches > 0
@@ -269,7 +270,8 @@ const DataAnonymization = () => {
                       alignItems: 'center',
                       gap: '4px',
                       padding: '4px 10px',
-                      background: '#fce4ec',
+                      background: colors.sidebarBackground,
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '16px',
                       fontSize: '12px',
                       fontFamily: 'monospace'

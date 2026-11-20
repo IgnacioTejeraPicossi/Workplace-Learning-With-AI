@@ -48,7 +48,20 @@ export const ThemeProvider = ({ children }) => {
       
       // Border colors
       border: isDark ? '#404040' : '#e5e7eb',
-      
+
+      // Semantic status colors (theme-aware bg + text) — for badges, event rows,
+      // checklists, status chips. Avoids hardcoded light backgrounds in dark mode.
+      successBg: isDark ? '#1b3a24' : '#e8f5e9',
+      successText: isDark ? '#81c784' : '#2e7d32',
+      warningBg: isDark ? '#3a2e15' : '#fff3e0',
+      warningText: isDark ? '#ffb74d' : '#e65100',
+      dangerBg: isDark ? '#3a1f1f' : '#ffebee',
+      dangerText: isDark ? '#ef9a9a' : '#c62828',
+      infoBg: isDark ? '#16293d' : '#e3f2fd',
+      infoText: isDark ? '#64b5f6' : '#1565c0',
+      // Neutral track for progress/slider backgrounds
+      track: isDark ? '#404040' : '#e0e0e0',
+
       // Chart colors
       chartGrid: isDark ? '#404040' : '#f0f0f0',
       

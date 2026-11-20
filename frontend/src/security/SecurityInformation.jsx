@@ -16,7 +16,7 @@ const SecurityInformation = () => {
   useEffect(() => { refresh(); }, [refresh]);
 
   const cardStyle = {
-    background: colors.background,
+    background: colors.cardBackground,
     padding: '20px',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
@@ -51,7 +51,7 @@ const SecurityInformation = () => {
         {/* Score Circle */}
         <div style={{ position: 'relative', width: '140px', height: '140px', flexShrink: 0 }}>
           <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-            <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e0e0" strokeWidth="10" />
+            <circle cx="60" cy="60" r="50" fill="none" stroke={colors.track} strokeWidth="10" />
             <circle
               cx="60" cy="60" r="50"
               fill="none"
@@ -127,9 +127,10 @@ const SecurityInformation = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 16px',
-              background: check.passed ? '#e8f5e9' : '#fff3e0',
+              background: check.passed ? colors.successBg : colors.warningBg,
               borderRadius: '8px',
-              borderLeft: `4px solid ${check.passed ? '#4caf50' : '#ff9800'}`
+              borderLeft: `4px solid ${check.passed ? '#4caf50' : '#ff9800'}`,
+              color: colors.text
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '18px' }}>{check.passed ? '✅' : '⚠️'}</span>
@@ -222,7 +223,7 @@ const SecurityInformation = () => {
                 </div>
                 <div style={{
                   height: '8px',
-                  background: '#e0e0e0',
+                  background: colors.track,
                   borderRadius: '4px',
                   overflow: 'hidden',
                   marginBottom: '8px'
@@ -245,7 +246,7 @@ const SecurityInformation = () => {
       <div style={cardStyle}>
         <h4 style={{ marginBottom: '16px' }}>📋 {t('security.securityInfo.additionalInfo')}</h4>
         <div style={{ display: 'grid', gap: '12px' }}>
-          {['lastAudit', 'certifications', 'penTesting'].map((item) => (
+          {['assessment', 'dataLocation', 'userControl'].map((item) => (
             <div key={item} style={{
               padding: '12px 16px',
               background: colors.sidebarBackground,

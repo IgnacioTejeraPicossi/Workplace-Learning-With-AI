@@ -78,7 +78,7 @@ const AutomaticDataDeletion = () => {
   };
 
   const cardStyle = {
-    background: colors.background,
+    background: colors.cardBackground,
     padding: '20px',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
@@ -102,7 +102,7 @@ const AutomaticDataDeletion = () => {
           </div>
           <div style={{
             height: '12px',
-            background: '#e0e0e0',
+            background: colors.track,
             borderRadius: '6px',
             overflow: 'hidden'
           }}>
@@ -257,10 +257,10 @@ const AutomaticDataDeletion = () => {
           <div style={{
             marginTop: '12px',
             padding: '12px',
-            background: '#e8f5e9',
+            background: colors.successBg,
             borderRadius: '6px',
             fontSize: '14px',
-            color: '#2e7d32'
+            color: colors.successText
           }}>
             ✅ {t('security.dataDeletion.purgeComplete', {
               count: lastPurgeResult.purgedCount,
@@ -285,7 +285,7 @@ const AutomaticDataDeletion = () => {
           zIndex: 1000
         }}>
           <div style={{
-            background: colors.background,
+            background: colors.cardBackground,
             padding: '24px',
             borderRadius: '12px',
             maxWidth: '400px',
