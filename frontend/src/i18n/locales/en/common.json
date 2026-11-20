@@ -125,7 +125,7 @@
       "futureApp": "Future App",
       "ideaLog": "Idea Log",
       "featureRoadmap": "Feature Roadmap"
-  },
+    },
     "selfCorrectingLoop": "Self-Correcting AI Loop",
     "andresRobot": "Andrés the Robot"
   },
@@ -2838,6 +2838,24 @@
       "title": "🛰️ Recent Threat Intelligence",
       "intro": "A live, AI-summarized digest of recent cybersecurity threats, CVEs and advisories — grounded in fresh web sources with citations. Press “Get latest” to refresh.",
       "query": "recent cybersecurity threats vulnerabilities CVE and advisories 2026"
+    },
+    "topAttacks": {
+      "title": "Top Cyber Attacks",
+      "subtitle": "How the most common attacks work — and how to defend against them.",
+      "sourceLabel": "Source",
+      "infographicCredit": "Infographic by {{name}}",
+      "viewFlow": "View flow",
+      "howItWorks": "How it works",
+      "defenses": "Defenses",
+      "relatedThreats": "Related threats",
+      "disclaimer": "Educational reference, paraphrased from public knowledge; not reproduced from the original artwork.",
+      "class": {
+        "social": "Social",
+        "malware": "Malware",
+        "network": "Network",
+        "web": "Web",
+        "software": "Software"
+      }
     }
   },
   "ai": {

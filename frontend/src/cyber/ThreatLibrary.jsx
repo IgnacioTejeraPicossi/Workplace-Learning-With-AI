@@ -98,6 +98,20 @@ export default function ThreatLibrary() {
     }
   };
 
+  // Localized attack content: use the no/es i18n override when present, else fall
+  // back to the backend English (the source of truth). Attack names are kept
+  // as-is (international technical terms).
+  const getAttackOneLiner = (atk) =>
+    t(`cyber.topAttacks.data.${atk.id}.one_liner`, { defaultValue: atk.one_liner });
+  const getAttackFlow = (atk) => {
+    const v = t(`cyber.topAttacks.data.${atk.id}.how_it_works`, { returnObjects: true, defaultValue: atk.how_it_works });
+    return Array.isArray(v) ? v : (atk.how_it_works || []);
+  };
+  const getAttackDefenses = (atk) => {
+    const v = t(`cyber.topAttacks.data.${atk.id}.defenses`, { returnObjects: true, defaultValue: atk.defenses });
+    return Array.isArray(v) ? v : (atk.defenses || []);
+  };
+
   const filteredThreats = filterCategory === 'all' 
     ? threats 
     : threats.filter(threat => threat.category === filterCategory);
@@ -189,6 +203,8 @@ export default function ThreatLibrary() {
             {topAttacks.map((atk) => {
               const cm = getAttackClassMeta(atk.attack_class);
               const sm = getSeverityMeta(atk.severity);
+              const flow = getAttackFlow(atk);
+              const oneLiner = getAttackOneLiner(atk);
               return (
                 <div
                   key={atk.id}
@@ -214,14 +230,14 @@ export default function ThreatLibrary() {
                       {atk.severity}
                     </span>
                   </div>
-                  <p style={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4, margin: '0 0 0.75rem' }}>{atk.one_liner}</p>
+                  <p style={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4, margin: '0 0 0.75rem' }}>{oneLiner}</p>
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
-                    {atk.how_it_works.map((step, i) => (
+                    {flow.map((step, i) => (
                       <React.Fragment key={i}>
                         <span title={step} style={{ fontSize: '0.65rem', fontWeight: 700, color: '#374151', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '0.25rem', padding: '0.1rem 0.4rem' }}>
                           {i + 1}
                         </span>
-                        {i < atk.how_it_works.length - 1 && <span style={{ color: '#9ca3af', fontSize: '0.7rem' }}>→</span>}
+                        {i < flow.length - 1 && <span style={{ color: '#9ca3af', fontSize: '0.7rem' }}>→</span>}
                       </React.Fragment>
                     ))}
                     <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: 600, marginLeft: '0.25rem' }}>
@@ -508,6 +524,9 @@ export default function ThreatLibrary() {
       {selectedAttack && (() => {
         const cm = getAttackClassMeta(selectedAttack.attack_class);
         const sm = getSeverityMeta(selectedAttack.severity);
+        const flow = getAttackFlow(selectedAttack);
+        const defenses = getAttackDefenses(selectedAttack);
+        const oneLiner = getAttackOneLiner(selectedAttack);
         return (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
             <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', padding: '2rem', maxWidth: '640px', width: '100%', maxHeight: '85vh', overflowY: 'auto', margin: '1rem' }}>
@@ -525,14 +544,14 @@ export default function ThreatLibrary() {
                 <button onClick={() => setSelectedAttack(null)} style={{ backgroundColor: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#6b7280' }}>×</button>
               </div>
 
-              <p style={{ color: '#374151', lineHeight: 1.5, marginBottom: '1.5rem' }}>{selectedAttack.one_liner}</p>
+              <p style={{ color: '#374151', lineHeight: 1.5, marginBottom: '1.5rem' }}>{oneLiner}</p>
 
               {/* How it works */}
               <div style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '0.75rem' }}>
                   {t('cyber.topAttacks.howItWorks', { defaultValue: 'How it works' })}
                 </h3>
-                {selectedAttack.how_it_works.map((step, i) => (
+                {flow.map((step, i) => (
                   <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.6rem' }}>
                     <span style={{ width: '1.6rem', height: '1.6rem', borderRadius: '50%', background: cm.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
                     <span style={{ color: '#374151', fontSize: '0.9rem', lineHeight: 1.45, paddingTop: '0.1rem' }}>{step}</span>
@@ -546,7 +565,7 @@ export default function ThreatLibrary() {
                   🛡️ {t('cyber.topAttacks.defenses', { defaultValue: 'Defenses' })}
                 </h3>
                 <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#374151', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                  {selectedAttack.defenses.map((d, i) => <li key={i}>{d}</li>)}
+                  {defenses.map((d, i) => <li key={i}>{d}</li>)}
                 </ul>
               </div>
 

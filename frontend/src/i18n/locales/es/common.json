@@ -125,7 +125,7 @@
       "futureApp": "Aplicación futura",
       "ideaLog": "Registro de ideas",
       "featureRoadmap": "Hoja de ruta de funciones"
-  },
+    },
     "selfCorrectingLoop": "Bucle de IA Autocorrectivo",
     "andresRobot": "Andrés the Robot"
   },
@@ -4145,6 +4145,146 @@
       "title": "🛰️ Inteligencia de amenazas reciente",
       "intro": "Un resumen en vivo, hecho por IA, de amenazas de ciberseguridad, CVEs y avisos recientes — fundamentado en fuentes web frescas con citas. Pulsa «Traer novedades» para actualizar.",
       "query": "amenazas de ciberseguridad vulnerabilidades CVE y avisos recientes 2026"
+    },
+    "topAttacks": {
+      "title": "Principales ciberataques",
+      "subtitle": "Cómo funcionan los ataques más comunes — y cómo defenderse.",
+      "sourceLabel": "Fuente",
+      "infographicCredit": "Infografía de {{name}}",
+      "viewFlow": "Ver flujo",
+      "howItWorks": "Cómo funciona",
+      "defenses": "Defensas",
+      "relatedThreats": "Amenazas relacionadas",
+      "disclaimer": "Referencia educativa, parafraseada de conocimiento público; no reproducida del material original.",
+      "class": {
+        "social": "Social",
+        "malware": "Malware",
+        "network": "Red",
+        "web": "Web",
+        "software": "Software"
+      },
+      "data": {
+        "A1": {
+          "one_liner": "Correos, mensajes o sitios engañosos que inducen a las personas a entregar credenciales o datos sensibles.",
+          "how_it_works": [
+            "El atacante envía un enlace engañoso por correo o SMS",
+            "La víctima lo abre y confía en la página falsa",
+            "La víctima introduce sus credenciales, que el atacante captura",
+            "El atacante reutiliza las credenciales robadas para acceder a las cuentas"
+          ],
+          "defenses": [
+            "Autenticación multifactor en todas las cuentas",
+            "Formación de usuarios y simulaciones de phishing",
+            "Filtrado de correo y reescritura/sandbox de enlaces",
+            "Un botón fácil de «reportar phishing»"
+          ]
+        },
+        "A2": {
+          "one_liner": "Malware que cifra tus datos y exige un pago para restaurar el acceso.",
+          "how_it_works": [
+            "El malware entra por medios infectados, phishing o un servicio expuesto",
+            "Se propaga y cifra archivos en el equipo y la red",
+            "Los datos quedan bloqueados e inaccesibles",
+            "El atacante exige un rescate para descifrarlos"
+          ],
+          "defenses": [
+            "Copias de seguridad sin conexión y probadas (regla 3-2-1)",
+            "Parchear con rapidez los servicios expuestos a Internet",
+            "EDR más segmentación de red",
+            "Mínimo privilegio y control de macros/scripts"
+          ]
+        },
+        "A3": {
+          "one_liner": "Saturar una máquina o red con tráfico para que no pueda atender a usuarios legítimos.",
+          "how_it_works": [
+            "El atacante comanda bots o abusa de resolutores DNS abiertos",
+            "Una avalancha de peticiones se dirige al servidor objetivo",
+            "Se agotan los recursos del objetivo (ancho de banda, CPU, conexiones)",
+            "El servicio se vuelve lento o queda totalmente indisponible"
+          ],
+          "defenses": [
+            "Protección DDoS / CDN con limitación de tasa",
+            "Autoescalado y depuración de tráfico aguas arriba",
+            "Distribución Anycast de los endpoints",
+            "Un runbook de incidentes de disponibilidad ensayado"
+          ]
+        },
+        "A4": {
+          "one_liner": "Interceptar y alterar en secreto la comunicación entre dos partes que creen hablar directamente.",
+          "how_it_works": [
+            "El atacante se sitúa entre el usuario y el servicio (Wi-Fi falso, trucos ARP/DNS)",
+            "El tráfico pasa por el atacante en lugar de por la conexión real",
+            "El atacante lee o modifica los mensajes en tránsito",
+            "Ninguna de las partes advierte la intercepción"
+          ],
+          "defenses": [
+            "Forzar TLS en todo (HSTS) y validar certificados",
+            "Evitar redes no confiables; usar una VPN",
+            "Fijación de certificados (pinning) en apps sensibles",
+            "Autenticación mutua cuando sea posible"
+          ]
+        },
+        "A5": {
+          "one_liner": "Inyectar SQL malicioso en las entradas para que la base de datos ejecute consultas controladas por el atacante.",
+          "how_it_works": [
+            "El atacante envía una entrada manipulada en un campo o parámetro vulnerable",
+            "La aplicación la concatena en una consulta sin el tratamiento adecuado",
+            "La base de datos ejecuta la consulta del atacante (p. ej. SELECT * FROM users)",
+            "Los datos de todos los usuarios se devuelven o se alteran para el atacante"
+          ],
+          "defenses": [
+            "Consultas parametrizadas / sentencias preparadas",
+            "Validación de entradas y cuentas de BD con mínimo privilegio",
+            "Un ORM o un constructor de consultas seguro",
+            "Un firewall de aplicaciones web (WAF) como defensa en profundidad"
+          ]
+        },
+        "A6": {
+          "one_liner": "Inyectar scripts maliciosos en páginas para que se ejecuten en los navegadores de otros visitantes.",
+          "how_it_works": [
+            "El atacante almacena o refleja un script malicioso mediante una entrada sin sanear",
+            "El servidor devuelve la página con el script incrustado",
+            "El navegador de un visitante ejecuta el script en el contexto del sitio",
+            "El script roba sesiones/datos o actúa en nombre del usuario"
+          ],
+          "defenses": [
+            "Codificación/escape de salida según el contexto",
+            "Una Content-Security-Policy (CSP) estricta",
+            "Sanear y validar toda la entrada del usuario",
+            "Cookies HttpOnly y SameSite"
+          ]
+        },
+        "A7": {
+          "one_liner": "Ataques que explotan vulnerabilidades desconocidas antes de que exista un parche.",
+          "how_it_works": [
+            "Existe un fallo de seguridad, pero el proveedor lo desconoce",
+            "Un atacante lo descubre antes que nadie",
+            "Se lanza el exploit contra sistemas sin parchear",
+            "Los desarrolladores detectan el ataque y corren para mitigarlo"
+          ],
+          "defenses": [
+            "Defensa en profundidad para que un solo fallo no baste",
+            "Parcheo rápido y parcheo virtual (WAF/IPS)",
+            "EDR y detección de anomalías para detectar la explotación",
+            "Inteligencia de amenazas y respuesta a incidentes ágil"
+          ]
+        },
+        "A8": {
+          "one_liner": "Envenenar las respuestas DNS para enviar a las víctimas a sitios maliciosos sin que lo noten.",
+          "how_it_works": [
+            "El atacante inyecta una entrada DNS falsa en un resolutor o en el camino",
+            "La petición de la víctima a un sitio real es interceptada",
+            "La respuesta envenenada resuelve al sitio del atacante",
+            "La víctima aterriza en el sitio falso y es engañada"
+          ],
+          "defenses": [
+            "Validación DNSSEC",
+            "DNS sobre HTTPS/TLS (resolución cifrada)",
+            "Resolutores de confianza y endurecidos",
+            "HSTS y validación de certificados en los clientes"
+          ]
+        }
+      }
     }
   },
   "hologramGuide": {

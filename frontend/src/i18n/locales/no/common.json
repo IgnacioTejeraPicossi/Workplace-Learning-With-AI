@@ -3997,6 +3997,146 @@
       "title": "🛰️ Nylig trusselinformasjon",
       "intro": "Et sanntids, AI-oppsummert sammendrag av nylige cybersikkerhetstrusler, CVE-er og varsler — basert på ferske nettkilder med kildehenvisninger. Trykk «Hent siste» for å oppdatere.",
       "query": "nylige cybersikkerhetstrusler sårbarheter CVE og varsler 2026"
+    },
+    "topAttacks": {
+      "title": "Topp cyberangrep",
+      "subtitle": "Slik fungerer de vanligste angrepene – og hvordan du forsvarer deg.",
+      "sourceLabel": "Kilde",
+      "infographicCredit": "Infografikk av {{name}}",
+      "viewFlow": "Se flyt",
+      "howItWorks": "Slik fungerer det",
+      "defenses": "Forsvar",
+      "relatedThreats": "Relaterte trusler",
+      "disclaimer": "Pedagogisk referanse, omskrevet fra offentlig kunnskap; ikke gjengitt fra originalgrafikken.",
+      "class": {
+        "social": "Sosial",
+        "malware": "Skadevare",
+        "network": "Nettverk",
+        "web": "Web",
+        "software": "Programvare"
+      },
+      "data": {
+        "A1": {
+          "one_liner": "Villedende e-poster, meldinger eller nettsteder som lurer folk til å oppgi påloggingsdetaljer eller sensitive data.",
+          "how_it_works": [
+            "Angriperen sender en villedende lenke på e-post eller SMS",
+            "Offeret åpner den og stoler på den falske siden",
+            "Offeret taster inn påloggingsdetaljer, som angriperen fanger opp",
+            "Angriperen bruker de stjålne detaljene til å få tilgang til kontoer"
+          ],
+          "defenses": [
+            "Tofaktorautentisering på alle kontoer",
+            "Opplæring av brukere og phishing-simuleringer",
+            "E-postfiltrering og omskriving/sandkasse av lenker",
+            "En enkel «rapporter phishing»-knapp"
+          ]
+        },
+        "A2": {
+          "one_liner": "Skadevare som krypterer dataene dine og krever betaling for å gi tilgang tilbake.",
+          "how_it_works": [
+            "Skadevaren kommer inn via infiserte medier, phishing eller en eksponert tjeneste",
+            "Den sprer seg og krypterer filer på maskinen og i nettverket",
+            "Dataene låses og er ikke lenger tilgjengelige",
+            "Angriperen krever løsepenger for å dekryptere dem"
+          ],
+          "defenses": [
+            "Frakoblede, testede sikkerhetskopier (3-2-1-regelen)",
+            "Oppdater internettvendte tjenester raskt",
+            "EDR pluss nettverkssegmentering",
+            "Minste privilegium og kontroll på makroer/skript"
+          ]
+        },
+        "A3": {
+          "one_liner": "Å overvelde en maskin eller et nettverk med trafikk slik at det ikke lenger kan betjene legitime brukere.",
+          "how_it_works": [
+            "Angriperen styrer bot-nett eller misbruker åpne DNS-servere",
+            "En flom av forespørsler rettes mot målserveren",
+            "Målets ressurser (båndbredde, CPU, tilkoblinger) tømmes",
+            "Tjenesten blir treg eller helt utilgjengelig"
+          ],
+          "defenses": [
+            "DDoS-beskyttelse / CDN med hastighetsbegrensning",
+            "Autoskalering og rensing av trafikk oppstrøms",
+            "Anycast-distribusjon av endepunkter",
+            "En innøvd beredskapsplan for tilgjengelighet"
+          ]
+        },
+        "A4": {
+          "one_liner": "Å i hemmelighet avlytte og endre kommunikasjon mellom to parter som tror de snakker direkte.",
+          "how_it_works": [
+            "Angriperen plasserer seg mellom brukeren og tjenesten (falskt Wi-Fi, ARP/DNS-triks)",
+            "Trafikken går gjennom angriperen i stedet for den ekte forbindelsen",
+            "Angriperen leser eller endrer meldinger underveis",
+            "Ingen av partene merker avlyttingen"
+          ],
+          "defenses": [
+            "Krev TLS overalt (HSTS) og valider sertifikater",
+            "Unngå upålitelige nettverk; bruk VPN",
+            "Sertifikat-pinning for sensitive apper",
+            "Gjensidig autentisering der det er mulig"
+          ]
+        },
+        "A5": {
+          "one_liner": "Å injisere ondsinnet SQL i inndata slik at databasen kjører angriperstyrte spørringer.",
+          "how_it_works": [
+            "Angriperen sender spesiallaget inndata i et sårbart felt eller en URL-parameter",
+            "Appen setter det sammen til en databasespørring uten riktig håndtering",
+            "Databasen kjører angriperens spørring (f.eks. SELECT * FROM users)",
+            "Data for alle brukere returneres til, eller endres av, angriperen"
+          ],
+          "defenses": [
+            "Parameteriserte spørringer / forberedte setninger",
+            "Validering av inndata og databasekontoer med minste privilegium",
+            "En ORM eller trygg spørringsbygger",
+            "En web-brannmur (WAF) som ekstra forsvar"
+          ]
+        },
+        "A6": {
+          "one_liner": "Å injisere ondsinnede skript på sider slik at de kjører i andre besøkendes nettlesere.",
+          "how_it_works": [
+            "Angriperen lagrer eller reflekterer et ondsinnet skript via usanert inndata",
+            "Serveren returnerer siden med skriptet innebygd",
+            "En besøkendes nettleser kjører skriptet i nettstedets kontekst",
+            "Skriptet stjeler økter/data eller handler på brukerens vegne"
+          ],
+          "defenses": [
+            "Kontekstbevisst koding/escaping av utdata",
+            "En streng Content-Security-Policy (CSP)",
+            "Saner og valider all inndata fra brukere",
+            "HttpOnly- og SameSite-informasjonskapsler"
+          ]
+        },
+        "A7": {
+          "one_liner": "Angrep som utnytter ukjente sårbarheter før det finnes en rettelse.",
+          "how_it_works": [
+            "En sikkerhetsfeil finnes, men er ukjent for leverandøren",
+            "En angriper oppdager den før noen andre",
+            "Utnyttelsen settes inn mot uoppdaterte systemer",
+            "Utviklere oppdager angrepet og kappløper for å begrense det"
+          ],
+          "defenses": [
+            "Forsvar i dybden slik at én feil ikke er nok",
+            "Rask oppdatering og virtuell patching (WAF/IPS)",
+            "EDR og avviksdeteksjon for å fange utnyttelse",
+            "Trusseletterretning og rask hendelseshåndtering"
+          ]
+        },
+        "A8": {
+          "one_liner": "Å forgifte DNS-svar slik at ofre sendes til ondsinnede nettsteder uten å merke det.",
+          "how_it_works": [
+            "Angriperen injiserer en falsk DNS-oppføring i en resolver eller på veien",
+            "Offerets forespørsel til et ekte nettsted avskjæres",
+            "Det forgiftede svaret peker til angriperens nettsted",
+            "Offeret havner på det falske nettstedet og blir lurt"
+          ],
+          "defenses": [
+            "DNSSEC-validering",
+            "DNS over HTTPS/TLS (kryptert oppslag)",
+            "Pålitelige, herdede resolvere",
+            "HSTS og sertifikatvalidering hos klienter"
+          ]
+        }
+      }
     }
   },
   "ai": {
