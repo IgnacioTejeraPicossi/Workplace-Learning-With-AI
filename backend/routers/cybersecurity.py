@@ -19,7 +19,7 @@ from backend.models.cyber_models import (
     ComplianceStatus, VulnerabilityScanRequest, CyberRAGRequest,
     SecureCodingLessonRequest, CyberRAGResponse, SecureCodingLessonResponse,
     ScanResult, SeverityLevel, ComplianceUpdateRequest, CoachTopic,
-    DrillScenario, DrillStep, DrillSession, KnowledgeArticle
+    DrillScenario, DrillStep, DrillSession, KnowledgeArticle, TopAttack
 )
 import uuid
 
@@ -101,6 +101,172 @@ _MOCK_THREATS = [
         controls=["NIST-CSF:PR.IP-1", "CIS:8.1"],
         tags=["supply-chain", "dependencies", "third-party"]
     )
+]
+
+# --- Curated "Top Cyber Attacks 2026" reference (Threat Library panel) ---
+# Content paraphrased from widely-documented attack patterns; surfaced via the
+# "Cyber Threat Intelligence" channel the owner follows. The original infographic
+# is by Cyber Security News — we recreate the content as native UI, we do NOT
+# reproduce the image. `source` carries the attribution shown in the panel.
+_ATTACK_SRC = {
+    "name": "Cyber Threat Intelligence",
+    "url": "https://www.linkedin.com/company/cyber-threat-intel/",
+    "infographic": "Cyber Security News",
+}
+
+_TOP_ATTACKS = [
+    TopAttack(
+        id="A1", rank=1, name="Phishing", attack_class="social",
+        one_liner="Deceptive emails, texts, or websites that trick people into handing over credentials or sensitive data.",
+        how_it_works=[
+            "Attacker sends a deceptive link by email or text",
+            "The victim opens it and trusts the fake page",
+            "The victim enters credentials, which the attacker captures",
+            "Attacker reuses the stolen credentials to access accounts",
+        ],
+        cia_impact={"C": 8, "I": 5, "A": 3}, severity=SeverityLevel.HIGH,
+        defenses=[
+            "Multi-factor authentication on every account",
+            "User-awareness training and phishing simulations",
+            "Email filtering and link rewriting / sandboxing",
+            "An easy 'report phishing' button",
+        ],
+        related_threats=["T001"], related_controls=["NIST-CSF:PR.AC-1", "OWASP-ASVS:2.1"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A2", rank=2, name="Ransomware", attack_class="malware",
+        one_liner="Malware that encrypts your data and demands a payment to restore access.",
+        how_it_works=[
+            "Malware enters via infected media, phishing, or an exposed service",
+            "It spreads and encrypts files across the host and network",
+            "Data is locked and no longer accessible",
+            "The attacker demands a ransom to decrypt it",
+        ],
+        cia_impact={"C": 5, "I": 7, "A": 9}, severity=SeverityLevel.CRITICAL,
+        defenses=[
+            "Offline, tested backups (3-2-1 rule)",
+            "Patch internet-facing services promptly",
+            "EDR plus network segmentation",
+            "Least privilege and macro/script controls",
+        ],
+        related_threats=["T002"], related_controls=["CIS:1.1", "NIST-CSF:PR.DS-1"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A3", rank=3, name="Denial-of-Service (DoS)", attack_class="network",
+        one_liner="Overwhelming a machine or network with traffic so it can no longer serve legitimate users.",
+        how_it_works=[
+            "Attacker commands bots or abuses open DNS resolvers",
+            "A flood of requests is aimed at the target server",
+            "The target's resources (bandwidth, CPU, connections) are exhausted",
+            "The service becomes slow or fully unavailable",
+        ],
+        cia_impact={"C": 1, "I": 1, "A": 9}, severity=SeverityLevel.HIGH,
+        defenses=[
+            "DDoS protection / CDN with rate limiting",
+            "Autoscaling and upstream traffic scrubbing",
+            "Anycast distribution of endpoints",
+            "A rehearsed availability incident runbook",
+        ],
+        related_threats=[], related_controls=[],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A4", rank=4, name="Man-in-the-Middle (MitM)", attack_class="network",
+        one_liner="Secretly intercepting and altering communication between two parties who believe they talk directly.",
+        how_it_works=[
+            "Attacker positions between the user and the service (rogue Wi-Fi, ARP/DNS tricks)",
+            "Traffic is relayed through the attacker instead of the real connection",
+            "The attacker reads or modifies messages in transit",
+            "Neither party notices the interception",
+        ],
+        cia_impact={"C": 8, "I": 8, "A": 2}, severity=SeverityLevel.HIGH,
+        defenses=[
+            "Enforce TLS everywhere (HSTS) and validate certificates",
+            "Avoid untrusted networks; use a VPN",
+            "Certificate pinning for sensitive apps",
+            "Mutual authentication where possible",
+        ],
+        related_threats=[], related_controls=["NIST-CSF:PR.DS-2"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A5", rank=5, name="SQL Injection", attack_class="web",
+        one_liner="Injecting malicious SQL into inputs so the database runs attacker-controlled queries.",
+        how_it_works=[
+            "Attacker submits crafted input into a vulnerable field or URL parameter",
+            "The app concatenates it into a database query without proper handling",
+            "The database executes the attacker's query (e.g. SELECT * FROM users)",
+            "Data for all users is returned to, or altered by, the attacker",
+        ],
+        cia_impact={"C": 9, "I": 9, "A": 4}, severity=SeverityLevel.HIGH,
+        defenses=[
+            "Parameterized queries / prepared statements",
+            "Input validation and least-privilege DB accounts",
+            "An ORM or safe query builder",
+            "A web application firewall as defense-in-depth",
+        ],
+        related_threats=["T003"], related_controls=["OWASP-TOP10:A03", "NIST-CSF:PR.DS-2"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A6", rank=6, name="Cross-Site Scripting (XSS)", attack_class="web",
+        one_liner="Injecting malicious scripts into pages so they run in other visitors' browsers.",
+        how_it_works=[
+            "Attacker stores or reflects a malicious script via an unsanitized input",
+            "The server returns the page with the script embedded",
+            "A visitor's browser runs the script in the site's context",
+            "The script steals sessions/data or acts on the user's behalf",
+        ],
+        cia_impact={"C": 7, "I": 6, "A": 2}, severity=SeverityLevel.MEDIUM,
+        defenses=[
+            "Context-aware output encoding / escaping",
+            "A strict Content-Security-Policy (CSP)",
+            "Sanitize and validate all user input",
+            "HttpOnly and SameSite cookies",
+        ],
+        related_threats=[], related_controls=["OWASP-TOP10:A03"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A7", rank=7, name="Zero-Day Exploits", attack_class="software",
+        one_liner="Attacks that exploit unknown vulnerabilities before a fix exists.",
+        how_it_works=[
+            "A security flaw exists but is unknown to the vendor",
+            "An attacker discovers it before anyone else",
+            "The exploit is launched against unpatched systems",
+            "Developers detect the attack and race to mitigate it",
+        ],
+        cia_impact={"C": 8, "I": 8, "A": 7}, severity=SeverityLevel.CRITICAL,
+        defenses=[
+            "Defense-in-depth so one flaw isn't enough",
+            "Fast patching and virtual patching (WAF/IPS)",
+            "EDR and anomaly detection to catch exploitation",
+            "Threat intelligence and rapid incident response",
+        ],
+        related_threats=[], related_controls=["NIST-CSF:PR.IP-1"],
+        year=2026, source=_ATTACK_SRC,
+    ),
+    TopAttack(
+        id="A8", rank=8, name="DNS Spoofing", attack_class="network",
+        one_liner="Poisoning DNS answers so victims are sent to malicious sites without realizing it.",
+        how_it_works=[
+            "Attacker injects a fake DNS entry into a resolver or the path",
+            "The victim's request to a real website is intercepted",
+            "The poisoned answer resolves to the attacker's site",
+            "The victim lands on the fake site and is deceived",
+        ],
+        cia_impact={"C": 7, "I": 7, "A": 4}, severity=SeverityLevel.MEDIUM,
+        defenses=[
+            "DNSSEC validation",
+            "DNS over HTTPS/TLS (encrypted resolution)",
+            "Trusted, hardened resolvers",
+            "HSTS and certificate validation on clients",
+        ],
+        related_threats=[], related_controls=[],
+        year=2026, source=_ATTACK_SRC,
+    ),
 ]
 
 _MOCK_CONTROLS = [
@@ -255,6 +421,15 @@ async def get_control(control_id: str):
         if control.id == control_id:
             return control
     raise HTTPException(status_code=404, detail="Control not found")
+
+@router.get("/top-attacks", response_model=List[TopAttack])
+async def list_top_attacks():
+    """Curated 'Top Cyber Attacks' reference with step-by-step flows + defenses.
+
+    A dated, educational catalog (paraphrased, source-credited) shown as a panel
+    in the Threat Library. Ordered by editorial rank.
+    """
+    return sorted(_TOP_ATTACKS, key=lambda a: a.rank)
 
 @router.get("/vulnerabilities", response_model=List[Vulnerability])
 async def list_vulnerabilities(project: str = "default", severity: Optional[str] = None):

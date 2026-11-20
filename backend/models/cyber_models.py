@@ -182,3 +182,27 @@ class KnowledgeArticle(BaseModel):
     tags: List[str] = []
     difficulty: str = "intermediate"
     reading_minutes: int = 5
+
+# --- Curated "Top Cyber Attacks" reference (Threat Library panel) ---
+
+class TopAttack(BaseModel):
+    """A curated, dated attack technique with a step-by-step 'how it works' flow.
+
+    Complements Threat (which models CIA impact + framework controls) by keeping
+    the educational attack flow the Threat model does not carry. Content is
+    paraphrased from public knowledge; `source` credits the channel that
+    surfaced it. Cross-links to existing Threat/ControlMap ids where relevant.
+    """
+    id: str                                   # e.g. "A1"
+    rank: int                                 # 1-8 (editorial order)
+    name: str
+    attack_class: str                         # "social", "malware", "network", "web", "software"
+    one_liner: str
+    how_it_works: List[str] = []              # ordered flow steps
+    cia_impact: Dict[str, int] = Field(default={"C": 0, "I": 0, "A": 0})  # 0-10
+    severity: SeverityLevel = SeverityLevel.HIGH
+    defenses: List[str] = []                  # brief mitigations
+    related_threats: List[str] = []           # existing Threat ids
+    related_controls: List[str] = []          # existing ControlMap ids
+    year: int = 2026
+    source: Dict[str, str] = {}               # {name, url, infographic}
