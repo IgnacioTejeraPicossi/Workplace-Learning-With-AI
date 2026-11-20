@@ -3317,7 +3317,15 @@
       "firewall": "Cortafuegos",
       "firewallDesc": "Mantén activado el firewall de tu sistema operativo",
       "updates": "Actualizaciones",
-      "updatesDesc": "Mantén tu navegador y sistema operativo actualizados"
+      "updatesDesc": "Mantén tu navegador y sistema operativo actualizados",
+      "passphraseTitle": "Activar cifrado local",
+      "passphraseHint": "Elige una frase de contraseña para cifrar tus datos locales. Guárdala bien — no se puede recuperar.",
+      "passphraseLabel": "Frase de contraseña",
+      "passphraseConfirm": "Confirmar frase de contraseña",
+      "passphraseEmpty": "Introduce una frase de contraseña.",
+      "passphraseMismatch": "Las frases de contraseña no coinciden.",
+      "passphraseEnable": "Activar cifrado",
+      "passphraseCancel": "Cancelar"
     },
     "dataDeletion": {
       "label": "Eliminación automática de datos",

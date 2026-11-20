@@ -163,6 +163,25 @@ const YourData = () => {
     transition: 'all 0.2s ease'
   });
 
+  // Keyboard-operable collapsible header props (role=button + Enter/Space).
+  const toggleSection = (key, onOpen) => {
+    const opening = activeSection !== key;
+    setActiveSection(opening ? key : null);
+    if (opening && onOpen) onOpen();
+  };
+  const sectionA11y = (key, onOpen) => ({
+    role: 'button',
+    tabIndex: 0,
+    'aria-expanded': activeSection === key,
+    onClick: () => toggleSection(key, onOpen),
+    onKeyDown: (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleSection(key, onOpen);
+      }
+    },
+  });
+
   return (
     <div style={{ padding: '24px', maxWidth: '900px' }}>
       <h3 style={{ color: colors.primary, marginBottom: '20px' }}>
@@ -202,7 +221,7 @@ const YourData = () => {
         {/* Personal Information */}
         <div
           style={sectionBtnStyle(activeSection === 'profile')}
-          onClick={() => setActiveSection(activeSection === 'profile' ? null : 'profile')}
+          {...sectionA11y('profile')}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '20px' }}>👤</span>
@@ -296,7 +315,7 @@ const YourData = () => {
         {/* Export Data */}
         <div
           style={sectionBtnStyle(activeSection === 'export')}
-          onClick={() => setActiveSection(activeSection === 'export' ? null : 'export')}
+          {...sectionA11y('export')}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '20px' }}>📦</span>
@@ -352,7 +371,7 @@ const YourData = () => {
         {/* Usage Statistics */}
         <div
           style={sectionBtnStyle(activeSection === 'stats')}
-          onClick={() => { setActiveSection(activeSection === 'stats' ? null : 'stats'); refreshStats(); }}
+          {...sectionA11y('stats', refreshStats)}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '20px' }}>📈</span>
@@ -403,7 +422,7 @@ const YourData = () => {
         {/* Account Deletion */}
         <div
           style={sectionBtnStyle(activeSection === 'delete')}
-          onClick={() => setActiveSection(activeSection === 'delete' ? null : 'delete')}
+          {...sectionA11y('delete')}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '20px' }}>⚠️</span>

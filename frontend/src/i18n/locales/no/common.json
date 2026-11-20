@@ -1585,7 +1585,15 @@
       "firewall": "Brannmur",
       "firewallDesc": "Hold operativsystemets brannmur på",
       "updates": "Oppdateringer",
-      "updatesDesc": "Hold nettleseren og operativsystemet oppdatert"
+      "updatesDesc": "Hold nettleseren og operativsystemet oppdatert",
+      "passphraseTitle": "Aktiver lokal kryptering",
+      "passphraseHint": "Velg en passordfrase for å kryptere dine lokale data. Oppbevar den trygt — den kan ikke gjenopprettes.",
+      "passphraseLabel": "Passordfrase",
+      "passphraseConfirm": "Bekreft passordfrase",
+      "passphraseEmpty": "Skriv inn en passordfrase.",
+      "passphraseMismatch": "Passordfrasene er ikke like.",
+      "passphraseEnable": "Aktiver kryptering",
+      "passphraseCancel": "Avbryt"
     },
     "dataDeletion": {
       "label": "Automatisk datasletting",

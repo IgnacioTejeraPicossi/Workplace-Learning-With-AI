@@ -1263,7 +1263,15 @@
       "firewall": "Firewall",
       "firewallDesc": "Keep your operating system firewall enabled",
       "updates": "Updates",
-      "updatesDesc": "Keep your browser and operating system up to date"
+      "updatesDesc": "Keep your browser and operating system up to date",
+      "passphraseTitle": "Enable local encryption",
+      "passphraseHint": "Choose a passphrase to encrypt your local data. Store it safely — it cannot be recovered.",
+      "passphraseLabel": "Passphrase",
+      "passphraseConfirm": "Confirm passphrase",
+      "passphraseEmpty": "Enter a passphrase.",
+      "passphraseMismatch": "The passphrases do not match.",
+      "passphraseEnable": "Enable encryption",
+      "passphraseCancel": "Cancel"
     },
     "dataDeletion": {
       "label": "Automatic Data Deletion",

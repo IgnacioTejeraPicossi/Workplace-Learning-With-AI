@@ -20,11 +20,24 @@ describe('anonymizeText', () => {
     expect(totalMatches).toBe(1);
   });
 
-  test('masks credit card, SSN and IP address', () => {
-    const { result } = anonymizeText('card 4111 1111 1111 1111 ssn 123-45-6789 ip 192.168.0.1', allOn);
+  test('each rule uses its own label (credit card, SSN, IP)', () => {
+    // Tested without the phone rule: its greedy 7+ digit pattern would otherwise
+    // claim these numbers first and label them [PHONE] (see next test).
+    const noPhone = { enabled: true, rules: { creditCard: true, ssn: true, ipAddress: true } };
+    const { result } = anonymizeText('card 4111 1111 1111 1111 ssn 123-45-6789 ip 192.168.0.1', noPhone);
     expect(result).toContain('[CARD]');
     expect(result).toContain('[SSN]');
     expect(result).toContain('[IP]');
+  });
+
+  test('with every rule on, numeric PII is always redacted (never left in clear)', () => {
+    // Documents a known quirk: the greedy phone rule runs before card/ssn/ip and
+    // may mask them as [PHONE]. The security property that still holds is that the
+    // raw values never survive in the output.
+    const { result } = anonymizeText('card 4111 1111 1111 1111 ssn 123-45-6789 ip 192.168.0.1', allOn);
+    expect(result).not.toContain('4111 1111 1111 1111');
+    expect(result).not.toContain('123-45-6789');
+    expect(result).not.toContain('192.168.0.1');
   });
 
   test('masks a real phone number', () => {

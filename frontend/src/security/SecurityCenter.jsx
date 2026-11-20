@@ -123,7 +123,16 @@ const SecurityCenter = () => {
           {securityOptions.map((option) => (
             <div
               key={option.key}
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedOption === option.key}
               onClick={() => setSelectedOption(option.key)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedOption(option.key);
+                }
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
