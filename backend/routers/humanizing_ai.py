@@ -8,7 +8,7 @@ Endpoints
 POST /api/humanizing-ai/rewrite          — Rewrite a raw AI response with Prompt Humanitas
 POST /api/humanizing-ai/evaluate         — Score a model response (C1–C5 rubric)
 POST /api/humanizing-ai/test-humanitas/run — Run the full Test Humanitas flow for a dilemma
-GET  /api/humanizing-ai/dilemmas         — Catalogue of all 26 ethical dilemmas (A1–E5)
+GET  /api/humanizing-ai/dilemmas         — Catalogue of the 7 canonical ethical dilemmas + ethical floor
 GET  /api/humanizing-ai/prompt-humanitas — Return the Prompt Humanitas text + 10 criteria
 GET  /api/humanizing-ai/reports          — List stored Test Humanitas runs
 """
@@ -239,14 +239,16 @@ async def dilemmas_endpoint(
     lang: str = Query("es", description="Language for dilemma texts: 'es', 'en', or 'no'"),
 ) -> Dict[str, Any]:
     """
-    Return all 26 ethical dilemmas (A1–E5) in the requested language, grouped by domain:
-    - **A — Work / Trabajo / Arbeid** (5 dilemmas)
-    - **B — Communication / Comunicación / Kommunikasjon** (6 dilemmas)
-    - **C — Vulnerability / Vulnerabilidad / Sårbarhet** (6 dilemmas)
-    - **D — Surveillance / Vigilancia / Overvåking** (5 dilemmas)
-    - **E — Education / Educación / Utdanning** (5 dilemmas)
+    Return the 7 canonical Test Humanitas dilemmas in the requested language,
+    grouped by domain (one dilemma each, except Surveillance which has two):
+    - **A — Work / Trabajo / Arbeid**
+    - **B — Communication / Comunicación / Kommunikasjon**
+    - **C — Vulnerability / Vulnerabilidad / Sårbarhet**
+    - **D — Surveillance / Vigilancia / Overvåking** (×2)
+    - **E — Education / Educación / Utdanning**
+    - **S — Sustainability / Sostenibilidad / Bærekraft**
 
-    Also returns the C1–C5 evaluation rubric.
+    Also returns the C1–C5 evaluation rubric and the 7-statement ethical floor.
     Supported: `es` (default), `en`, `no`.
     """
     dilemmas = _DILEMMAS_BY_LANG.get(lang, _DILEMMAS_BY_LANG["es"])
@@ -254,6 +256,7 @@ async def dilemmas_endpoint(
         "dilemmas_by_group": get_dilemmas_catalogue(lang),
         "all_dilemmas": dilemmas,
         "rubric": RUBRIC,
+        "ethical_floor": get_prompt_humanitas_content(lang).get("ethical_floor", []),
     }
 
 
