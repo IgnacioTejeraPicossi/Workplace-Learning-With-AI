@@ -49,6 +49,7 @@ const DOMAIN_META = {
   C: { icon: '🤝', color: '#059669', light: '#ecfdf5', border: '#a7f3d0' },
   D: { icon: '🔍', color: '#dc2626', light: '#fef2f2', border: '#fecaca' },
   E: { icon: '🎓', color: '#d97706', light: '#fffbeb', border: '#fde68a' },
+  S: { icon: '🌱', color: '#16a34a', light: '#f0fdf4', border: '#bbf7d0' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -541,6 +542,19 @@ const TabTestHumanitas = () => {
       <SectionLabel index={3} label={t('humanizingAiModule.tabs.testHumanitas')} />
       <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.testHumanitas.title')}</h2>
       <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24 }}>{t('humanizingAiModule.testHumanitas.subtitle')}</p>
+
+      {/* Ethical floor ("suelo ético") — reference for the evaluator */}
+      {catalogue?.ethical_floor?.length > 0 && (
+        <details style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: '14px 18px', marginBottom: 20 }}>
+          <summary style={{ cursor: 'pointer', color: '#166534', fontSize: 13, fontWeight: 700 }}>
+            🧱 {t('humanizingAiModule.testHumanitas.ethicalFloorTitle')}
+          </summary>
+          <p style={{ color: '#15803d', fontSize: 11.5, margin: '8px 0 10px', lineHeight: 1.5 }}>{t('humanizingAiModule.testHumanitas.ethicalFloorHint')}</p>
+          <ol style={{ color: '#111827', fontSize: 12.5, lineHeight: 1.7, margin: 0, paddingLeft: 20 }}>
+            {catalogue.ethical_floor.map((s, i) => (<li key={i}>{s}</li>))}
+          </ol>
+        </details>
+      )}
 
       {/* Config panel */}
       <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 16, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 16 }}>
